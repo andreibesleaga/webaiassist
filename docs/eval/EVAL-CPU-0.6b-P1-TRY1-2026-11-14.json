@@ -1,0 +1,173 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 289,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 36.4,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor (small; in this browser, on your processor and memory; 397 MB download; needs about 0.8 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3 0.6B on the processor: 0 of 397 MB (0%)",
+      "Downloading Qwen3 0.6B on the processor: 45 of 397 MB (11%)",
+      "Downloading Qwen3 0.6B on the processor: 89 of 397 MB (22%)",
+      "Downloading Qwen3 0.6B on the processor: 134 of 397 MB (34%)",
+      "Downloading Qwen3 0.6B on the processor: 179 of 397 MB (45%)",
+      "Downloading Qwen3 0.6B on the processor: 222 of 397 MB (56%)",
+      "Downloading Qwen3 0.6B on the processor: 268 of 397 MB (67%)",
+      "Downloading Qwen3 0.6B on the processor: 312 of 397 MB (79%)",
+      "Downloading Qwen3 0.6B on the processor: 354 of 397 MB (89%)",
+      "Downloading Qwen3 0.6B on the processor: 397 of 397 MB (100%)",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 91.7,
+        "totalS": 92
+      },
+      "answer": "The site mentions handoffs as a process where tasks are transferred between agents, which is part of the AGSC-07 closure algebra.",
+      "speeds": [
+        {
+          "promptTokens": 1065,
+          "promptPerSecond": 12.7,
+          "replyTokens": 34,
+          "replyPerSecond": 4.5
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 13,
+        "totalS": 13
+      },
+      "answer": "The site mentions that agents share work through processes like handoffs, which are part of the AGSC-07 closure algebra.",
+      "speeds": [
+        {
+          "promptTokens": 58,
+          "promptPerSecond": 11.4,
+          "replyTokens": 32,
+          "replyPerSecond": 4.1
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 13.8,
+        "totalS": 13.9
+      },
+      "answer": "The site mentions that review is a process used to evaluate and refine tasks, which is part of the AGSC-07 closure algebra.",
+      "speeds": [
+        {
+          "promptTokens": 50,
+          "promptPerSecond": 12.6,
+          "replyTokens": 34,
+          "replyPerSecond": 3.4
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 15.1,
+        "totalS": 15.3
+      },
+      "answer": "The site mentions that memory is used to store and retrieve information about tasks and their progress.",
+      "speeds": [
+        {
+          "promptTokens": 52,
+          "promptPerSecond": 8.5,
+          "replyTokens": 24,
+          "replyPerSecond": 2.6
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 24.6,
+        "totalS": 24.6
+      },
+      "answer": "The site mentions that guardrails are processes to ensure tasks are completed correctly and efficiently, part of the AGSC-07 closure algebra.",
+      "speeds": [
+        {
+          "promptTokens": 45,
+          "promptPerSecond": 10.4,
+          "replyTokens": 34,
+          "replyPerSecond": 1.6
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 17.3,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor (small; in this browser, on your processor and memory; 397 MB download; needs about 0.8 GB of memory; Apache-2.0)…",
+      "Loading Qwen3 0.6B on the processor into memory…",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

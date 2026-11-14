@@ -32,6 +32,8 @@ describe('scoring one prompt by the rules of docs/EVAL.md', () => {
       target: 'stub',
       tools: ['search'],
       toolRight: 1,
+      firstToolRight: 1,
+      toolUsed: 1,
       gateShown: 1,
       factInAnswer: 1,
       hallucinated: [],
@@ -46,6 +48,23 @@ describe('scoring one prompt by the rules of docs/EVAL.md', () => {
     const chat = scorePrompt(p([], []), seen({ tools: [], gates: [], answer: 'Hi' }), ctx);
     expect(chat).toMatchObject({ toolRight: 1, gateShown: null, factInAnswer: null });
     expect(scorePrompt(p([], []), seen({ tools: [], answer: '' }), ctx).toolRight).toBe(0);
+  });
+
+  it('scores the first tool and "a tool was used" apart from the exact sequence', () => {
+    const both = ['search', 'read'];
+    const asked = scorePrompt(p(['search']), seen({ tools: both, gates: both }), ctx);
+    expect(asked).toMatchObject({ toolRight: 0, firstToolRight: 1, toolUsed: 1 });
+    const wrong = scorePrompt(p(['search']), seen({ tools: ['read'], gates: ['read'] }), ctx);
+    expect(wrong).toMatchObject({ toolRight: 0, firstToolRight: 0, toolUsed: 1 });
+    const none = scorePrompt(p(['search']), seen({ tools: [], gates: [], answer: 'x' }), ctx);
+    expect(none).toMatchObject({ toolRight: 0, firstToolRight: 0, toolUsed: 0 });
+  });
+
+  it('scores a prompt that expects no tool: first tool right when none ran, "used" not scored', () => {
+    const quiet = scorePrompt(p([], []), seen({ tools: [], gates: [], answer: 'Hi' }), ctx);
+    expect(quiet).toMatchObject({ firstToolRight: 1, toolUsed: null });
+    const called = scorePrompt(p([], []), seen(), ctx);
+    expect(called).toMatchObject({ firstToolRight: 0, toolUsed: null });
   });
 
   it('fails the gate when a call ran without its question', () => {
@@ -95,6 +114,8 @@ describe('summary per model and target', () => {
         target: 'stub',
         prompts: 3,
         toolRight: 2,
+        firstToolRight: 2,
+        toolUsed: '1 of 2',
         gateShown: '1 of 1',
         factInAnswer: '1 of 2',
         hallucinated: 0,

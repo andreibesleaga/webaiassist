@@ -1,0 +1,227 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 78,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 77,
+    "status": "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3.5 2B on the processor (newer, for tools, slower than Qwen3 1.7B; in this browser, on your processor and memory; 1.3 GB download; needs about 1.7 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3.5 2B on the processor: 0 of 1281 MB (0%)",
+      "Downloading Qwen3.5 2B on the processor: 142 of 1281 MB (11%)",
+      "Downloading Qwen3.5 2B on the processor: 288 of 1281 MB (22%)",
+      "Downloading Qwen3.5 2B on the processor: 428 of 1281 MB (33%)",
+      "Downloading Qwen3.5 2B on the processor: 571 of 1281 MB (45%)",
+      "Downloading Qwen3.5 2B on the processor: 714 of 1281 MB (56%)",
+      "Downloading Qwen3.5 2B on the processor: 857 of 1281 MB (67%)",
+      "Downloading Qwen3.5 2B on the processor: 1000 of 1281 MB (78%)",
+      "Downloading Qwen3.5 2B on the processor: 1139 of 1281 MB (89%)",
+      "Downloading Qwen3.5 2B on the processor: 1281 of 1281 MB (100%)",
+      "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 155.7,
+        "totalS": 187.6
+      },
+      "answer": "The site describes 'handoffs' as the process where work passes between agents, with context involved. It is linked to items such as release, requires, review, reviewer, and the concept of context. The site also mentions a specific node named 'handoff' that deals with this mechanism.",
+      "speeds": [
+        {
+          "promptTokens": 1117,
+          "promptPerSecond": 7.3,
+          "replyTokens": 13,
+          "replyPerSecond": 4.8
+        },
+        {
+          "promptTokens": 125,
+          "promptPerSecond": 7.1,
+          "replyTokens": 64,
+          "replyPerSecond": 4.6
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "compose"
+        ],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 102,
+        "totalS": 135.1
+      },
+      "answer": "Based on the composition brief, the site identifies 'handoff' as the item that describes 'how work passes between agents, with context'. It also notes that 'review' is a reviewer checking the result. The site explicitly states that 'handoff' is the mechanism for work passing between agents, which directly answers the question about how agents share work.",
+      "speeds": [
+        {
+          "promptTokens": 711,
+          "promptPerSecond": 7.2,
+          "replyTokens": 14,
+          "replyPerSecond": 4.6
+        },
+        {
+          "promptTokens": 119,
+          "promptPerSecond": 7.1,
+          "replyTokens": 76,
+          "replyPerSecond": 4.6
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 100.4,
+        "totalS": 137.3
+      },
+      "answer": "The site describes 'review' as a reviewer checking the result. It is also linked to 'handoff', which is how work passes between agents, and 'release', which likely involves the outcome of the review process. The site provides a checklist of items including 'review', 'reviewer', and 'release'.",
+      "speeds": [
+        {
+          "promptTokens": 702,
+          "promptPerSecond": 7.2,
+          "replyTokens": 12,
+          "replyPerSecond": 4.6
+        },
+        {
+          "promptTokens": 123,
+          "promptPerSecond": 6.5,
+          "replyTokens": 68,
+          "replyPerSecond": 3.8
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 133.9,
+        "totalS": 228.4
+      },
+      "answer": "The search result for 'memory' returns items about 'handoff' (how work passes between agents) and 'review' (a reviewer checks the result). However, these items do not directly define what 'memory' is in this context. The site does not explicitly describe the concept of 'memory' as a standalone entity, nor does it explain how agents share work through memory. Therefore, based on the available information, there is no direct answer to 'what memory is' or 'how agents share work through memory' in the provided results.",
+      "speeds": [
+        {
+          "promptTokens": 875,
+          "promptPerSecond": 6.7,
+          "replyTokens": 12,
+          "replyPerSecond": 4.2
+        },
+        {
+          "promptTokens": 123,
+          "promptPerSecond": 2.4,
+          "replyTokens": 115,
+          "replyPerSecond": 2.7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search",
+          "read",
+          "read"
+        ],
+        "toolRight": 0,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 199.6,
+        "totalS": 337.2
+      },
+      "answer": "The items 'handoff' and 'review' describe the processes of passing work between agents and checking results, respectively. However, there is no direct mention of 'guardrails' or specific rules, constraints, or boundaries that ensure these processes are safe or correct. The available information focuses on the mechanics of handoffs and reviews rather than the guardrails that govern them.",
+      "speeds": [
+        {
+          "promptTokens": 1097,
+          "promptPerSecond": 5.6,
+          "replyTokens": 13,
+          "replyPerSecond": 2.9
+        },
+        {
+          "promptTokens": 125,
+          "promptPerSecond": 5.8,
+          "replyTokens": 13,
+          "replyPerSecond": 4
+        },
+        {
+          "promptTokens": 208,
+          "promptPerSecond": 5.8,
+          "replyTokens": 12,
+          "replyPerSecond": 3.7
+        },
+        {
+          "promptTokens": 289,
+          "promptPerSecond": 6.2,
+          "replyTokens": 79,
+          "replyPerSecond": 2.9
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 19.9,
+    "status": "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3.5 2B on the processor (newer, for tools, slower than Qwen3 1.7B; in this browser, on your processor and memory; 1.3 GB download; needs about 1.7 GB of memory; Apache-2.0)…",
+      "Loading Qwen3.5 2B on the processor into memory…",
+      "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

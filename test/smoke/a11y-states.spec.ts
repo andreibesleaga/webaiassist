@@ -126,8 +126,6 @@ test('the error banner is an alert and is axe-clean in both themes', async () =>
   await expect(panel.locator('#model-status')).toHaveText('Ready: Scripted test model.');
   await panel.fill('#question', '/fail the model crashed');
   await panel.press('#question', 'Control+Enter');
-  // A page with tools asks for the site first, even for a question that needs no tool.
-  await panel.locator('#confirm-allow').click();
   await expect(panel.locator('#error-banner')).toBeVisible();
   await expect(panel.locator('#error-banner')).toHaveAttribute('role', 'alert');
   await cleanInBothThemes(panel);

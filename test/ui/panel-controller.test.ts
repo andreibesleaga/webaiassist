@@ -165,20 +165,30 @@ describe('side panel controller', () => {
     expect(deps.bridge.calls).toHaveLength(1);
   });
 
-  it('answers without tools when the site is denied, and says so', async () => {
-    const deps = fakeDeps([answer('No tools used.')]);
+  it('asks nothing about the site when the answer needs no tool', async () => {
+    const deps = fakeDeps([answer('Hello.')]);
+    await started(deps);
+    await ask('hello');
+    expect(transcript()).toContain('WebAIAssistHello.');
+    expect(byId<HTMLDialogElement>('confirm').open).toBe(false);
+    expect(deps.grants.origins.size).toBe(0);
+  });
+
+  it('runs no tool when the site is denied at the first tool, and says so', async () => {
+    const deps = fakeDeps([call('search', { query: 'a' }), answer('No tools used.')]);
     await started(deps);
     byId<HTMLTextAreaElement>('question').value = 'q';
     byId<HTMLFormElement>('ask').requestSubmit();
     await settle();
+    expect(byId('confirm-title').textContent).toBe('Use the tools of https://node.example?');
     click('confirm-deny');
     await settle();
     expect(byId('page-note').textContent).toBe(
       'You did not allow this site’s tools, so the answer uses none.',
     );
     expect(transcript()).toContain('No tools used.');
-    const system = (deps.model as FakeModelRuntime).requests[0]?.messages[0]?.content;
-    expect(system).toContain('No tools are available on this page.');
+    expect(byId<HTMLDialogElement>('confirm').open).toBe(false);
+    expect(deps.bridge.calls).toHaveLength(0);
   });
 
   it('answers on a page with no WebMCP tools and says what to do', async () => {

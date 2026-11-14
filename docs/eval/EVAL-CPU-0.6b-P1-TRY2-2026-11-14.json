@@ -1,0 +1,181 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 72,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 72.2,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor (small; in this browser, on your processor and memory; 397 MB download; needs about 0.8 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3 0.6B on the processor: 0 of 397 MB (0%)",
+      "Downloading Qwen3 0.6B on the processor: 46 of 397 MB (12%)",
+      "Downloading Qwen3 0.6B on the processor: 91 of 397 MB (23%)",
+      "Downloading Qwen3 0.6B on the processor: 132 of 397 MB (33%)",
+      "Downloading Qwen3 0.6B on the processor: 177 of 397 MB (45%)",
+      "Downloading Qwen3 0.6B on the processor: 220 of 397 MB (56%)",
+      "Downloading Qwen3 0.6B on the processor: 265 of 397 MB (67%)",
+      "Downloading Qwen3 0.6B on the processor: 309 of 397 MB (78%)",
+      "Downloading Qwen3 0.6B on the processor: 353 of 397 MB (89%)",
+      "Downloading Qwen3 0.6B on the processor: 397 of 397 MB (100%)",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 88.3,
+        "totalS": 88.3
+      },
+      "answer": "The site discusses handoffs in the context of collaborative tasks, highlighting how these interactions occur between agents and their items. It mentions the role of a handoff in the closure algebra and how it affects the composition of item slugs.",
+      "speeds": [
+        {
+          "promptTokens": 1087,
+          "promptPerSecond": 13.4,
+          "replyTokens": 52,
+          "replyPerSecond": 7.4
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 12.5,
+        "totalS": 12.7
+      },
+      "answer": "The site discusses how agents share work through handoffs, specifying that this involves the closure algebra and the composition of item slugs. This process ensures that agents can effectively manage their tasks and resources across different items.",
+      "speeds": [
+        {
+          "promptTokens": 76,
+          "promptPerSecond": 13.7,
+          "replyTokens": 48,
+          "replyPerSecond": 7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 12.6,
+        "totalS": 12.6
+      },
+      "answer": "The site contains items related to review, including descriptions and links to items that discuss the process of reviewing tasks. These items are part of the AgenticSystemCore and help illustrate how agents interact with each other and their items during collaborative work.",
+      "speeds": [
+        {
+          "promptTokens": 66,
+          "promptPerSecond": 12.4,
+          "replyTokens": 54,
+          "replyPerSecond": 7.5
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 7.3,
+        "totalS": 25.2
+      },
+      "answer": "The site contains items related to review, including descriptions and links to items that discuss the process of reviewing tasks. These items are part of the AgenticSystemCore and help illustrate how agents interact with each other and their items during collaborative work.",
+      "speeds": [
+        {
+          "promptTokens": 72,
+          "promptPerSecond": 14.8,
+          "replyTokens": 16,
+          "replyPerSecond": 7.4
+        },
+        {
+          "promptTokens": 124,
+          "promptPerSecond": 12.5,
+          "replyTokens": 54,
+          "replyPerSecond": 7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 54.3,
+        "totalS": 54.3
+      },
+      "answer": "The site includes information on guardrails, which are essential in collaborative work. These guardrails ensure that agents and their items are managed in a safe and structured manner, preventing conflicts and ensuring smooth interaction.",
+      "speeds": [
+        {
+          "promptTokens": 406,
+          "promptPerSecond": 10.7,
+          "replyTokens": 46,
+          "replyPerSecond": 2.8
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 10.8,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor (small; in this browser, on your processor and memory; 397 MB download; needs about 0.8 GB of memory; Apache-2.0)…",
+      "Loading Qwen3 0.6B on the processor into memory…",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

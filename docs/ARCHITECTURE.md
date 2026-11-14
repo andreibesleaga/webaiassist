@@ -67,7 +67,12 @@ Each run starts from a user message. The loop (`src/core/agent-loop.ts`):
    tool, `name(arg*:type): purpose`, at most 12 lines and 22 % of the window, the other tools by
    name only. The full input schema stays in the core and still validates every call. Tokens
    are estimated: three Latin characters per token, one per CJK or other non-Latin character
-   (`src/core/history.ts`).
+   (`src/core/history.ts`). On a page with tools both prompts add the tool rules of
+   `src/core/tool-rules.ts` (the model cannot see the site, so it calls a tool first; site files
+   are background; read-only tools first, others only when the user asked; answer from the first
+   sufficient result); read-only tools are listed first. The site text for a question is cut to
+   the limit of `siteContextLimit` (12,000 characters; 2,400 for a window of 4096 tokens or
+   less; 1,500 for the compact prompt).
 2. Asks the model for one JSON action: `{"tool": ..., "arguments": {...}}` or `{"answer": ...}`.
    While the reply streams, the panel shows the answer text so far; a tool call shows nothing.
 3. Checks the action (`src/core/check-action.ts`): valid JSON, a listed tool, arguments that
@@ -102,9 +107,12 @@ Each run starts from a user message. The loop (`src/core/agent-loop.ts`):
 
 ## The confirmation gate
 
-Before the first question about a site in a browser session, the panel asks "Use the tools of
-this site?" and names the number of tools. Allow is kept in `chrome.storage.session`, which the
-browser clears when it restarts; Deny means the question is answered with no tools.
+When a tool of a site is first about to be used in a browser session (not before: a question the
+model answers without a tool asks nothing), the panel asks "Use the tools of this site?" and
+names the number of tools. The loop asks it through `AgentDeps.siteGate` (`src/core/site-consent.ts`),
+before the question about that call. Allow is kept in `chrome.storage.session`, which the
+browser clears when it restarts; Deny means no tool runs for the rest of that question and the
+model is told so.
 
 Then each tool call goes through the gate, in one of the two modes set in Options:
 
@@ -146,9 +154,9 @@ sequenceDiagram
   M-->>I: tools/list-result (getTools)
   I-->>W: result + origin + linkset flag
   W-->>P: result (checked again)
-  P->>U: Use the tools of this site? (first time in the session)
   P->>H: model/chat
   H-->>P: model/token ... model/chat-result {"tool": ...}
+  P->>U: Use the tools of this site? (at the first tool, once in the session)
   P->>W: tools/list again (refuse the call if the tool changed)
   P->>U: Run the tool? site, arguments: Allow once / Deny
   P->>W: tools/call (with the run's origin)

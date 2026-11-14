@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { AGSC_TOOL_NAMES } from '../../src/core/node-mode';
 import type { FileOutcome, SiteFileId } from '../../src/core/site-files';
-import { SITE_CONTEXT_CAP, siteContext } from '../../src/core/site-context';
+import { SITE_CONTEXT_CAP, siteContext, siteContextLimit } from '../../src/core/site-context';
 import { buildSiteFacts, isNodeSite, type Outcomes } from '../../src/core/site-facts';
 import { AGSC_PROFILE } from '../../src/core/site-linkset';
 
@@ -211,5 +211,24 @@ describe('every file id of the facts is a known site file id', () => {
       'tdmrep',
     ];
     expect(ids).toHaveLength(8);
+  });
+});
+
+describe('siteContextLimit: how much site text a window can carry', () => {
+  const window = (contextTokens: number, compactPrompt?: boolean) => ({
+    nativeToolCalls: false,
+    jsonConstraint: false,
+    contextTokens,
+    ...(compactPrompt === undefined ? {} : { compactPrompt }),
+  });
+
+  it('is small for a window of 4096 tokens or less, and for a compact prompt', () => {
+    expect(siteContextLimit(window(4096))).toBeLessThan(SITE_CONTEXT_CAP / 2);
+    expect(siteContextLimit(window(2048))).toBe(siteContextLimit(window(4096)));
+    expect(siteContextLimit(window(9216, true))).toBe(1500);
+  });
+
+  it('is the full cap for a larger window', () => {
+    expect(siteContextLimit(window(8192))).toBe(SITE_CONTEXT_CAP);
   });
 });

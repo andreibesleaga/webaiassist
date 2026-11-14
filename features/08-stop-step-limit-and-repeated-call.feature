@@ -77,7 +77,6 @@ Feature: Stop, step limit and the repeated-call stop
     And the side panel is open on that page
     And the scripted model is ready
     When I ask '/tool nosuchtool {}'
-    And I press "Allow for this session"
     Then the conversation shows 'unknown tool "nosuchtool"'
     And no tool dialog is shown
 

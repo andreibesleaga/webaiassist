@@ -15,7 +15,6 @@ Given('an error is shown in the banner', async ({ world }) => {
   await scriptedReady(world);
   await panel.fill('#question', '/fail the model crashed');
   await panel.press('#question', 'Control+Enter');
-  await panel.locator('#confirm-allow').click();
   await expect(panel.locator('#error-banner')).toBeVisible();
 });
 

@@ -12,10 +12,10 @@ import { WebLlmRuntime } from '../../src/adapters/webllm-runtime';
 import { runAgent } from '../../src/core/agent-loop';
 import { estimateTokens, REPLY_RESERVE_TOKENS, usableContext } from '../../src/core/history';
 import type { ModelCapabilities } from '../../src/core/ports/model-runtime';
-import { siteContext } from '../../src/core/site-context';
-import { buildSiteFacts } from '../../src/core/site-facts';
+import { siteContext, siteContextLimit } from '../../src/core/site-context';
+import { buildSiteFacts, type SiteFacts } from '../../src/core/site-facts';
 import type { FileOutcome } from '../../src/core/site-files';
-import { AGSC_PROFILE } from '../../src/core/site-linkset';
+import { AGSC_PROFILE, type Linkset } from '../../src/core/site-linkset';
 import { answer, makeDeps } from '../helpers';
 
 const ORIGIN = 'https://agenticsystemcore.com';
@@ -43,6 +43,51 @@ function liveSiteContext(limit?: number): string {
     },
   });
   return siteContext(facts, limit) ?? '';
+}
+
+const words = (n: number): string => Array.from({ length: n }, (_, i) => `word${i}`).join(' ');
+
+/** A site whose published files fill every piece of the site context to its cap. */
+function fullSiteFacts(): SiteFacts {
+  const base = buildSiteFacts({
+    origin: ORIGIN,
+    pagePath: '/',
+    nowMs: Date.parse('2026-11-14T00:00:00Z'),
+    outcomes: {
+      linkset: found(
+        fixture('agsc-linkset.json'),
+        `application/linkset+json; profile="${AGSC_PROFILE}"`,
+      ),
+    },
+  });
+  const node = base.node as Linkset;
+  const links = Array.from({ length: 30 }, (_, i) => ({
+    rel: 'item',
+    href: `${ORIGIN}/items/${i}/`,
+    title: `Item ${i} ${words(8)}`,
+    sameOrigin: true,
+  }));
+  return {
+    ...base,
+    node: { ...node, links },
+    catalog: { ...node, links },
+    llms: {
+      title: 'A site',
+      summary: words(400),
+      provenance: {},
+      sections: Array.from({ length: 20 }, (_, i) => ({
+        name: `Section ${i}`,
+        links: Array.from({ length: 10 }, (_, j) => ({ text: `Link ${i} ${j} ${words(6)}` })),
+      })),
+      linkCount: 200,
+    },
+    agentCard: {
+      name: 'Card',
+      description: words(300),
+      skills: Array.from({ length: 10 }, (_, i) => `skill ${i} ${words(10)}`),
+    },
+    page: { source: 'JSON-LD', type: 'Article', title: words(40), description: words(300) },
+  };
 }
 
 /** The runtime of each listed model, as the loop sees it: same window for every model of a runtime. */
@@ -88,4 +133,23 @@ describe('the 4096-token window', () => {
       expect(room).toBeGreaterThanOrEqual(1000);
     },
   );
+});
+
+describe('a site that fills every piece of site context to its cap', () => {
+  const facts = fullSiteFacts();
+
+  it.each(WINDOWS)(
+    '%s: with the limit for this window the request fits and leaves room for a result',
+    async (_name, caps) => {
+      const context = siteContext(facts, siteContextLimit(caps)) ?? '';
+      const request = await firstRequestTokens(caps, context);
+      expect(request).toBeLessThanOrEqual(usableContext(caps) - REPLY_RESERVE_TOKENS);
+      expect(usableContext(caps) - REPLY_RESERVE_TOKENS - request).toBeGreaterThanOrEqual(1000);
+    },
+  );
+
+  it('is the case that the old limit (12000 characters) did not fit in 4096 tokens', async () => {
+    const request = await firstRequestTokens(CPU_CAPABILITIES, siteContext(facts) ?? '');
+    expect(request).toBeGreaterThan(usableContext(CPU_CAPABILITIES) - REPLY_RESERVE_TOKENS - 1000);
+  });
 });

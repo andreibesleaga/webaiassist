@@ -18,7 +18,7 @@ describe('attempt 1: instructions injected in a tool result', () => {
     const deps = makeDeps([call('search', { query: 'review' }), answer('done')]);
     deps.bridge.handle('search', () => ({ ok: true, text: injected }));
     await runAgent(deps, { ...input, confirmEveryCall: true });
-    const fed = deps.model.requests[1]?.messages.at(-1)?.content ?? '';
+    const fed = deps.model.requests[1]?.messages.at(-2)?.content ?? '';
     expect(fed.match(/<tool-result/gi)).toHaveLength(1);
     expect(fed.match(/<\/tool-result>/gi)).toHaveLength(1);
     expect(fed.startsWith('<tool-result tool="search" trust="untrusted">')).toBe(true);

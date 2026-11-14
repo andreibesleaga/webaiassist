@@ -1,0 +1,213 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 74,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 186.2,
+    "status": "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3.5 2B on the processor (newer, for tools, slower than Qwen3 1.7B; in this browser, on your processor and memory; 1.3 GB download; needs about 1.7 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3.5 2B on the processor: 0 of 1281 MB (0%)",
+      "Downloading Qwen3.5 2B on the processor: 143 of 1281 MB (11%)",
+      "Downloading Qwen3.5 2B on the processor: 285 of 1281 MB (22%)",
+      "Downloading Qwen3.5 2B on the processor: 428 of 1281 MB (33%)",
+      "Downloading Qwen3.5 2B on the processor: 570 of 1281 MB (44%)",
+      "Downloading Qwen3.5 2B on the processor: 712 of 1281 MB (56%)",
+      "Downloading Qwen3.5 2B on the processor: 855 of 1281 MB (67%)",
+      "Downloading Qwen3.5 2B on the processor: 996 of 1281 MB (78%)",
+      "Downloading Qwen3.5 2B on the processor: 1139 of 1281 MB (89%)",
+      "Downloading Qwen3.5 2B on the processor: 1281 of 1281 MB (100%)",
+      "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 0.3,
+        "totalS": 178.1
+      },
+      "answer": "The site does not mention handoffs in its content. The available tools allow you to search for items, read specific items, list links, ask questions, explain links, compose briefs, check warnings, propose tasks, remember items, or search the memory, but none of these functions retrieve information about handoffs from the site's content.",
+      "speeds": [
+        {
+          "promptTokens": 954,
+          "promptPerSecond": 6.2,
+          "replyTokens": 73,
+          "replyPerSecond": 3.2
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 77.1,
+        "totalS": 77.1
+      },
+      "answer": "The site does not explicitly mention how agents share work. The available tools allow you to search for items, read specific items, list links, ask questions, explain links, compose briefs, check warnings, propose tasks, remember items, or search the memory, but none of these functions retrieve information about how agents share work from the site's content.",
+      "speeds": [
+        {
+          "promptTokens": 97,
+          "promptPerSecond": 3,
+          "replyTokens": 75,
+          "replyPerSecond": 1.7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search",
+          "read",
+          "brief"
+        ],
+        "toolRight": 0,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 1,
+        "firstTokenS": 21.5,
+        "totalS": 198.4
+      },
+      "answer": "Based on the brief provided, the site indicates that 'handoff' (how work passes between agents, with context) and 'review' (a reviewer checks the result) are the two items, and they have no gaps in the composition. However, the brief does not explicitly explain the mechanism of how agents share work or the specific flow of information between them, other than the context mentioned for handoff. The 'review' item simply describes the action of a reviewer checking the result. Therefore, while the site identifies these two items as related, it does not provide a detailed explanation of the handoff process itself.",
+      "speeds": [
+        {
+          "promptTokens": 93,
+          "promptPerSecond": 6,
+          "replyTokens": 16,
+          "replyPerSecond": 2.7
+        },
+        {
+          "promptTokens": 98,
+          "promptPerSecond": 5.7,
+          "replyTokens": 17,
+          "replyPerSecond": 4.4
+        },
+        {
+          "promptTokens": 91,
+          "promptPerSecond": 6,
+          "replyTokens": 21,
+          "replyPerSecond": 3.7
+        },
+        {
+          "promptTokens": 98,
+          "promptPerSecond": 6,
+          "replyTokens": 21,
+          "replyPerSecond": 3.2
+        },
+        {
+          "promptTokens": 130,
+          "promptPerSecond": 3.6,
+          "replyTokens": 129,
+          "replyPerSecond": 1.7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search",
+          "read",
+          "brief"
+        ],
+        "toolRight": 0,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 237.7,
+        "totalS": 469.6
+      },
+      "answer": "Based on the brief provided for the items 'handoff' and 'review', the site indicates that these two items are the components of the memory. 'Handoff' describes how work passes between agents with context, and 'review' describes a reviewer checking the result. The brief notes that there are no gaps in the composition between these items. However, the brief itself does not provide a detailed narrative about the memory's contents or the specific flow of information; it only confirms the existence and relationship of these two items within the memory structure.",
+      "speeds": [
+        {
+          "promptTokens": 1281,
+          "promptPerSecond": 5.6,
+          "replyTokens": 16,
+          "replyPerSecond": 1.8
+        },
+        {
+          "promptTokens": 98,
+          "promptPerSecond": 4.5,
+          "replyTokens": 17,
+          "replyPerSecond": 2.7
+        },
+        {
+          "promptTokens": 91,
+          "promptPerSecond": 2.8,
+          "replyTokens": 21,
+          "replyPerSecond": 0.7
+        },
+        {
+          "promptTokens": 98,
+          "promptPerSecond": 3.6,
+          "replyTokens": 113,
+          "replyPerSecond": 1
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 424.3,
+        "totalS": 424.3
+      },
+      "answer": "The site does not explicitly mention 'guardrails' or any specific mechanisms designed to prevent errors or ensure safety. However, the brief for the items 'handoff' and 'review' notes that there are 'no gaps' in the composition between them, suggesting a complete and cohesive system. While this implies a well-structured process, it does not describe the underlying logic or constraints that would constitute 'guardrails' in the traditional sense of preventing failures.",
+      "speeds": [
+        {
+          "promptTokens": 1686,
+          "promptPerSecond": 4.5,
+          "replyTokens": 96,
+          "replyPerSecond": 1.9
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 20.5,
+    "status": "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3.5 2B on the processor (newer, for tools, slower than Qwen3 1.7B; in this browser, on your processor and memory; 1.3 GB download; needs about 1.7 GB of memory; Apache-2.0)…",
+      "Loading Qwen3.5 2B on the processor into memory…",
+      "Ready: Qwen3.5 2B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

@@ -10,7 +10,25 @@ import { wrapUntrusted } from './untrusted';
 
 /** All site pieces of one question together, in characters. */
 export const SITE_CONTEXT_CAP = 12000;
+/** For a compact prompt (Chrome's built-in model). */
+const COMPACT_CAP = 1500;
+/**
+ * For a window of 4096 tokens or less. The rest of a node request is about 1,650 estimated
+ * tokens (rules, node hint, ten tools, the question); with the reply reserve and the 1,000
+ * tokens kept for a tool result, the site text may take about 900 tokens, 2,400 characters.
+ */
+const SMALL_WINDOW_CAP = 2400;
+const SMALL_WINDOW_TOKENS = 4096;
 const PIECE_CAP = 4000;
+
+/** How many characters of site text one question may carry on this runtime. */
+export function siteContextLimit(capabilities: {
+  readonly contextTokens: number;
+  readonly compactPrompt?: boolean;
+}): number {
+  if (capabilities.compactPrompt === true) return COMPACT_CAP;
+  return capabilities.contextTokens <= SMALL_WINDOW_TOKENS ? SMALL_WINDOW_CAP : SITE_CONTEXT_CAP;
+}
 
 interface Piece {
   readonly path: string;

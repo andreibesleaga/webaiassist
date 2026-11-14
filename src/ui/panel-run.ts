@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
-// One question: read the page, ask for the site once per session, run the agent loop
+// One question: read the page, ask for the site when a tool is first used, run the agent loop
 // with the Options (step cap, confirmation mode, memory), and let Stop end it.
-import { runAgent } from '../core/agent-loop';
+import { runAgent, type AgentDeps } from '../core/agent-loop';
 import { isNodeSite } from '../core/site-facts';
-import { SITE_CONTEXT_CAP, siteContext } from '../core/site-context';
+import { siteContext, siteContextLimit } from '../core/site-context';
 import type { ToolBridge } from '../core/ports/tool-bridge';
-import { siteAllowed } from '../core/site-consent';
+import { siteGate } from '../core/site-consent';
 import { byId } from './dom';
 import { t } from './i18n';
 import { withSlowStartNotice } from './slow-start';
@@ -15,7 +15,7 @@ import { aiBlocked, refreshPage } from './panel-page';
 import { dismissFirstRun } from './panel-notices';
 import { shownText } from './panel-problems';
 
-/** The bridge used when the page has no tools or the user did not allow them. */
+/** The bridge used when the page has no tools. */
 const NO_TOOLS: ToolBridge = {
   list: () => Promise.resolve({ tools: [] }),
   call: () => Promise.resolve({ ok: false, text: 'No tools are available.' }),
@@ -26,9 +26,11 @@ interface ToolPlan {
   readonly bridge: ToolBridge;
   readonly origin: string;
   readonly node: boolean;
+  /** Asks "use the tools of this site?" when a tool is first about to be used. */
+  readonly gate?: () => Promise<boolean>;
 }
 
-async function toolPlan(ctx: PanelController): Promise<ToolPlan> {
+function toolPlan(ctx: PanelController): ToolPlan {
   const page = ctx.state.page;
   const info = page?.info;
   if (!info) return { bridge: NO_TOOLS, origin: page?.origin ?? '-', node: false };
@@ -40,11 +42,13 @@ async function toolPlan(ctx: PanelController): Promise<ToolPlan> {
   );
   if (info.tools.length === 0) return { bridge: NO_TOOLS, origin, node };
   const site = { origin, toolCount: info.tools.length };
-  if (await siteAllowed(ctx.deps.grants, (r) => ctx.ui.confirmSite(r), site)) {
-    return { bridge: ctx.deps.bridge, origin, node };
-  }
-  note(ctx, t('siteDenied'));
-  return { bridge: NO_TOOLS, origin, node: false };
+  const gate = siteGate(
+    ctx.deps.grants,
+    (r) => ctx.ui.confirmSite(r),
+    site,
+    () => note(ctx, t('siteDenied')),
+  );
+  return { bridge: ctx.deps.bridge, origin, node, gate };
 }
 
 function setRunning(ctx: PanelController, controller: AbortController | undefined): void {
@@ -70,8 +74,16 @@ function siteFactsFor(ctx: PanelController, origin: string): string | undefined 
   if (!facts || facts.origin !== origin || !ctx.state.settings.siteFacts || aiBlocked(ctx)) {
     return undefined;
   }
-  const compact = ctx.state.runtime?.model.capabilities().compactPrompt === true;
-  return siteContext(facts, compact ? 1500 : SITE_CONTEXT_CAP);
+  const capabilities = ctx.state.runtime?.model.capabilities();
+  return siteContext(facts, capabilities ? siteContextLimit(capabilities) : undefined);
+}
+
+type Parts = Pick<AgentDeps, 'model' | 'memory' | 'ui'>;
+
+function agentDepsFor(ctx: PanelController, parts: Parts, plan: ToolPlan): AgentDeps {
+  const { clock, validator } = ctx.deps;
+  const gate = plan.gate ? { siteGate: plan.gate } : {};
+  return { ...parts, bridge: plan.bridge, clock, validator, ...gate };
 }
 
 async function runQuestion(ctx: PanelController, text: string, tabId: number): Promise<void> {
@@ -79,7 +91,7 @@ async function runQuestion(ctx: PanelController, text: string, tabId: number): P
   const model = state.runtime?.model;
   if (!model) return;
   state.settings = await deps.loadSettings();
-  const plan = await toolPlan(ctx);
+  const plan = toolPlan(ctx);
   const memory = await deps.memory(state.settings);
   const controller = new AbortController();
   setRunning(ctx, controller);
@@ -91,14 +103,7 @@ async function runQuestion(ctx: PanelController, text: string, tabId: number): P
   const pageText = pageTextFor(ctx, tabId, plan.origin);
   const siteText = siteFactsFor(ctx, plan.origin);
   const notice = withSlowStartNotice(ui);
-  const agentDeps = {
-    model,
-    bridge: plan.bridge,
-    memory,
-    ui: notice.ui,
-    clock: deps.clock,
-    validator: deps.validator,
-  };
+  const agentDeps = agentDepsFor(ctx, { model, memory, ui: notice.ui }, plan);
   const result = await runAgent(agentDeps, {
     tabId,
     origin: plan.origin,

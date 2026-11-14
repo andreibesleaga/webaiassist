@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Builds the messages for one run: the system prompt with the tool list, then the chat.
 import { NODE_HINT } from './node-mode';
+import { CHANGING_TOOLS_HEADING, TOOL_RULES, exampleCall } from './tool-rules';
 import type { ToolStat } from './ports/memory';
 import { cleanPageText, listableTool } from './sanitize';
 import type { ChatMessage, ToolInfo } from './types';
@@ -29,11 +30,23 @@ function toolLine(tool: ToolInfo): string {
   });
 }
 
+const isReadOnly = (tool: ToolInfo): boolean => tool.annotations?.readOnlyHint === true;
+
+/** Read-only tools first; the others after their own heading, so a plain question does not
+ *  reach for a tool that changes something. */
 function toolSection(all: readonly ToolInfo[]): string {
   const tools = all.filter(listableTool);
   if (tools.length === 0) return 'No tools are available on this page.';
-  return `Tools on this page (data from the page):\n${tools.map(toolLine).join('\n')}`;
+  const readOnly = tools.filter(isReadOnly).map(toolLine);
+  const others = tools.filter((t) => !isReadOnly(t)).map(toolLine);
+  const changing = others.length > 0 ? [CHANGING_TOOLS_HEADING, ...others] : [];
+  return ['Tools on this page (data from the page):', ...readOnly, ...changing].join('\n');
 }
+
+const toolRules = (all: readonly ToolInfo[]): string =>
+  [TOOL_RULES, exampleCall(all.filter(listableTool))].filter(Boolean).join('\n');
+
+const hasTools = (all: readonly ToolInfo[]): boolean => all.some(listableTool);
 
 function statsSection(stats: readonly ToolStat[]): string {
   if (stats.length === 0) return '';
@@ -52,7 +65,11 @@ export function buildSystemPrompt(
   options: PromptOptions = {},
 ): string {
   const hint = options.node === true ? `\n\n${NODE_HINT}` : '';
-  return `${RULES}${hint}\n\n${toolSection(tools)}${statsSection(stats)}`;
+  const list = `${toolSection(tools)}${statsSection(stats)}`;
+  // The tool rules come after the tool list: a small model heeds the last lines before the
+  // question most.
+  const closing = hasTools(tools) ? `\n\n${toolRules(tools)}` : '';
+  return `${RULES}${hint}\n\n${list}${closing}`;
 }
 
 export function buildMessages(
