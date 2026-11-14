@@ -685,3 +685,13 @@ dialog .warning {
   min-height: 1.5em;
   margin: var(--space-2) 0 0;
 }
+
+/* Starter prompts on a node: buttons that fill the question box. */
+.starters {
+  flex-direction: column;
+  align-items: stretch;
+}
+.starters button {
+  text-align: left;
+  white-space: normal;
+}

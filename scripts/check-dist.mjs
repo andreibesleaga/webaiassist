@@ -98,6 +98,10 @@ function checkAccess(m, variant) {
     problems.push(`extension_pages CSP must be exactly ${EXPECTED_CSP}`);
   }
   if (m.background?.type !== 'module') problems.push('background must be a module service worker');
+  // The one key the owner approved: the keyboard shortcut of the toolbar button.
+  if (m.commands !== undefined && !same(Object.keys(m.commands), ['_execute_action'])) {
+    problems.push('commands may only declare _execute_action');
+  }
   return problems;
 }
 

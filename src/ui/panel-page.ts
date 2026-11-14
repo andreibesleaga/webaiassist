@@ -15,6 +15,7 @@ import { allowLabel, errorStatus, statusOf, statusText, type PageStatus } from '
 import type { PanelController, SiteState } from './panel-controller';
 import { note } from './panel-note';
 import { showSiteChat, stopForSwitch } from './panel-switch';
+import { starterPrompts } from './starter-prompts';
 
 const hostOf = (origin: string): string => {
   try {
@@ -92,6 +93,9 @@ export function drawPage(ctx: PanelController, looking = stillLooking(ctx)): voi
   if (info) showStatus(ctx, statusOf(info, { node: isNode(ctx), blocked }));
   renderCard(ctx.deps.doc, cardView(ctx, looking));
   ctx.ui.setEmptyText(emptyText(ctx, blocked));
+  ctx.ui.setStarters(
+    isNode(ctx) && !blocked ? starterPrompts(ctx.state.page?.info?.tools ?? []) : [],
+  );
 }
 
 function emptyText(ctx: PanelController, blocked: boolean): string {
@@ -147,6 +151,7 @@ function clearPage(ctx: PanelController): void {
     canOverride: true,
   });
   ctx.ui.setEmptyText(t('chatEmptyNoPage'));
+  ctx.ui.setStarters([]);
 }
 
 async function listTools(

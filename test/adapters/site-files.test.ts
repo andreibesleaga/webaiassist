@@ -116,7 +116,7 @@ describe('readSiteFile', () => {
 });
 
 describe('readSiteFiles', () => {
-  it('reads each file of the list once, at most eight, two at a time', async () => {
+  it('reads each file of the list once, at most nine, two at a time', async () => {
     let running = 0;
     let most = 0;
     const deps = fake(async (request) => {
@@ -132,9 +132,9 @@ describe('readSiteFiles', () => {
     expect(deps.asked.map((request) => request.id).sort()).toEqual(
       SITE_FILES.map((file) => file.id).sort(),
     );
-    expect(deps.asked.length).toBeLessThanOrEqual(8);
+    expect(deps.asked.length).toBeLessThanOrEqual(9);
     expect(most).toBe(2);
-    expect(Object.keys(outcomes)).toHaveLength(8);
+    expect(Object.keys(outcomes)).toHaveLength(9);
   });
 
   it('builds every address from the tab origin and the fixed paths, never from a file', async () => {

@@ -19,8 +19,13 @@ const reply = (change: Partial<SiteFileReply> = {}): SiteFileReply => ({
 });
 
 describe('the fixed list of site files', () => {
-  it('has at most eight files, each path once, every path from the site root', () => {
+  it('has at most nine files, each path once, every path from the site root', () => {
     expect(SITE_FILES.length).toBeLessThanOrEqual(LIMITS.maxFiles);
+    // The cap was eight; the ninth is the sustainability file, approved on 14 Nov 2026. The two
+    // kept ones stay in the list.
+    expect(LIMITS.maxFiles).toBe(9);
+    const ids = SITE_FILES.map((file) => file.id);
+    expect(ids).toEqual(expect.arrayContaining(['api-catalog', 'agent-card', 'sustainability']));
     const paths = SITE_FILES.map((file) => file.path);
     expect(new Set(paths).size).toBe(paths.length);
     for (const path of paths) expect(path).toMatch(/^\/[A-Za-z0-9._/-]+$/);
@@ -40,6 +45,16 @@ describe('the fixed list of site files', () => {
 describe('checkReply', () => {
   const llms = specOf('llms');
   const linkset = specOf('linkset');
+
+  it('keeps the sustainability file small and fixed, as JSON', () => {
+    const spec = specOf('sustainability');
+    expect(spec).toMatchObject({
+      path: '/.well-known/sustainability-data',
+      maxBytes: 8192,
+      json: true,
+    });
+    expect(spec.accept).toContain('application/sustainability-data+json');
+  });
 
   it('accepts status 200 with an expected type', () => {
     expect(checkReply(llms, reply())).toMatchObject({

@@ -152,6 +152,8 @@ export interface SiteFileMessage {
   text: string;
   cut: boolean;
   failed?: 'timeout' | 'network';
+  /** Base64 SHA-256 of the whole body, absent for a cut body or where WebCrypto is missing. */
+  sha256?: string;
 }
 
 export interface SitePageLink {

@@ -11,7 +11,8 @@ export type SiteFileId =
   | 'agent-card'
   | 'security'
   | 'robots'
-  | 'tdmrep';
+  | 'tdmrep'
+  | 'sustainability';
 
 export interface SiteFileSpec {
   readonly id: SiteFileId;
@@ -28,7 +29,12 @@ const TEXT = ['text/plain', 'text/markdown'];
 const JSON_TYPES = ['application/json'];
 const LINKSET = ['application/linkset+json', 'application/json'];
 
-/** At most eight files: this list is the cap (research note, rule F4). */
+/**
+ * At most nine files: this list is the cap. The research note (rule F4) set eight; the ninth,
+ * `sustainability`, was added by owner approval of 14 Nov 2026 (package P2) because the
+ * well-known file of the sustainability draft is small (8 KiB), fixed in path and read as data
+ * only. `api-catalog` and `agent-card` are kept. docs/THREAT-MODEL.md names the same cap.
+ */
 export const SITE_FILES: readonly SiteFileSpec[] = [
   {
     id: 'linkset',
@@ -68,6 +74,13 @@ export const SITE_FILES: readonly SiteFileSpec[] = [
     json: true,
   },
   { id: 'llms-full', path: '/llms-full.txt', accept: TEXT, maxBytes: 256 * KIB, json: false },
+  {
+    id: 'sustainability',
+    path: '/.well-known/sustainability-data',
+    accept: ['application/sustainability-data+json', 'application/json'],
+    maxBytes: 8 * KIB,
+    json: true,
+  },
 ];
 
 export const LIMITS = {
@@ -75,7 +88,7 @@ export const LIMITS = {
   fileMs: 5000,
   /** All files of one page load end after this long. */
   totalMs: 10_000,
-  maxFiles: 8,
+  maxFiles: 9,
   parallel: 2,
 } as const;
 
@@ -93,6 +106,8 @@ export interface SiteFileReply {
   readonly link: string;
   readonly text: string;
   readonly cut: boolean;
+  /** Base64 SHA-256 of the whole body, when the page script could compute it (not for a cut body). */
+  readonly sha256?: string;
   /** Set when no answer came: the request failed or ran out of time. */
   readonly failed?: 'timeout' | 'network';
 }
@@ -107,6 +122,8 @@ export type FileOutcome =
       readonly cut: boolean;
       readonly link: string;
       readonly contentType: string;
+      /** Base64 SHA-256 of the raw bytes; compared in site-digest.ts. */
+      readonly sha256?: string;
     }
   | { readonly state: 'not-published' }
   | { readonly state: 'unavailable'; readonly why: Trouble }
@@ -137,6 +154,7 @@ export function checkReply(spec: SiteFileSpec, reply: SiteFileReply): FileOutcom
   if (!spec.accept.includes(mediaType(reply.contentType)))
     return { state: 'not-usable', why: 'type' };
   if (reply.cut && spec.json) return { state: 'not-usable', why: 'size' };
-  const { text, cut, link, contentType } = reply;
-  return { state: 'found', text: text.slice(0, spec.maxBytes), cut, link, contentType };
+  const { text, cut, link, contentType, sha256 } = reply;
+  const digest = sha256 === undefined || cut ? {} : { sha256 };
+  return { state: 'found', text: text.slice(0, spec.maxBytes), cut, link, contentType, ...digest };
 }

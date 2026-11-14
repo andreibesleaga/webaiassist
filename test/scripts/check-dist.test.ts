@@ -82,6 +82,15 @@ describe('checkManifest', () => {
     ]);
   });
 
+  it('allows the keyboard shortcut for the toolbar button and no other command', () => {
+    const shortcut = { _execute_action: { suggested_key: { default: 'Alt+Shift+A' } } };
+    expect(checkManifest({ ...good, commands: shortcut }, exists)).toEqual([]);
+    const other = { ...shortcut, 'run-it': { description: 'x' } };
+    expect(checkManifest({ ...good, commands: other }, exists)).toEqual([
+      'commands may only declare _execute_action',
+    ]);
+  });
+
   it('refuses extra or missing permissions', () => {
     const problems = checkManifest({ ...good, permissions: ['tabs', 'storage'] }, exists);
     expect(problems).toEqual([

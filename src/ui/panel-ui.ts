@@ -116,8 +116,33 @@ export class PanelUI implements ChatUI {
     this.syncEmpty();
   }
 
+  /** Questions offered in the empty chat; a click fills the question box and sends nothing. */
+  setStarters(prompts: readonly string[]): void {
+    const list = byId(this.doc, 'starter-prompts');
+    list.replaceChildren(
+      ...prompts.map((prompt) => {
+        const item = element(this.doc, 'li');
+        const button = element(this.doc, 'button', prompt);
+        button.type = 'button';
+        button.addEventListener('click', () => this.fillQuestion(prompt));
+        item.append(button);
+        return item;
+      }),
+    );
+    this.syncEmpty();
+  }
+
+  private fillQuestion(prompt: string): void {
+    const box = byId<HTMLTextAreaElement>(this.doc, 'question');
+    box.value = prompt;
+    box.dispatchEvent(new Event('input', { bubbles: true }));
+    box.focus();
+  }
+
   private syncEmpty(): void {
     byId(this.doc, 'chat-empty').hidden = this.entries.length > 0;
+    const starters = byId(this.doc, 'starter-prompts');
+    starters.hidden = this.entries.length > 0 || starters.childElementCount === 0;
   }
 
   confirmSite(request: SiteRequest): Promise<boolean> {

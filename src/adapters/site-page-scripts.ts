@@ -35,7 +35,16 @@ export async function fetchSiteFile(request: PageFileRequest): Promise<unknown> 
     cut: false,
     ...change,
   });
-  const readBody = async (response: Response): Promise<{ text: string; cut: boolean }> => {
+  // The SHA-256 of the whole body as base64, for the node's own list of digests; none for a cut
+  // body (the rest was never read) or where WebCrypto is missing (a page that is not secure).
+  const digestOf = async (blob: Blob): Promise<string | undefined> => {
+    if (typeof crypto === 'undefined' || !crypto.subtle) return undefined;
+    const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', await blob.arrayBuffer()));
+    return btoa(String.fromCharCode(...hash));
+  };
+  const readBody = async (
+    response: Response,
+  ): Promise<{ text: string; cut: boolean; sha256?: string }> => {
     const reader = response.body?.getReader();
     if (!reader) return { text: '', cut: false };
     const chunks: Uint8Array[] = [];
@@ -53,7 +62,9 @@ export async function fetchSiteFile(request: PageFileRequest): Promise<unknown> 
         break;
       }
     }
-    return { text: await new Blob(chunks as BlobPart[]).text(), cut };
+    const blob = new Blob(chunks as BlobPart[]);
+    const sha256 = cut ? undefined : await digestOf(blob);
+    return { text: await blob.text(), cut, ...(sha256 === undefined ? {} : { sha256 }) };
   };
   const ownPath = /^\/[A-Za-z0-9._/-]*$/.test(request.path) && !request.path.startsWith('//');
   if (location.origin !== request.origin || !ownPath) return answer({ failed: 'network' });
