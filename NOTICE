@@ -15,6 +15,23 @@ a part of the extension imports it. Each keeps its own licence.
   project's schemas.
   Ajv depends on: fast-deep-equal 3.1.3 (MIT), fast-uri 3.1.9 (BSD-3-Clause),
   json-schema-traverse 1.0.0 (MIT), require-from-string 2.0.2 (MIT).
+- WebLLM (@mlc-ai/web-llm 0.2.86), Apache License, Version 2.0, Copyright 2023-2026 WebLLM Team.
+  https://github.com/mlc-ai/web-llm
+  Runs the graphics-card models. It depends on loglevel 1.9.2 (MIT, Copyright (c) 2013 Tim Perry).
+- The compiled model libraries (four .wasm files, shipped as model-libs/*.wasm), from
+  https://github.com/mlc-ai/binary-mlc-llm-libs at commit 00fe7a40e57e5e8eb9fef87526a4bf28ad5846c0,
+  pinned by size and SHA-256 in scripts/model-libs.json. That repository states no licence at
+  that commit. The project that builds such libraries, mlc-llm, is Apache-2.0.
+- wllama (@wllama/wllama 3.8.1), MIT licence, Copyright (c) 2024 Xuan Son NGUYEN.
+  https://github.com/ngxson/wllama
+  Its engine file wllama.wasm ships as model-libs/wllama.wasm, pinned by size and SHA-256. It is a
+  WebAssembly build of llama.cpp (https://github.com/ggml-org/llama.cpp, MIT licence).
+- @w3c/webmcp-polyfill 0.1.0, Apache License, Version 2.0.
+  https://github.com/w3c-oss/webmcp-polyfill
+  Loaded into a site's page only when the user turns on compat mode for that site.
+- @cfworker/json-schema 4.1.1, MIT licence (the package.json states it; the package has no licence
+  file), by Jeremy Danyow. https://github.com/cfworker/cfworker
+  Checks tool arguments against the tool's JSON Schema.
 - idb 8.0.4, ISC licence, Copyright (c) 2016, Jake Archibald.
   https://github.com/jakearchibald/idb
 - force-graph 1.52.0, MIT licence, Copyright (c) 2018 Vasco Asturiano.
@@ -45,5 +62,12 @@ fixtures/agsc-tools.json is the tool list that an AgenticSystemCore node page
 registers through WebMCP, taken from the AgenticSystemCore engine
 (src/distribution/mcp-tools.js), Apache License, Version 2.0.
 
-AgenticSystemCore is a trademark of Andrei N. Besleaga, used here to refer to
-the project; this work is not sponsored by, approved by or connected with it.
+AgenticSystemCore is a trademark of Andrei N. Besleaga. WebAIAssist is the browser client of the
+AgenticSystemCore project, by the same author. It works with AgenticSystemCore nodes; it is not an
+official WebMCP extension and has no connection with Google, W3C or any model publisher named in it.
+
+Models
+------
+
+No model weights are part of this package. The user downloads them, on a click, from the addresses
+and revisions listed in docs/MODEL-LICENCES.md, which also gives each publisher's licence statement.
