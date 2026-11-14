@@ -98,6 +98,7 @@ describe('side panel privacy actions', () => {
         model: 'big-model',
       },
     };
+    deps.panelState = { ...deps.panelState, endpointHosts: ['api.example.com'] }; // agreed earlier
     await startPanel(deps);
     click('start');
     await settle();

@@ -94,7 +94,13 @@
             </div>
             <div class="field">
               <label for="endpoint-model" data-i18n="endpointModel"></label>
-              <input type="text" id="endpoint-model" spellcheck="false" />
+              <input
+                type="text"
+                id="endpoint-model"
+                aria-describedby="endpoint-model-help"
+                spellcheck="false"
+              />
+              <p id="endpoint-model-help" class="hint" data-i18n="endpointModelHelp"></p>
             </div>
             <div class="field">
               <label for="endpoint-key" data-i18n="endpointKey"></label>

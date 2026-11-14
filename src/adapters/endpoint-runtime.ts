@@ -10,6 +10,7 @@ import type {
   LoadProgress,
   ModelCapabilities,
   ModelRuntime,
+  ModelUsage,
 } from '../core/ports/model-runtime';
 import type { CancelSignal } from '../core/types';
 import { asAbortSignal, toRuntimeMessages } from './chat-messages';
@@ -64,8 +65,15 @@ const timedOut = (signal: AbortSignal | null | undefined): boolean =>
 const errorText = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
 
-/** The content pieces of a chat-completions event stream (data: lines, ended by [DONE]). */
-async function* sseContent(body: ReadableStream<Uint8Array>): AsyncIterable<string> {
+interface StreamEvent {
+  readonly content: string;
+  readonly usage?: ModelUsage;
+  /** The service's own error text, from an error event inside the stream. */
+  readonly failure?: string;
+}
+
+/** The parsed data: events of a chat-completions event stream (ended by [DONE]). */
+async function* sseEvents(body: ReadableStream<Uint8Array>): AsyncIterable<StreamEvent> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
@@ -82,24 +90,60 @@ async function* sseContent(body: ReadableStream<Uint8Array>): AsyncIterable<stri
     const lines = buffer.split('\n');
     buffer = lines.pop() ?? '';
     for (const line of lines) {
-      const piece = readLine(line.trim());
-      if (piece === null) return;
-      if (piece) yield piece;
+      const event = readLine(line.trim());
+      if (event === null) return;
+      yield event;
     }
   }
 }
 
-/** The content of one line; null at [DONE]; '' for anything else. */
-function readLine(line: string): string | null {
-  if (!line.startsWith('data:')) return '';
+const count = (value: unknown): number | undefined =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
+
+/** The counts and the price of a `usage` object; undefined when it holds none of them. */
+function readUsage(value: unknown): ModelUsage | undefined {
+  const raw = (typeof value === 'object' && value !== null ? value : {}) as Record<string, unknown>;
+  const promptTokens = count(raw.prompt_tokens);
+  const completionTokens = count(raw.completion_tokens);
+  const costUsd = count(raw.cost);
+  const usage = {
+    ...(promptTokens === undefined ? {} : { promptTokens }),
+    ...(completionTokens === undefined ? {} : { completionTokens }),
+    ...(costUsd === undefined ? {} : { costUsd }),
+  };
+  return Object.keys(usage).length > 0 ? usage : undefined;
+}
+
+const NOTHING: StreamEvent = { content: '' };
+
+type Chunk = {
+  choices?: { delta?: { content?: unknown } }[];
+  usage?: unknown;
+  error?: { message?: unknown };
+};
+
+const textOf = (value: unknown): string => (typeof value === 'string' ? value : '');
+
+/** The event of one parsed chunk: its text, its usage, and its error message when it holds one. */
+function eventOf(raw: Chunk): StreamEvent {
+  const usage = readUsage(raw.usage);
+  const failure = raw.error === undefined ? undefined : textOf(raw.error.message) || 'error';
+  return {
+    content: textOf(raw.choices?.[0]?.delta?.content),
+    ...(usage ? { usage } : {}),
+    ...(failure === undefined ? {} : { failure }),
+  };
+}
+
+/** One line as an event; null at [DONE]; an empty event for anything else. */
+function readLine(line: string): StreamEvent | null {
+  if (!line.startsWith('data:')) return NOTHING;
   const data = line.slice(5).trim();
   if (data === '[DONE]') return null;
   try {
-    const event = JSON.parse(data) as { choices?: { delta?: { content?: unknown } }[] };
-    const content = event.choices?.[0]?.delta?.content;
-    return typeof content === 'string' ? content : '';
+    return eventOf(JSON.parse(data) as Chunk);
   } catch {
-    return '';
+    return NOTHING;
   }
 }
 
@@ -107,8 +151,29 @@ function readLine(line: string): string | null {
 const FORBIDDEN_HINT =
   ' Ollama refuses extensions unless it is started with OLLAMA_ORIGINS=chrome-extension://*.';
 
-function refusal(status: number): string {
-  return `The endpoint answered ${status}.${status === 403 ? FORBIDDEN_HINT : ''}`;
+/** Longest piece of a service's own error text that is shown. */
+const SERVICE_TEXT_CHARS = 200;
+const MIN_KEY_CHARS = 8;
+const TOKEN_LIKE = /\b(?:Bearer\s+\S+|sk-[\w-]{8,})/gi;
+
+/** A service's error text can echo what it received, headers included: the API key and anything
+ *  shaped like a bearer token or an sk- key is removed, and the text is cut and kept to one line. */
+export function scrubServiceText(text: string, apiKey: string | undefined): string {
+  const hidden = apiKey && apiKey.length >= MIN_KEY_CHARS ? text.split(apiKey).join('[key]') : text;
+  const clean = hidden.replace(TOKEN_LIKE, '[key]').replace(/\s+/g, ' ').trim();
+  return clean.length > SERVICE_TEXT_CHARS ? `${clean.slice(0, SERVICE_TEXT_CHARS)}…` : clean;
+}
+
+/** The message of a JSON error body (`{"error":{"message":…}}`), read from at most 2 KB. */
+async function serviceMessage(response: Response): Promise<string | undefined> {
+  try {
+    const text = (await response.text()).slice(0, 2048);
+    const raw = JSON.parse(text) as { error?: { message?: unknown } | string };
+    const message = typeof raw.error === 'string' ? raw.error : raw.error?.message;
+    return typeof message === 'string' ? message : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export class EndpointRuntime implements ModelRuntime {
@@ -130,7 +195,7 @@ export class EndpointRuntime implements ModelRuntime {
     const stop = asAbortSignal(cancel);
     const signal = stop ? AbortSignal.any([timeout, stop]) : timeout;
     const response = await this.send('/models', { method: 'GET', signal });
-    if (!response.ok) throw new Error(refusal(response.status));
+    if (!response.ok) throw await this.refusal(response);
     this.connected = true;
     onProgress({ fraction: 1, text: `Connected to ${this.config.url}` });
   }
@@ -143,8 +208,8 @@ export class EndpointRuntime implements ModelRuntime {
       body: JSON.stringify(this.body(request)),
       ...(signal ? { signal } : {}),
     });
-    if (!response.ok || !response.body) throw new Error(refusal(response.status));
-    return this.read(response.body, request.onToken, signal);
+    if (!response.ok || !response.body) throw await this.refusal(response);
+    return this.read(response.body, request, signal);
   }
 
   unload(): Promise<void> {
@@ -161,26 +226,47 @@ export class EndpointRuntime implements ModelRuntime {
     return {
       model: this.config.model,
       stream: true,
+      stream_options: { include_usage: true },
       temperature: TEMPERATURE,
       messages: toRuntimeMessages(request.messages),
     };
   }
 
+  private async refusal(response: Response): Promise<Error> {
+    const hint = response.status === 403 ? FORBIDDEN_HINT : '';
+    const said = await serviceMessage(response);
+    const service = said ? ` It says: ${scrubServiceText(said, this.config.apiKey)}` : '';
+    return new Error(`The endpoint answered ${response.status}.${service}${hint}`);
+  }
+
   private async read(
     body: ReadableStream<Uint8Array>,
-    onToken: ((token: string) => void) | undefined,
+    request: ChatRequest,
     signal: AbortSignal | undefined,
   ): Promise<string> {
-    let text = '';
+    const reply = { text: '', usage: undefined as ModelUsage | undefined };
     try {
-      for await (const piece of sseContent(body)) {
-        text += piece;
-        onToken?.(piece);
-      }
+      for await (const event of sseEvents(body)) this.take(event, reply, request);
     } catch (error) {
       if (signal?.aborted !== true) throw error;
     }
-    return text;
+    if (reply.usage) request.onUsage?.(reply.usage);
+    return reply.text;
+  }
+
+  private take(
+    event: StreamEvent,
+    reply: { text: string; usage: ModelUsage | undefined },
+    request: ChatRequest,
+  ): void {
+    if (event.failure !== undefined) throw new Error(this.failureText(event.failure));
+    reply.usage = event.usage ?? reply.usage;
+    reply.text += event.content;
+    if (event.content) request.onToken?.(event.content);
+  }
+
+  private failureText(said: string): string {
+    return `The endpoint reported an error: ${scrubServiceText(said, this.config.apiKey)}`;
   }
 
   private timeoutText(): string {
@@ -196,7 +282,8 @@ export class EndpointRuntime implements ModelRuntime {
     } catch (error) {
       if (timedOut(init.signal)) throw new Error(this.timeoutText());
       if (init.signal?.aborted === true) throw error;
-      throw new Error(`WebAIAssist could not reach ${this.config.url}: ${errorText(error)}`);
+      const why = scrubServiceText(errorText(error), this.config.apiKey);
+      throw new Error(`WebAIAssist could not reach ${this.config.url}: ${why}`);
     }
   }
 }

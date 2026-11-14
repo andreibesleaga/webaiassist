@@ -3,11 +3,13 @@
 // one more file with the same keys (see i18n.ts). {name} marks a value filled in at runtime.
 
 import { P2_EN } from './messages-p2-en';
+import { ENDPOINT_EN } from './messages-endpoint-en';
 import { SITE_EN } from './messages-site-en';
 
 export const EN = {
   ...SITE_EN,
   ...P2_EN,
+  ...ENDPOINT_EN,
   appName: 'WebAIAssist',
   help: 'Help',
   closeHelp: 'Close help',
@@ -212,7 +214,7 @@ export const EN = {
     'For other models, use a chat endpoint such as Ollama.',
   automatic: 'Automatic',
   endpointPreset: 'Endpoint preset',
-  presetCustom: 'Custom address',
+  presetCustom: 'Other address',
   endpointUrl: 'Endpoint address',
   endpointUrlHelp: 'The address before /chat/completions. https, or http for localhost only.',
   endpointModel: 'Model name at the endpoint',

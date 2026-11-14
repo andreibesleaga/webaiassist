@@ -28,6 +28,13 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
     list, replies constrained to the action schema, and a plain reason for each state;
   - an OpenAI-compatible chat endpoint (Ollama and LM Studio presets; `https`, or `http` on
     `localhost` and `127.0.0.1` only; no redirects, replies capped at 1 MB).
+- **Chat endpoint, local or remote**: an OpenRouter preset and "Other address"; the model list
+  offers "Use your own server or a remote service…" while no endpoint is set; a one-time question
+  per host before a remote service is first used (where the model runs, what is sent, that it may
+  charge; nothing is sent before **Use this service**; never for `localhost`); the endpoint
+  runtime reads token counts and the price from the streamed reply (`onUsage` on the chat
+  request); a service's error text is cut and scrubbed of the API key; `npm run eval:endpoint`
+  runs five questions against any endpoint (address, model and key from the environment only).
 
   One model is in memory at a time. The model libraries and the llama.cpp engine ship inside the
   package, pinned by SHA-256; only weights download, from fixed Hugging Face addresses.

@@ -120,6 +120,7 @@ describe('EndpointRuntime (OpenAI-compatible chat completions)', () => {
     expect(body).toEqual({
       model: 'qwen3:0.6b',
       stream: true,
+      stream_options: { include_usage: true },
       temperature: 0.2,
       messages: [{ role: 'user', content: 'R' }],
     });

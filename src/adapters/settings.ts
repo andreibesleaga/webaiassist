@@ -45,6 +45,7 @@ export interface StorageAreaLike {
 export const ENDPOINT_PRESETS = [
   { name: 'Ollama', url: 'http://localhost:11434/v1' },
   { name: 'LM Studio', url: 'http://localhost:1234/v1' },
+  { name: 'OpenRouter', url: 'https://openrouter.ai/api/v1' },
 ] as const;
 
 export const MAX_STEPS_LIMIT = 12;

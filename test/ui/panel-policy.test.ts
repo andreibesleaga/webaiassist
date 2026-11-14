@@ -179,6 +179,7 @@ describe('a site that asks for no AI input', () => {
       ...DEFAULT_SETTINGS,
       endpoint: { ...DEFAULT_SETTINGS.endpoint, url: 'https://api.example.com/v1', model: 'big' },
     };
+    deps.panelState = { ...deps.panelState, endpointHosts: ['api.example.com'] }; // agreed earlier
     await open(deps);
     await startModel();
     click('use-anyway');

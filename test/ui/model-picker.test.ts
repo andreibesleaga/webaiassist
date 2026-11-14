@@ -23,6 +23,7 @@ describe('model picker', () => {
       `webllm:${LLAMA}`,
       `webllm:${QWEN35}`,
       `webllm:${GEMMA}`,
+      SETUP_VALUE,
     ]);
     const all = pickerChoices(
       {
@@ -153,9 +154,11 @@ describe('model picker', () => {
     expect(selectedValue(DEFAULT_SETTINGS, noGpu)).toBe(SETUP_VALUE);
     const choices = pickerChoices(DEFAULT_SETTINGS, noGpu);
     expect(choices.at(-1)).toMatchObject({ value: SETUP_VALUE, runtime: 'setup' });
-    expect(
-      pickerChoices(DEFAULT_SETTINGS, { ...noGpu, webgpu: true }).map((c) => c.value),
-    ).not.toContain(SETUP_VALUE);
+    // With a working graphics card the same entry is there too, worded as the way in to Options.
+    const own = pickerChoices(DEFAULT_SETTINGS, { ...noGpu, webgpu: true }).at(-1);
+    expect(own?.value).toBe(SETUP_VALUE);
+    expect(own?.label).toMatch(/remote service/);
+    expect(choices.at(-1)?.label).toMatch(/no WebGPU/);
   });
 
   it('falls back to the browser model when the chosen runtime cannot be used', () => {
@@ -189,10 +192,11 @@ describe('model picker', () => {
       'cpu:qwen3-0.6b-q4_k_m',
       'cpu:qwen3-1.7b-q4_k_m',
       'cpu:qwen3.5-2b-q4_k_m',
+      SETUP_VALUE,
     ]);
     expect(cpu[4]).toMatchObject({ runtime: 'cpu', modelId: 'qwen3-0.6b-q4_k_m' });
     expect(cpu[4]?.label).toMatch(/397 MB/);
-    expect(pickerChoices(DEFAULT_SETTINGS, { ...env, cpu: false })).toHaveLength(4);
+    expect(pickerChoices(DEFAULT_SETTINGS, { ...env, cpu: false })).toHaveLength(5);
   });
 
   it('adds the test models of the smoke build and keeps a chosen one', () => {
@@ -237,6 +241,7 @@ describe('Gemma 4 E2B needs the shader-f16 feature of the graphics card', () => 
       `webllm:${QWEN}`,
       `webllm:${LLAMA}`,
       `webllm:${QWEN35}`,
+      SETUP_VALUE,
     ]);
   });
 

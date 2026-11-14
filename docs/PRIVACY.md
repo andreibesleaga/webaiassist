@@ -103,3 +103,27 @@ press it. It starts with a short block that marks the text as AI-generated (`ai-
 untrusted page content). Argument values whose names look like secrets (password, token, API key,
 auth, bearer, private key, session, cookie, credential) are replaced with `[redacted]`, and so is
 the endpoint API key wherever it appears, even in text you typed.
+
+## A remote chat endpoint (OpenRouter and similar)
+
+- **Where the model runs.** The OpenRouter preset is `https://openrouter.ai/api/v1`; any other
+  `https` address works the same way. An address on this computer (`localhost`, `127.0.0.1`) keeps the chat on
+  it. Any other address is a remote service: the model runs there, and your questions, the
+  page's tool list, tool results and any page text you read go to that host. The service may
+  charge for it and may keep what it receives under its own terms; WebAIAssist cannot see or change
+  that.
+- **One question first.** Before a remote host is used for the first time, the panel says so in
+  plain words and waits for **Use this service**. Nothing is sent before. The answer is kept per
+  host in `chrome.storage.local` (the list of hosts you agreed to); a different host asks again.
+  An address on this computer never asks. A site that asks for no AI input is never offered to a
+  remote endpoint.
+- **Access.** Saving a remote address asks Chrome, from the Save click, for access to that one host
+  (an optional permission; it is not granted at install).
+- **What is sent besides the chat.** Only `Authorization: Bearer <key>` (when you set a key) and
+  `Content-Type`. No app name, referrer or other identifying header is sent. The request asks the
+  service to include token counts (`stream_options.include_usage`).
+- **The key** stays in `chrome.storage.local`, unencrypted. It is never in the export, the saved
+  chat, an error text or a log; a service's error text is cut to 200 characters and has the key
+  and bearer-shaped strings removed before it is shown.
+- **What is read back.** The reply text, and the token counts and price the service reports for
+  the call (kept in memory for the activity log; nothing is sent anywhere).

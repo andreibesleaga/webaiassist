@@ -60,12 +60,12 @@ Scenarios whose wording changed when they stopped being pending:
 | Tag | Scenarios |
 |---|---|
 | @smoke | 108 |
-| @unit | 129 |
+| @unit | 135 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 7 |
-| all | 249 |
+| all | 255 |
 | run by `npm run test:bdd` now | 108 |
 
 ### Every scenario
@@ -321,6 +321,12 @@ Scenarios whose wording changed when they stopped being pending:
 | F25.14 | The node's own list, more site facts, the shortcut, diagnostics and storage | Diagnostics hold no page text, no address and no key | @unit | `test/ui/diagnostics.test.ts`, `test/core/diagnostics.test.ts` | unit test |
 | F25.15 | The node's own list, more site facts, the shortcut, diagnostics and storage | Persistent storage is asked once, after the first successful download | @unit | `test/ui/storage-p2.test.ts` | unit test |
 | F25.16 | The node's own list, more site facts, the shortcut, diagnostics and storage | Options shows the total size of the downloaded models | @unit | `test/ui/storage-p2.test.ts` | unit test |
+| F26.1 | A chat endpoint, on this computer or remote | The model list leads to the endpoint set-up while none is set | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.2 | A chat endpoint, on this computer or remote | Options offers Ollama, LM Studio, OpenRouter and Other address | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.3 | A chat endpoint, on this computer or remote | A remote endpoint asks once, per host, before anything is sent | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.4 | A chat endpoint, on this computer or remote | An endpoint on this computer never shows the question | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.5 | A chat endpoint, on this computer or remote | The endpoint's token counts and price are read, streamed or not | @unit | `test/adapters/endpoint-usage.test.ts` | unit test |
+| F26.6 | A chat endpoint, on this computer or remote | A service that echoes the API key in an error cannot show it | @unit | `test/security/endpoint-key-leaks.test.ts`, `test/adapters/endpoint-usage.test.ts` | unit test |
 
 ### Requirement rows
 

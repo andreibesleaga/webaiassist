@@ -48,10 +48,11 @@ describe('settings', () => {
     expect(normalizeSettings({}).siteFacts).toBe(true);
   });
 
-  it('offers Ollama and LM Studio as endpoint presets', () => {
+  it('offers Ollama, LM Studio and OpenRouter as endpoint presets', () => {
     expect(ENDPOINT_PRESETS.map((p) => p.url)).toEqual([
       'http://localhost:11434/v1',
       'http://localhost:1234/v1',
+      'https://openrouter.ai/api/v1',
     ]);
   });
 

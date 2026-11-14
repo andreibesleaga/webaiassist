@@ -58,4 +58,13 @@ describe('stored panel state', () => {
     expect(normalizePanelState({ lastError: 5 })).toEqual({ firstRunDone: false });
     expect(normalizePanelState({ lastError: '' })).toEqual({ firstRunDone: false });
   });
+
+  it('keeps the hosts of remote endpoints the user agreed to, and nothing else', () => {
+    expect(
+      normalizePanelState({ endpointHosts: ['openrouter.ai', 'openrouter.ai', 5, 'llm.example'] }),
+    ).toEqual({ firstRunDone: false, endpointHosts: ['openrouter.ai', 'llm.example'] });
+    expect(normalizePanelState({ endpointHosts: 'openrouter.ai' })).toEqual({
+      firstRunDone: false,
+    });
+  });
 });

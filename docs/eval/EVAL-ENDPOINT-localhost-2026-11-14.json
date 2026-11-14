@@ -1,0 +1,85 @@
+{
+  "date": "2026-11-14",
+  "host": "localhost:11434",
+  "model": "gemma3:4b",
+  "local": true,
+  "rows": [
+    {
+      "n": 1,
+      "text": "What does this site say about handoffs?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "seconds": 15.2,
+      "modelCalls": 2,
+      "promptTokens": 1907,
+      "completionTokens": 68,
+      "costUsd": null,
+      "answer": "The site mentions \"handoff\" (how work passes between agents, with context) and \"review\" (a reviewer checks the result)."
+    },
+    {
+      "n": 2,
+      "text": "Which items best answer: how do agents share work?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "seconds": 11.7,
+      "modelCalls": 2,
+      "promptTokens": 1905,
+      "completionTokens": 46,
+      "costUsd": null,
+      "answer": "Agents share work through handoff and review."
+    },
+    {
+      "n": 3,
+      "text": "Find items about review.",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "seconds": 7.6,
+      "modelCalls": 2,
+      "promptTokens": 1891,
+      "completionTokens": 35,
+      "costUsd": null,
+      "answer": "review and reviewer"
+    },
+    {
+      "n": 4,
+      "text": "Search for \"memory\".",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "seconds": 6.9,
+      "modelCalls": 2,
+      "promptTokens": 1891,
+      "completionTokens": 45,
+      "costUsd": null,
+      "answer": "The following items match the query 'memory': handoff and review"
+    },
+    {
+      "n": 5,
+      "text": "Is there anything on guardrails here?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": false,
+      "seconds": 7.8,
+      "modelCalls": 2,
+      "promptTokens": 1898,
+      "completionTokens": 56,
+      "costUsd": null,
+      "answer": "Based on the provided information, there are mentions of 'handoff' and 'review', which suggest processes for managing and checking work."
+    }
+  ],
+  "totals": {
+    "toolRight": 4,
+    "promptTokens": 9492,
+    "completionTokens": 250,
+    "costUsd": null,
+    "medianSeconds": 7.8
+  }
+}
