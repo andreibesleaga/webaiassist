@@ -3,7 +3,7 @@
 // schema matches its type in messages.ts. This file has type-only imports so that
 // scripts/gen-validators.ts can load it with Node's type stripping.
 import type { JSONSchemaType } from 'ajv';
-import { siteFile, sitePage } from './site-schemas';
+import { siteFile, siteGraphFile, sitePage } from './site-schemas.ts';
 import type {
   GpuProbeRequest,
   GpuProbeResult,
@@ -259,6 +259,7 @@ export const MESSAGE_SCHEMAS: Record<MessageType, object> = {
   'probe/gpu-result': gpuProbeResult,
   'site/file': siteFile,
   'site/page': sitePage,
+  'site/graph-file': siteGraphFile,
 };
 
 export const ENVELOPE_SCHEMA: object = pageEnvelope;

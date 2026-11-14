@@ -2,10 +2,14 @@
 // Every text the side panel and the Options page show, in English. Another language is
 // one more file with the same keys (see i18n.ts). {name} marks a value filled in at runtime.
 
+import { EXPLORER_EN } from './messages-explorer-en';
+import { QUERY_EN } from './messages-query-en';
 import { SITE_EN } from './messages-site-en';
 
 export const EN = {
   ...SITE_EN,
+  ...EXPLORER_EN,
+  ...QUERY_EN,
   appName: 'WebAIAssist',
   help: 'Help',
   closeHelp: 'Close help',

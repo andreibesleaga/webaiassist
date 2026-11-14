@@ -154,6 +154,14 @@ export interface SiteFileMessage {
   failed?: 'timeout' | 'network';
 }
 
+/**
+ * The answer to one graph-file request (src/adapters/graph-files.ts): the same shape as a site
+ * file, with its own list of ids (src/core/graph-files.ts) and a larger text cap (4 MiB).
+ */
+export interface SiteGraphFileMessage extends Omit<SiteFileMessage, 'type'> {
+  type: 'site/graph-file';
+}
+
 export interface SitePageLink {
   rel: string;
   href: string;
@@ -182,6 +190,7 @@ export interface SitePageMessage {
 
 export type Message =
   | SiteFileMessage
+  | SiteGraphFileMessage
   | SitePageMessage
   | ToolsListRequest
   | ToolsListResult
@@ -226,7 +235,7 @@ const MODEL_TYPES = [
   'model/chat-result',
 ] as const;
 const PROBE_TYPES = ['probe/gpu', 'probe/gpu-result'] as const;
-const SITE_TYPES = ['site/file', 'site/page'] as const;
+const SITE_TYPES = ['site/file', 'site/page', 'site/graph-file'] as const;
 
 /** Which message types each hop may carry. Anything else is dropped. */
 export const HOPS = {

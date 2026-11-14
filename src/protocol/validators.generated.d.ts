@@ -22,3 +22,4 @@ export declare const validate_probe_gpu: StandaloneValidator;
 export declare const validate_probe_gpu_result: StandaloneValidator;
 export declare const validate_site_file: StandaloneValidator;
 export declare const validate_site_page: StandaloneValidator;
+export declare const validate_site_graph_file: StandaloneValidator;

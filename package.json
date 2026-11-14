@@ -45,6 +45,7 @@
     "@w3c/webmcp-polyfill": "0.1.0",
     "@wllama/wllama": "3.8.1",
     "ajv": "8.20.0",
+    "force-graph": "1.52.0",
     "idb": "8.0.4"
   },
   "devDependencies": {

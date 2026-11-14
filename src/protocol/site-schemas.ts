@@ -2,7 +2,13 @@
 // The schemas of the two messages that carry what was read from a site (site/file, site/page).
 // Type-only imports, so that scripts/gen-validators.ts can load this file with Node's type stripping.
 import type { JSONSchemaType } from 'ajv';
-import type { SiteFileMessage, SiteOpenGraph, SitePageLink, SitePageMessage } from './messages';
+import type {
+  SiteFileMessage,
+  SiteGraphFileMessage,
+  SiteOpenGraph,
+  SitePageLink,
+  SitePageMessage,
+} from './messages';
 
 const typed = <T extends string>(value: T) => ({ type: 'string', const: value }) as const;
 
@@ -32,6 +38,24 @@ export const siteFile: JSONSchemaType<SiteFileMessage> = {
     link: shortText(2000),
     // The largest file is robots.txt: 500 KiB (src/core/site-files.ts).
     text: shortText(512000),
+    cut: { type: 'boolean' },
+    failed: { type: 'string', enum: ['timeout', 'network'], nullable: true },
+  },
+  required: ['type', 'id', 'origin', 'status', 'contentType', 'link', 'text', 'cut'],
+  additionalProperties: false,
+};
+
+export const siteGraphFile: JSONSchemaType<SiteGraphFileMessage> = {
+  type: 'object',
+  properties: {
+    type: typed('site/graph-file'),
+    id: { type: 'string', enum: ['graph-jsonld', 'graph-nq', 'chunks', 'ontology'] },
+    origin: REQUIRED_ORIGIN,
+    status: { type: 'integer', minimum: 0, maximum: 599 },
+    contentType: shortText(200),
+    link: shortText(2000),
+    // The largest file is graph.nq: 4 MiB (src/core/graph-files.ts).
+    text: shortText(4194304),
     cut: { type: 'boolean' },
     failed: { type: 'string', enum: ['timeout', 'network'], nullable: true },
   },

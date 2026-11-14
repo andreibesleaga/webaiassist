@@ -27,7 +27,7 @@ const page = {
 
 describe('the site messages', () => {
   it('are carried on the site hop only', () => {
-    expect([...HOPS.site]).toEqual(['site/file', 'site/page']);
+    expect([...HOPS.site]).toEqual(['site/file', 'site/page', 'site/graph-file']);
     for (const hop of ['page', 'content', 'panel', 'offscreen'] as const) {
       expect(parseMessage(file, hop).ok).toBe(false);
       expect(parseMessage(page, hop).ok).toBe(false);

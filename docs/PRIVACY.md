@@ -28,12 +28,15 @@ The code of the release package can contact these hosts, and no others:
 | The endpoint address you set (the presets: `localhost`, `127.0.0.1`) | A question, with a chat endpoint chosen in Options                                                                       | The conversation, as described above. Redirects are refused, so it goes to that address only.                                                                                                                                                                                                          |
 | Chrome (built-in model)                                              | You choose Chrome's built-in model and press Start                                                                       | Chrome downloads its model itself. WebAIAssist makes no request and has no address for it.                                                                                                                                                                                                             |
 | The open page's own site                                             | A tool you allowed runs, or you open a page of an allowed site or click the toolbar button on it (the eight files above) | The page's own tool code decides what it sends.                                                                                                                                                                                                                                                        |
+| A node you tick in the graph explorer                                | You press the Graph button, tick a node the open node names as a peer, and press Read the ticked nodes                   | Up to three published files of that node (its link set, `graph.jsonld`, `chunks.jsonl`), over https, without cookies or a referrer. It sees your IP address and that a browser asked. Nothing is read before the click.                                                                                |
 
 Chrome's built-in model is downloaded by Chrome, not by WebAIAssist. Other web addresses in the
 bundles are never fetched: `github.com` is a base address the schema validator uses to name
 schemas, `webgpureport.org` is part of an error message, `www.w3.org` is in a code comment,
 `w3id.org` and `www.rfc-editor.org` are names the extension compares a site's published files
-with (it never requests them), and WebLLM's own model list names `huggingface.co` repositories of models this extension does not
+with (it never requests them), `purl.org`, `schema.org` and `www.w3.org` are identifiers of vocabularies inside the
+graph explorer's code and `github.com` is the address of force-graph's source in its header (none of them is
+contacted, they are names, not contact points), and WebLLM's own model list names `huggingface.co` repositories of models this extension does not
 offer.
 
 ## What is stored, and where
@@ -75,3 +78,13 @@ press it. It starts with a short block that marks the text as AI-generated (`ai-
 untrusted page content). Argument values whose names look like secrets (password, token, API key,
 auth, bearer, private key, session, cookie, credential) are replaced with `[redacted]`, and so is
 the endpoint API key wherever it appears, even in text you typed.
+
+## The graph explorer tab (14 Nov 2026)
+
+The "Graph: N items" button on the card opens `explorer.html` in a new tab. The tab reads the open
+node's `/.well-known/knowledge-linkset`, `/graph.jsonld` and, when you select an item, `/chunks.jsonl`
+through the tab you opened it from, the same way the panel reads the eight site files: only for an
+allowed site, with no cookie and no referrer, and nothing is sent anywhere else. The explorer keeps one
+thing: the width you give its side list, as `agsc-graph-panel` in this page's local storage (a number).
+Other nodes are read only after you tick them and press the button (see the host table above); the
+ticked origins are kept in memory for the life of the tab and are never stored.

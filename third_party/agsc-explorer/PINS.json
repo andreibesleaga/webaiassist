@@ -1,0 +1,39 @@
+{
+  "sourceRepository": "AgenticSystemCore.com",
+  "sourceCommit": "152733b50412d9f3fa7a8a48024b4f419ea03a8e",
+  "files": [
+    {
+      "file": "graph-data.js",
+      "bytes": 25102,
+      "sha256": "d2bb781bc500b19b11c86eb6072a749d9d5269013838ca5c515b95771c8e235e",
+      "source": "assets/graph-data.js"
+    },
+    {
+      "file": "graph-explorer.js",
+      "bytes": 55892,
+      "sha256": "605130bd37777e4818a3f070392765aafef4542fd8d564fee1cc7159adee7960",
+      "source": "assets/graph-explorer.js"
+    },
+    {
+      "file": "graph-explorer.css",
+      "bytes": 12778,
+      "sha256": "f468a206cbe01af35ac970ecee06cbe3562a6336a76d0cffbaa4954fe670edd7",
+      "source": "assets/graph-explorer.css"
+    },
+    {
+      "file": "explorer-markup.html",
+      "bytes": 2736,
+      "sha256": "d195792faad91795d313b4c638ca1a4ba4cbc3dd5fdb15902631f30d197379cf",
+      "source": "www/graph/index.html",
+      "siteBlockSha256": "04273680faf663b8158d5eb4b4c4be792d0013e859018e9347ad7aa3e8dec545"
+    }
+  ],
+  "forceGraph": {
+    "package": "force-graph@1.52.0",
+    "file": "dist/force-graph.min.js",
+    "bytes": 173081,
+    "sha256": "f59db59ba92ff5a76ed93d7a4d77a703b176260e5d9cd29f4f8eb4f6c369a629",
+    "source": "npm: force-graph/dist/force-graph.min.js",
+    "siteCopy": "assets/vendor/force-graph-1.52.0.min.js"
+  }
+}

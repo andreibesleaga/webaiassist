@@ -68,6 +68,29 @@ export function sign(doc: Document): HTMLSpanElement {
   return mark;
 }
 
+/** "Graph: N items": one button in the chips row that opens the explorer tab (set as text). */
+function graphChip(doc: Document, facts: SiteFacts | undefined): HTMLLIElement[] {
+  const items = facts?.graphItems;
+  if (items === undefined) return [];
+  const item = element(doc, 'li', undefined, 'chip');
+  item.dataset.chip = 'graph';
+  const parts = Object.entries(facts?.node?.counts ?? {})
+    .filter(([, count]) => count > 0)
+    .map(([name, count]) => `${visible(name)} ${count}`)
+    .join(', ');
+  const button = element(
+    doc,
+    'button',
+    t(items === 1 ? 'graphChipOne' : 'graphChip', { count: items }),
+  );
+  button.type = 'button';
+  button.id = 'open-graph';
+  button.className = 'link';
+  button.title = t('graphChipTitle', { parts });
+  item.append(button);
+  return [item];
+}
+
 function renderChips(doc: Document, facts: SiteFacts | undefined): void {
   const chips = (facts?.chips ?? []).map((chip) => {
     const item = element(doc, 'li', chipLabel(chip.id), 'chip');
@@ -76,7 +99,7 @@ function renderChips(doc: Document, facts: SiteFacts | undefined): void {
     if (chip.id === 'ai-policy' && facts?.aiInput === 'blocked') item.classList.add('warn');
     return item;
   });
-  byId(doc, 'site-chips').replaceChildren(...chips);
+  byId(doc, 'site-chips').replaceChildren(...chips, ...graphChip(doc, facts));
 }
 
 function renderPolicy(doc: Document, view: CardView): void {

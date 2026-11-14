@@ -44,6 +44,13 @@ const EXTRA_FILES = [
   'content-main.js',
   'model-worker.js',
   'webmcp-polyfill.js',
+  'explorer.html',
+  'explorer.css',
+  'explorer.js',
+  'explorer-vendor/assets/graph-data.js',
+  'explorer-vendor/assets/graph-explorer.js',
+  'explorer-vendor/assets/graph-explorer.css',
+  'explorer-vendor/assets/vendor/force-graph-1.52.0.min.js',
 ];
 
 /** Files of the development build (dist-smoke/) only. */

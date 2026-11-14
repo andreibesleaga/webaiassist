@@ -248,6 +248,7 @@ read from `node_modules` and `npm view` on 14 Nov 2026.
 | `@cfworker/json-schema` | 4.1.1   | MIT        | Checks tool arguments against the tool's schema in the extension, without generating code (published 31 Jan 2025) |
 | `ajv`                   | 8.20.0  | MIT        | The same check in Node and in tests, and the build-time message validators (section 7)                            |
 | `idb`                   | 8.0.4   | ISC        | A small promise wrapper over IndexedDB for the chat memory (published 6 Oct 2026)                                 |
+| `force-graph`           | 1.52.0  | MIT        | The 2D drawing library of the graph explorer (section 19); published 28 Sep 2026                                  |
 
 The models are listed in sections 4 (graphics card), 15 (processor) and 3 (Chrome's built-in model,
 which Chrome downloads itself).
@@ -270,6 +271,38 @@ text of each before quoting it.
 
 Not read, with the reason: the MCP server card (its path is not settled on 13 Nov 2026) and the
 skills index named by a node's link set (its address would come from a file).
+
+## 19. The graph explorer (14 Nov 2026)
+
+The explorer tab runs the code of the AgenticSystemCore.com explorer, copied unchanged.
+
+| What                                                       | Source                                                                                                                                                                                                                            | Pinned by                                                                            |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `graph-data.js`, `graph-explorer.js`, `graph-explorer.css` | `assets/` of the repository `AgenticSystemCore.com` (the owner's own code, Apache-2.0), commit `152733b50412d9f3fa7a8a48024b4f419ea03a8e`, read on 14 Nov 2026                                                                    | `third_party/agsc-explorer/PINS.json`: size and SHA-256 of each file                 |
+| the explorer's markup                                      | the block of `www/graph/index.html` that holds the explorer, without its two 3D attributes                                                                                                                                        | `PINS.json` (its own hash and the hash of the site's block)                          |
+| `force-graph` 1.52.0                                       | npm, `dist/force-graph.min.js` (173,081 bytes, SHA-256 `f59db59ba92ff5a76ed93d7a4d77a703b176260e5d9cd29f4f8eb4f6c369a629`); byte for byte the file `assets/vendor/force-graph-1.52.0.min.js` of the site, compared on 14 Nov 2026 | `PINS.json`; the build copies it from `node_modules` and stops when the hash differs |
+| recorded node files                                        | `fixtures/graph/`: linkset, `graph.jsonld` (and the main node's `chunks.jsonl`) of both nodes, read with a normal browser User-Agent on 14 Nov 2026; every digest in the linksets matches the bytes                               | `fixtures/graph/README.md`                                                           |
+
+`node scripts/sync-agsc-explorer.mjs <path of AgenticSystemCore.com>` copies the files again and rewrites
+`PINS.json`; `test/ui/agsc-explorer-pins.test.ts` fails when a copy differs from its pin (and, with
+`AGSC_SITE_REPO` set to the site repository, when the pins are older than the site).
+
+Licences of `force-graph` 1.52.0 and of the 30 packages `npm install` added with it (read from
+`package-lock.json` and each package's `LICENSE` on 14 Nov 2026). Their code is in the one file
+`force-graph.min.js`; the 3D library is not shipped.
+
+| Licence      | Packages                                                                                                                                                                                                                                                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIT          | `force-graph` 1.52.0, `@tweenjs/tween.js` 25.0.0, `accessor-fn` 1.5.3, `bezier-js` 6.1.4, `canvas-color-tracker` 1.3.2, `d3-binarytree` 1.0.2, `d3-force-3d` 3.0.6, `d3-octree` 1.1.0, `float-tooltip` 1.8.0, `index-array-by` 1.4.2, `kapsule` 1.16.3, `lodash-es` 4.18.1, `preact` 11.2.0, `tinycolor2` 1.6.0                    |
+| ISC          | `d3-array` 3.2.5, `d3-color` 3.1.1, `d3-dispatch` 3.0.2, `d3-drag` 3.0.1, `d3-format` 3.1.3, `d3-interpolate` 3.0.2, `d3-quadtree` 3.0.2, `d3-scale` 4.0.3, `d3-scale-chromatic` 3.1.1, `d3-selection` 3.0.1, `d3-time` 3.1.1, `d3-time-format` 4.1.1, `d3-timer` 3.0.2, `d3-transition` 3.0.2, `d3-zoom` 3.0.1, `internmap` 2.0.3 |
+| BSD-3-Clause | `d3-ease` 3.0.2                                                                                                                                                                                                                                                                                                                    |
+
+Findings of the read, so the next reader need not repeat it: `force-graph.min.js` contains the string `innerHTML`
+(the bundled d3 `selection.html()` and preact's `__html` support) and no `eval` or `new Function`;
+the explorer never gives the library HTML: it sets `nodeLabel(() => '')` and `linkLabel(() => '')` and draws names as canvas text.
+`graph-data.js` and `graph-explorer.js` contain none of `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
+`eval` or `new Function` (`test/security/explorer-no-html-sink.test.ts`). `npm install` adds 31 packages for
+`force-graph`, not 14 as the design note counted; only `force-graph.min.js` ships.
 
 ## 18. Security and governance texts the audit used (13 Nov 2026)
 
