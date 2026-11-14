@@ -4,15 +4,17 @@
 // The page script in the tab answers with the origin it ran on; when that is not the origin the
 // explorer was opened for, the tab has left the site: that read, and every later one, ends with a
 // plain sentence and sends nothing.
-import type { GuardedFile } from './graph-fetch-guard';
-import { graphSpecOf } from '../core/graph-files';
+import { graphSpecOf, type GraphFileId } from '../core/graph-files';
 import { specOf, type FileOutcome } from '../core/site-files';
 import { readGraphFile } from './graph-files';
 import { readSiteFile, type SiteReadDeps, type SiteTarget } from './site-files';
 
 export const TAB_LEFT_TEXT = 'The tab left this site, so WebAIAssist stopped reading.';
 
-export type TabReader = (spec: GuardedFile) => Promise<FileOutcome>;
+/** The linkset and the four graph files: everything a tab of the explorer page reads through the tab. */
+export type TabFile = 'linkset' | GraphFileId;
+
+export type TabReader = (spec: TabFile) => Promise<FileOutcome>;
 
 const originOf = (result: unknown): unknown =>
   typeof result === 'object' && result !== null

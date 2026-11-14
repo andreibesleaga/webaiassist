@@ -141,6 +141,18 @@ thing: the width you give its side list, as `agsc-graph-panel` in this page's lo
 Other nodes are read only after you tick them and press the button (see the host table above); the
 ticked origins are kept in memory for the life of the tab and are never stored.
 
+## Query and semantic tools (14 Nov 2026)
+
+The Query tab and the model's graph tool read two more files of the open node through the same tab, the same way,
+and only for an allowed site: `/graph.nq` (at most 4 MiB) and, when you open the Vocabulary tab, `/ns/agsc.ttl`
+(at most 1 MiB). Each is used only when the node's linkset names it with a SHA-256 digest and the bytes match it.
+The questions are answered by a SPARQL engine inside the extension (Oxigraph, WebAssembly, from the package): the
+query text and the rows never leave the computer, and a query cannot ask any address (`SERVICE` is refused, a
+`FROM` address is only the name of a graph in the store). Nothing is stored: the graph lives in the memory of the
+query worker and is dropped when the tab or the panel moves to another site. The text of a query, and the rows the
+model reads, go where the model runs: the same rule as every other tool result, including the one-time question
+before a remote chat service gets page content.
+
 ## Conformance page and demo pages
 
 The conformance page (`conformance/`) is not part of the extension and sends nothing. The one host

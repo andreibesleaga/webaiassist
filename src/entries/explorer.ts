@@ -7,9 +7,13 @@
 //    explorer can read only the node's fixed files through the tab and the peers the user ticked;
 // 2. makes a click on a link open a new tab with no opener;
 // 3. writes the heading and the note around the explorer, as text;
-// 4. starts the tab list (src/ui/explorer/shell.ts), which mounts the Graph tab's peers block.
+// 4. starts the tab list (src/ui/explorer/shell.ts), which mounts the Graph tab's peers block and the
+//    Query, Vocabulary and Page data tabs (their query workers start when they are first used).
 import { createGuardedFetch } from '../adapters/graph-fetch-shim';
 import { createTabReader } from '../adapters/explorer-tab-reader';
+import { loadNodeFile } from '../adapters/graph-load';
+import { createQuerySession } from '../adapters/query-session';
+import { readPageData } from '../adapters/site-files';
 import { sha256Base64 } from '../adapters/sha256';
 import { explorerQuery, parseExplorerQuery, type ExplorerTarget } from '../ui/explorer-url';
 import { visible } from '../core/tool-card';
@@ -19,6 +23,7 @@ import { bindLinkOpener, openInNewTab } from '../ui/explorer/link-opener';
 import { startShell } from '../ui/explorer/shell';
 import { EXPLORER_TABS, type ExplorerContext } from '../ui/explorer/tabs';
 import { explorerDeps } from './shared/explorer-deps';
+import { makeQueryWorker } from './shared/query-worker-factory';
 
 /** The page address is rewritten to the three fields it needs; the explorer reads it next. */
 function normaliseAddress(target: ExplorerTarget): void {
@@ -40,7 +45,19 @@ function install(target: ExplorerTarget, approved: Set<string>): ExplorerContext
     sha256: sha256Base64,
     onProblem: showProblem,
   });
-  return { doc: document, target, readTab, approved };
+  const load = { readTab, sha256: sha256Base64 };
+  const session = (file: 'graph-nq' | 'ontology') =>
+    createQuerySession({
+      loadBytes: () => loadNodeFile(load, target.origin, file),
+      makeWorker: makeQueryWorker,
+      ...(file === 'ontology' ? { format: 'text/turtle' as const } : {}),
+    });
+  const query = {
+    graph: session('graph-nq'),
+    vocabulary: session('ontology'),
+    pageData: () => readPageData(explorerDeps, target),
+  };
+  return { doc: document, target, readTab, approved, query };
 }
 
 function withoutTarget(): void {

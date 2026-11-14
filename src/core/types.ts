@@ -21,6 +21,8 @@ export interface ToolInfo {
   readonly description: string;
   readonly inputSchema?: JsonSchema;
   readonly annotations?: ToolAnnotations;
+  /** Written by WebAIAssist, not by the page (builtin-tools.ts); no page tool can have it. */
+  readonly builtin?: true;
 }
 
 export type Role = 'system' | 'user' | 'assistant' | 'tool';

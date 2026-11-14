@@ -76,6 +76,13 @@ opens a tab with the graph explorer of the AgenticSystemCore site (2D), drawn in
 `graph.jsonld`, checked against the digest in its linkset. Other nodes it names are read only after you tick
 them and press **Read the ticked nodes** (see [docs/PRIVACY.md](docs/PRIVACY.md)).
 
+The same tab has **Query**, **Vocabulary** and **Page data**. Query is a text box for a read-only SPARQL query
+(SELECT or ASK) over the node's `graph.nq`, with Run, Stop, a table of up to 200 rows and the ten example
+questions of the AgenticSystemCore vocabulary; it runs in your browser with Oxigraph (WebAssembly, in the package)
+and sends nothing. An update or a `SERVICE` clause is refused. On a node, the model has one built-in tool,
+`webaiassist_query_graph`, for counts, lists and links that the page's tools cannot give; the same engine
+answers it, and no page tool can take its name.
+
 A site that says it wants no AI input (`Content-Signal: ai-input=no` in `robots.txt`) gets no
 text sent to the model and no **Read this page**. The results of the site's own tools still go
 to the model, because you asked for them. **Use on this tab anyway** overrides this for the

@@ -1,0 +1,43 @@
+{
+  "sourceRepository": "agentic-system-core",
+  "sourceTag": "v1.1.0",
+  "sourceTagCommit": "ec7a67ff7efa2aa42f83bb018596af37112384ea",
+  "sourceHeadCommit": "87f446719cc1df3a0064b23e245207542275a066",
+  "files": [
+    {
+      "file": "tokens.js",
+      "bytes": 14262,
+      "sha256": "a021c88ccafa87fc12539cf48b5b406ba9e5e290bde73487ff4d06f75a03fd6d",
+      "source": "src/distribution/query/tokens.js"
+    },
+    {
+      "file": "engine.js",
+      "bytes": 10540,
+      "sha256": "8cb6269a9cf7efbc02529a45dc6f89c4bfad57c05bc65fb7be3ca11d3fb18b9f",
+      "source": "src/distribution/query/engine.js"
+    },
+    {
+      "file": "view.js",
+      "bytes": 8349,
+      "sha256": "78aae2ff90b533fd03eddf205b8eb14a70acce3593abcdf478bf00a0d6a7c544",
+      "source": "src/distribution/query/view.js"
+    },
+    {
+      "file": "ontology-questions.json",
+      "bytes": 4702,
+      "sha256": "23256f5e69a6f4a78cf4a3e971d141da6eaca1be66f9cad3a4e2916aba5702ea",
+      "source": "docs/ontology-questions.json"
+    }
+  ],
+  "oxigraph": {
+    "package": "oxigraph@0.5.13",
+    "webJs": {
+      "bytes": 50946,
+      "sha256": "210c42fbba2915f668386f3285d28218db5865267e95b5403b82150431931f7c"
+    },
+    "wasm": {
+      "bytes": 4324920,
+      "sha256": "75e3f0f4de67921e88e3f6d587b2a8e7aa822abbe3a3b79873f2b97f20d52c24"
+    }
+  }
+}

@@ -59,14 +59,14 @@ Scenarios whose wording changed when they stopped being pending:
 
 | Tag | Scenarios |
 |---|---|
-| @smoke | 119 |
-| @unit | 144 |
+| @smoke | 125 |
+| @unit | 149 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 9 |
-| all | 277 |
-| run by `npm run test:bdd` now | 119 |
+| all | 288 |
+| run by `npm run test:bdd` now | 125 |
 
 ### Every scenario
 
@@ -322,6 +322,17 @@ Scenarios whose wording changed when they stopped being pending:
 | F21.15 | Graph explorer tab | The explorer page is accessible in the light and the dark theme | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
 | F21.16 | Graph explorer tab | The manifest gains no permission, no host and no web_accessible_resources | @unit | `test/security-review/dist-review.test.ts` | unit test |
 | F21.17 | Graph explorer tab | On the two live nodes the explorer draws their graphs | @manual | `features/21-graph-explorer.feature` | manual check |
+| F22.1 | Query and semantic tools | The Query tab runs the first query and shows the node's items as a table | @smoke | `features/22-query-tools.feature`, `test/query/worker-core.test.ts`, `test/ui/explorer-query-tabs.test.ts` | npm run test:bdd |
+| F22.2 | Query and semantic tools | An update is refused with a plain sentence and the graph is unchanged | @smoke | `features/22-query-tools.feature`, `test/query/worker-core.test.ts` | npm run test:bdd |
+| F22.3 | Query and semantic tools | Stop ends a query that would run for minutes | @smoke | `features/22-query-tools.feature` | npm run test:bdd |
+| F22.4 | Query and semantic tools | A query that names a remote graph with FROM sends no request | @smoke | `features/22-query-tools.feature` | npm run test:bdd |
+| F22.5 | Query and semantic tools | Put in editor writes an example question into the box and does not run it | @smoke | `features/22-query-tools.feature` | npm run test:bdd |
+| F22.6 | Query and semantic tools | The Vocabulary tab and the Page data tab show text only | @smoke | `features/22-query-tools.feature` | npm run test:bdd |
+| F22.7 | Query and semantic tools | Only reading queries are answered | @unit | `test/query/worker-core.test.ts` | unit test |
+| F22.8 | Query and semantic tools | The query engine has limits on the graph, the query and the rows | @unit | `test/query/worker-core.test.ts` | unit test |
+| F22.9 | Query and semantic tools | The graph is used only when its digest in the node's linkset matches | @unit | `test/adapters/graph-query.test.ts` | unit test |
+| F22.10 | Query and semantic tools | Every cell of a result is text | @unit | `test/ui/explorer-query-tabs.test.ts` | unit test |
+| F22.11 | Query and semantic tools | The query engine files are the published ones, byte for byte | @unit | `test/third-party/agsc-query-pins.test.ts` | unit test |
 | F23.1 | The WebMCP conformance page and suite | A conformance case registers exactly its tools and its own check ends as expected | @smoke | `features/23-webmcp-conformance.feature`, `test/ui/conformance-files.test.ts` | npm run test:bdd |
 | F23.2 | The WebMCP conformance page and suite | The side panel lists, asks and shows results for the conformance cases of errors, large and slow tools | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
 | F23.3 | The WebMCP conformance page and suite | A page that swaps a tool's description while the question to run it is open gets its call refused | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
@@ -364,7 +375,7 @@ Scenarios whose wording changed when they stopped being pending:
 | ASI05-1 | F17.5 |
 | ASI06-1 | F14.9 |
 | ASI07-1 | F09.5, F20.13, F21.8 |
-| ASI07-2 | F20.9, F21.5 |
+| ASI07-2 | F20.9, F21.5, F22.8, F22.9, F22.10, F22.11 |
 | ASI08-1 | F10.9 |
 | ASI09-1 | F07.4 |
 | ASI09-2 | F10.11, F20.15 |
@@ -435,8 +446,8 @@ Scenarios whose wording changed when they stopped being pending:
 | R4-4 | F10.18 |
 | R4-5 | F10.6 |
 | R4-6 | F10.7 |
-| R4-7 | F10.4, F11.6, F21.1 |
-| R4-8 | F11.5, F21.4, F21.12, F21.14 |
+| R4-7 | F10.4, F11.6, F21.1, F22.1 |
+| R4-8 | F11.5, F21.4, F21.12, F21.14, F22.2, F22.7 |
 | R4-9 | F10.10 |
 
 <!-- scenarios:end -->

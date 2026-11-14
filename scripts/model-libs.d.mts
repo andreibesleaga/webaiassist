@@ -15,6 +15,7 @@ export interface EsbuildPlugin {
 export declare const webLlmNoRemoteLibs: EsbuildPlugin;
 export declare const wllamaNoRemote: EsbuildPlugin;
 export declare const RUNTIMES: readonly {
+  readonly package: string;
   readonly file: string;
   readonly from: string;
   readonly bytes: number;

@@ -34,6 +34,13 @@
       "file": "wllama.wasm",
       "bytes": 8763949,
       "sha256": "551f13439366eff11e057b1b91fe46a7fdac29d56d67372d4c5f19a549dfe70c"
+    },
+    {
+      "package": "oxigraph@0.5.13",
+      "from": "node_modules/oxigraph/web_bg.wasm",
+      "file": "oxigraph.wasm",
+      "bytes": 4324920,
+      "sha256": "75e3f0f4de67921e88e3f6d587b2a8e7aa822abbe3a3b79873f2b97f20d52c24"
     }
   ]
 }
