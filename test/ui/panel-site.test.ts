@@ -33,7 +33,13 @@ describe('the card shows what the site publishes', () => {
     const { site, deps } = withSite();
     site.outcomes = nodeOutcomes();
     await open(deps);
-    expect(chips()).toEqual(['knowledge links', 'llms.txt', 'security.txt', 'AI policy']);
+    expect(chips()).toEqual([
+      'knowledge links',
+      'llms.txt',
+      'security.txt',
+      'AI policy',
+      'peer: patterns.agenticsystemcore.com',
+    ]);
     const llms = byId('site-chips').querySelector('[data-chip="llms"]');
     expect(llms?.getAttribute('title')).toContain('Published by the site');
     expect(llms?.getAttribute('title')).toContain('/llms.txt');

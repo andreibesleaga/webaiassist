@@ -86,6 +86,17 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   scenarios, manual checks, evaluation, browsers, sources, store listing and runbook, pitch and
   video script.
 
+- **More of what a node and a site publish** (package P2): the chip "matches the node's own list"
+  from the SHA-256 digests in the link set (a file that differs is marked and not given to the
+  model); bundle version, hash, date, item counts and ledger head; the page's own `<link rel>`
+  rows; Dataset, licence, creator and date from the page's JSON-LD; the sustainability file as the
+  ninth site file (the cap was eight); every Content-Signal value and group of `robots.txt`;
+  peer chips and three starter questions on a node; a plain reason when a page shows no tools
+  (this browser has no WebMCP, or the page registers none).
+- **Keyboard shortcut** Alt+Shift+A for the toolbar button (manifest `commands`, no permission).
+- **Copy diagnostics** with a preview, in Options and in the panel.
+- **Storage**: persistent storage asked once after the first download; total size in Options.
+
 ### Security
 
 - Manifest V3 with five install permissions (`sidePanel`, `offscreen`, `storage`, `activeTab`,

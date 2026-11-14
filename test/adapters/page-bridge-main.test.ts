@@ -94,6 +94,7 @@ describe('startMainBridge: tools/list', () => {
       id: 'l4',
       ok: true,
       tools: [],
+      webmcp: false,
     });
     const broken = { getTools: () => Promise.reject(new Error('NotAllowedError')) };
     const reply = await ask(setup(broken), { type: 'tools/list', id: 'l5' });

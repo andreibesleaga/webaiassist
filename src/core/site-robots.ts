@@ -46,6 +46,41 @@ export function parseRobots(raw: string): ContentSignal {
   return found;
 }
 
+export interface RobotsGroup {
+  /** The `User-agent` names of the group, as written (capped). */
+  readonly agents: readonly string[];
+  readonly signal: ContentSignal;
+}
+
+const MAX_GROUPS = 20;
+const MAX_AGENTS = 10;
+
+/**
+ * Every group of the file that has a Content-Signal line, with all its values. For showing only:
+ * the "no AI input" decision reads the "*" group alone (decideAiInput).
+ */
+export function parseRobotsGroups(raw: string): RobotsGroup[] {
+  const groups: RobotsGroup[] = [];
+  let agents: string[] = [];
+  let afterAgent = false;
+  for (const line of raw.split(/\r?\n/).slice(0, MAX_LINES)) {
+    const at = line.indexOf(':');
+    if (line.trimStart().startsWith('#') || at < 1) continue;
+    const key = line.slice(0, at).trim().toLowerCase();
+    const value = line.slice(at + 1).trim();
+    if (key === 'user-agent') {
+      agents = [...(afterAgent ? agents : []), value.slice(0, 60)].slice(0, MAX_AGENTS);
+      afterAgent = true;
+      continue;
+    }
+    afterAgent = false;
+    if (key === 'content-signal' && groups.length < MAX_GROUPS) {
+      groups.push({ agents, signal: signalOf(value) });
+    }
+  }
+  return groups;
+}
+
 export type AiInput = 'allowed' | 'blocked' | 'not-stated' | 'unreadable';
 
 /** A site that could not be asked is "not stated" unless the answer was lost or too big. */

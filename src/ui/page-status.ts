@@ -16,6 +16,8 @@ export type PageStatus =
       readonly node: boolean;
       /** The site asks that AI does not use its content as input (and nothing overrides it). */
       readonly blocked?: boolean;
+      /** The page has a WebMCP interface; false means this browser offers none to the page. */
+      readonly webmcp?: boolean;
     }
   | { readonly kind: 'not-allowed'; readonly origin?: string }
   | { readonly kind: 'restricted' }
@@ -32,7 +34,15 @@ export function statusOf(info: PageInfo, options: StatusOptions = {}): PageStatu
   const node =
     options.node ?? isAgscNode({ linkset: info.linkset, toolNames: info.tools.map((x) => x.name) });
   const blocked = options.blocked === true ? { blocked: true } : {};
-  return { kind: 'tools', origin: info.origin, count: info.tools.length, node, ...blocked };
+  const webmcp = info.webmcp === undefined ? {} : { webmcp: info.webmcp };
+  return {
+    kind: 'tools',
+    origin: info.origin,
+    count: info.tools.length,
+    node,
+    ...blocked,
+    ...webmcp,
+  };
 }
 
 export function errorStatus(error: unknown): PageStatus {
@@ -54,11 +64,18 @@ function hostOf(origin: string | undefined): string {
   }
 }
 
+/** No tools: this browser has no WebMCP, or the page registers none (the page said which). */
+function noToolsText(status: Extract<PageStatus, { kind: 'tools' }>, host: string): string {
+  if (status.webmcp === false) return t('pageNoWebmcp', { host });
+  if (status.node) return t('pageNodeNoTools', { host });
+  return t(status.webmcp === true ? 'pageNoToolsRegistered' : 'pageNoTools', { host });
+}
+
 function toolsText(status: Extract<PageStatus, { kind: 'tools' }>): string {
   const host = hostOf(status.origin);
   const count = status.count;
   if (status.blocked === true) return t('pageBlocked', { host });
-  if (count === 0) return t(status.node ? 'pageNodeNoTools' : 'pageNoTools', { host });
+  if (count === 0) return noToolsText(status, host);
   if (status.node) return t('pageNode', { host, count });
   return t(count === 1 ? 'pageTool' : 'pageTools', { host, count });
 }

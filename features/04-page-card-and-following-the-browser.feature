@@ -15,7 +15,7 @@ Feature: The page card and following the browser
     Given WebAIAssist is installed
     And a page without WebMCP tools is open
     And the side panel is open on that page
-    Then the page line says "{host} — no WebMCP tools (use Read this page or Add WebMCP to this site)"
+    Then the page line says "{host} — no WebMCP tools: this page registers none (use Read this page or Add WebMCP to this site)"
     And the page line is not shown as an error
 
   @smoke

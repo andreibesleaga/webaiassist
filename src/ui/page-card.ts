@@ -9,6 +9,7 @@ import { byId, element } from './dom';
 import { t } from './i18n';
 import { accessBadge, siteName, type PageStatus } from './page-status';
 import { chipLabel, factLines, policyLines } from './site-fact-lines';
+import { chipTitleFor, peerHosts } from './site-fact-lines-p2';
 
 export interface CardView {
   readonly title?: string;
@@ -71,12 +72,18 @@ export function sign(doc: Document): HTMLSpanElement {
 function renderChips(doc: Document, facts: SiteFacts | undefined): void {
   const chips = (facts?.chips ?? []).map((chip) => {
     const item = element(doc, 'li', chipLabel(chip.id), 'chip');
-    item.title = t('chipTitle', { path: chip.path });
+    item.title = chipTitleFor(chip, facts) ?? t('chipTitle', { path: chip.path });
     item.dataset.chip = chip.id;
     if (chip.id === 'ai-policy' && facts?.aiInput === 'blocked') item.classList.add('warn');
     return item;
   });
-  byId(doc, 'site-chips').replaceChildren(...chips);
+  const peers = peerHosts(facts).map((host) => {
+    const item = element(doc, 'li', t('chipPeer', { host }), 'chip');
+    item.title = t('chipPeerTitle');
+    item.dataset.chip = 'peer';
+    return item;
+  });
+  byId(doc, 'site-chips').replaceChildren(...chips, ...peers);
 }
 
 function renderPolicy(doc: Document, view: CardView): void {

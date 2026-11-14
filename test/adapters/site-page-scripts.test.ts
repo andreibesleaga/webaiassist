@@ -77,7 +77,22 @@ describe('fetchSiteFile (the function that runs in the tab)', () => {
       link: '<x>; rel="profile"',
       text: '# T',
       cut: false,
+      sha256: expect.stringMatching(/^[A-Za-z0-9+/]{43}=$/) as string,
     });
+  });
+
+  it('adds the base64 SHA-256 of the raw bytes of a body that was read whole', async () => {
+    stubFetch(() => Promise.resolve(respond('abc')));
+    const reply = (await fetchSiteFile(REQUEST)) as { sha256?: string };
+    expect(reply.sha256).toBe('ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0=');
+  });
+
+  it('adds no digest to a body that was cut, nor where WebCrypto is missing', async () => {
+    stubFetch(() => Promise.resolve(respond('x'.repeat(500))));
+    expect(await fetchSiteFile(REQUEST)).not.toHaveProperty('sha256');
+    vi.stubGlobal('crypto', {});
+    stubFetch(() => Promise.resolve(respond('abc')));
+    expect(await fetchSiteFile(REQUEST)).not.toHaveProperty('sha256');
   });
 
   it('refuses to run when the tab is no longer on the origin the panel expects', async () => {

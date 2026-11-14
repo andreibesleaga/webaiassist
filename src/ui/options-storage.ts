@@ -43,6 +43,9 @@ export async function showStore(deps: StorageDeps): Promise<void> {
   const models = await deps.store.list();
   byId(doc, 'model-store').replaceChildren(...models.map((m) => row(deps, m)));
   byId(doc, 'model-store-empty').hidden = models.length > 0;
+  const total = byId(doc, 'model-store-total');
+  total.hidden = models.length === 0;
+  total.textContent = t('storeTotal', { size: megabytes(models.reduce((n, m) => n + m.bytes, 0)) });
   byId(doc, 'remove-all-models').hidden = models.length === 0;
   byId(doc, 'remove-confirm').hidden = true;
 }

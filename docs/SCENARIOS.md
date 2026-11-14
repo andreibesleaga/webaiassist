@@ -60,12 +60,12 @@ Scenarios whose wording changed when they stopped being pending:
 | Tag | Scenarios |
 |---|---|
 | @smoke | 108 |
-| @unit | 114 |
+| @unit | 129 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
-| @manual | 6 |
-| all | 233 |
+| @manual | 7 |
+| all | 249 |
 | run by `npm run test:bdd` now | 108 |
 
 ### Every scenario
@@ -305,6 +305,22 @@ Scenarios whose wording changed when they stopped being pending:
 | F20.17 | Security and governance requirements that can be observed | For a site that asks for no AI input the panel says which parts are held back | @unit | `test/ui/panel-policy.test.ts`, `test/security-review/docs-review.test.ts` | unit test |
 | F20.18 | Security and governance requirements that can be observed | The export is marked as AI-generated in a front-matter block and names the endpoint host when one wrote it | @unit | `test/core/export.test.ts`, `test/ui/panel-export.test.ts` | unit test |
 | F20.19 | Security and governance requirements that can be observed | The privacy and governance texts state the saved tool results, the toolbar reads and the per-site exception | @unit | `test/security-review/docs-review.test.ts` | unit test |
+| F25.1 | The node's own list, more site facts, the shortcut, diagnostics and storage | Files that match the node's own list get the chip "matches the node's own list" | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
+| F25.2 | The node's own list, more site facts, the shortcut, diagnostics and storage | A file that does not match the node's own list is marked and not given to the model | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
+| F25.3 | The node's own list, more site facts, the shortcut, diagnostics and storage | The digest is computed over the raw bytes of a body that was read whole | @unit | `test/adapters/site-page-scripts.test.ts` | unit test |
+| F25.4 | The node's own list, more site facts, the shortcut, diagnostics and storage | The card shows the node's bundle, item counts and ledger head | @unit | `test/ui/panel-node-extras.test.ts` | unit test |
+| F25.5 | The node's own list, more site facts, the shortcut, diagnostics and storage | The page's own link rows and richer JSON-LD are shown as text, same site only | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
+| F25.6 | The node's own list, more site facts, the shortcut, diagnostics and storage | The sustainability file is the ninth site file and its signature is only "present" | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts`, `test/core/site-files.test.ts` | unit test |
+| F25.7 | The node's own list, more site facts, the shortcut, diagnostics and storage | Every Content-Signal value and group of robots.txt is shown, and only the "*" group decides | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
+| F25.8 | The node's own list, more site facts, the shortcut, diagnostics and storage | A node shows three starter questions that fill the box and send nothing | @unit | `test/ui/panel-node-extras.test.ts` | unit test |
+| F25.9 | The node's own list, more site facts, the shortcut, diagnostics and storage | The node's declared peer is shown as a text chip and is not fetched | @unit | `test/ui/panel-node-extras.test.ts` | unit test |
+| F25.10 | The node's own list, more site facts, the shortcut, diagnostics and storage | The status line says why a page has no tools | @unit | `test/ui/page-status.test.ts`, `test/adapters/page-bridge-main.test.ts` | unit test |
+| F25.11 | The node's own list, more site facts, the shortcut, diagnostics and storage | The manifest declares one shortcut, for the toolbar button, and no permission | @unit | `test/scripts/manifest-shortcut.test.ts`, `test/scripts/check-dist.test.ts` | unit test |
+| F25.12 | The node's own list, more site facts, the shortcut, diagnostics and storage | The shortcut opens the side panel like the toolbar button | @manual | `features/25-node-extras-shortcut-diagnostics-storage.feature` | manual check |
+| F25.13 | The node's own list, more site facts, the shortcut, diagnostics and storage | Copy diagnostics shows what it copies, then copies exactly that on a second click | @unit | `test/ui/diagnostics.test.ts`, `test/core/diagnostics.test.ts` | unit test |
+| F25.14 | The node's own list, more site facts, the shortcut, diagnostics and storage | Diagnostics hold no page text, no address and no key | @unit | `test/ui/diagnostics.test.ts`, `test/core/diagnostics.test.ts` | unit test |
+| F25.15 | The node's own list, more site facts, the shortcut, diagnostics and storage | Persistent storage is asked once, after the first successful download | @unit | `test/ui/storage-p2.test.ts` | unit test |
+| F25.16 | The node's own list, more site facts, the shortcut, diagnostics and storage | Options shows the total size of the downloaded models | @unit | `test/ui/storage-p2.test.ts` | unit test |
 
 ### Requirement rows
 

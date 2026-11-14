@@ -441,3 +441,17 @@ vendor/         model libraries fetched once by the build (not in git)
 test/           unit tests (Vitest), fixture replay, adversarial tests (test/security),
                 browser smoke and accessibility tests (Playwright, test/smoke)
 ```
+
+## Package P2 additions (14 Nov 2026)
+
+- Digest check: `src/adapters/site-page-scripts.ts` adds the base64 SHA-256 of a whole body to
+  `site/file`; `src/core/site-digest.ts` compares it with the digest in the node's link set;
+  `src/core/site-facts.ts` drops a mismatching file from the facts (so from the model's context).
+- New readers: `src/core/site-sustainability.ts`, `parseRobotsGroups` in `src/core/site-robots.ts`,
+  `pageLinkRows` and the creator and distribution fields in `src/core/site-page.ts`.
+- Texts and lines of these: `src/ui/messages-p2-en.ts`, `src/ui/site-fact-lines-p2.ts`; starter
+  questions: `src/ui/starter-prompts.ts`.
+- `tools/list-result` carries `webmcp` (the page has a WebMCP interface); `src/ui/page-status.ts`
+  words the reason for "no tools" from it.
+- Diagnostics: `src/core/diagnostics.ts` (text), `src/ui/diagnostics-ui.ts` (preview and copy),
+  `src/ui/panel-diagnostics.ts` (panel facts), `src/entries/options.ts` (Options facts).

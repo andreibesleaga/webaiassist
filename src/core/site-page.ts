@@ -2,6 +2,7 @@
 // What the open page says about itself: JSON-LD blocks, Open Graph and meta tags, as the
 // isolated page script read them from the live page (no request). JSON-LD is parsed here and
 // only a handful of text members are kept; no `@context`, `@id` or `url` is ever fetched.
+import { parseAddress } from './site-url';
 
 /** Raw page data, capped in the page before it comes here (site-page-script.ts). */
 export interface PageMeta {
@@ -33,6 +34,10 @@ export interface PageFact {
   readonly date?: string;
   readonly license?: string;
   readonly language?: string;
+  /** Creator name (a Person or Organization name, or text), cut. */
+  readonly creator?: string;
+  /** How many `distribution` entries a Dataset lists. */
+  readonly distributions?: number;
 }
 
 type Entry = Record<string, unknown>;
@@ -63,6 +68,22 @@ function licenseOf(node: Entry): string | undefined {
   return cut(isEntry(value) ? (value['@id'] ?? value.url) : value);
 }
 
+const MAX_DISTRIBUTIONS = 99;
+
+/** A creator as text: a string, or the name of an object, or of the first of a list. */
+function creatorOf(node: Entry): string | undefined {
+  const list: unknown = node.creator;
+  const value: unknown = Array.isArray(list) ? (list[0] as unknown) : list;
+  const text: unknown = isEntry(value) ? value.name : value;
+  return typeof text === 'string' && text.trim() !== '' ? text.trim().slice(0, 120) : undefined;
+}
+
+function distributionsOf(node: Entry): number | undefined {
+  const list = node.distribution;
+  if (Array.isArray(list)) return Math.min(list.length, MAX_DISTRIBUTIONS);
+  return isEntry(list) ? 1 : undefined;
+}
+
 function factOf(node: Entry, language: string | undefined): PageFact | undefined {
   const type = typeOf(node);
   const title = cut(node.name) ?? cut(node.headline);
@@ -74,6 +95,8 @@ function factOf(node: Entry, language: string | undefined): PageFact | undefined
     date: cut(node.dateModified) ?? cut(node.datePublished),
     license: licenseOf(node),
     language: cut(node.inLanguage) ?? language,
+    creator: creatorOf(node),
+    distributions: distributionsOf(node),
   };
   const defined = Object.entries(fields).filter(([, value]) => value !== undefined);
   return { source: 'JSON-LD', ...Object.fromEntries(defined) };
@@ -111,4 +134,30 @@ function fromMeta(meta: PageMeta): PageFact | undefined {
 /** The best source in this order: JSON-LD, Open Graph, the description meta tag. */
 export function pageFact(meta: PageMeta): PageFact | undefined {
   return fromJsonLd(meta) ?? fromOpenGraph(meta) ?? fromMeta(meta);
+}
+
+/** One `<link rel>` of the page on the site's own origin: the path as text, never opened. */
+export interface PageLinkRow {
+  readonly rel: string;
+  readonly path: string;
+  readonly type?: string;
+}
+
+const MAX_LINK_ROWS = 12;
+
+/** The page's own link rows whose target is on `origin`; other origins are left out. */
+export function pageLinkRows(meta: PageMeta, origin: string): PageLinkRow[] {
+  const rows: PageLinkRow[] = [];
+  for (const link of meta.links) {
+    const target = parseAddress(link.href);
+    if (target?.origin !== origin) continue;
+    const path = target.href.slice(origin.length) || '/';
+    rows.push({
+      rel: link.rel,
+      path: path.slice(0, 200),
+      ...(link.type ? { type: link.type } : {}),
+    });
+    if (rows.length >= MAX_LINK_ROWS) break;
+  }
+  return rows;
 }

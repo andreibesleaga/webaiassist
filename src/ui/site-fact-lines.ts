@@ -5,6 +5,7 @@ import { visible } from '../core/tool-card';
 import type { ChipId, SiteFacts } from '../core/site-facts';
 import { t } from './i18n';
 import type { MessageKey } from './messages-en';
+import { extraFactLines } from './site-fact-lines-p2';
 
 const CHIP_KEYS: Readonly<Record<ChipId, MessageKey>> = {
   linkset: 'chipLinkset',
@@ -17,6 +18,8 @@ const CHIP_KEYS: Readonly<Record<ChipId, MessageKey>> = {
   tdmrep: 'chipAiPolicy',
   'ai-policy': 'chipAiPolicy',
   'structured-data': 'chipStructured',
+  sustainability: 'chipSustainability',
+  'digest-match': 'chipDigestMatch',
 };
 
 export const chipLabel = (id: ChipId): string => t(CHIP_KEYS[id]);
@@ -75,7 +78,12 @@ function otherLines(facts: SiteFacts): string[] {
 
 /** The facts, one short line each (the AI policy has its own lines in the card). */
 export function factLines(facts: SiteFacts): string[] {
-  return [...nodeLines(facts), ...guideLines(facts), ...otherLines(facts)];
+  return [
+    ...nodeLines(facts),
+    ...guideLines(facts),
+    ...otherLines(facts),
+    ...extraFactLines(facts, chipLabel),
+  ];
 }
 
 /** The AI-policy line: what the site says about AI input, and a reserved-rights note. */

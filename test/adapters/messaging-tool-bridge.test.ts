@@ -36,6 +36,15 @@ describe('MessagingToolBridge', () => {
     expect(await bridge.list(9)).toEqual({ origin: 'https://node.example', tools: AGSC_TOOLS });
   });
 
+  it('passes on whether the page has a WebMCP interface; unknown stays unknown', async () => {
+    const yes = bridgeWith((m) => listResult(m, { webmcp: true }));
+    expect((await yes.bridge.page(1)).webmcp).toBe(true);
+    const no = bridgeWith((m) => listResult(m, { webmcp: false }));
+    expect((await no.bridge.page(1)).webmcp).toBe(false);
+    const unknown = bridgeWith((m) => listResult(m));
+    expect((await unknown.bridge.page(1)).webmcp).toBeUndefined();
+  });
+
   it('drops empty optional fields of a tool', async () => {
     const tools = [
       {

@@ -40,6 +40,9 @@ export function fake(stored: Settings = DEFAULT_SETTINGS): Fake {
       deps.requested.push(origin);
       return Promise.resolve(deps.granted);
     },
+    diagnostics: () =>
+      Promise.resolve({ version: '0.1.0', browser: 'Chrome/157', webmcp: 'not checked here' }),
+    copyText: () => Promise.resolve(),
     clearMemory: () => {
       deps.cleared += 1;
       return Promise.resolve();

@@ -4,6 +4,7 @@
 // site and is untrusted; nothing in it adds a tool, changes a setting or names an address to
 // fetch. The text for the model is built in site-context.ts.
 import { isAgscNode } from './node-mode';
+import { checkDigests, type DigestCheck } from './site-digest';
 import {
   AGSC_PROFILE,
   CATALOG_PROFILE,
@@ -12,8 +13,21 @@ import {
   type Linkset,
 } from './site-linkset';
 import { parseLlms, type Llms } from './site-llms';
-import { pageFact, type PageFact, type PageMeta } from './site-page';
-import { decideAiInput, parseRobots, type AiInput } from './site-robots';
+import {
+  pageFact,
+  pageLinkRows,
+  type PageFact,
+  type PageLinkRow,
+  type PageMeta,
+} from './site-page';
+import {
+  decideAiInput,
+  parseRobots,
+  parseRobotsGroups,
+  type AiInput,
+  type RobotsGroup,
+} from './site-robots';
+import { parseSustainability, type Sustainability } from './site-sustainability';
 import type { FileOutcome, SiteFileId } from './site-files';
 import {
   parseAgentCard,
@@ -23,7 +37,7 @@ import {
   type SecurityTxt,
 } from './site-small';
 
-export type ChipId = SiteFileId | 'ai-policy' | 'structured-data';
+export type ChipId = SiteFileId | 'ai-policy' | 'structured-data' | 'digest-match';
 export type Outcomes = Partial<Record<SiteFileId, FileOutcome>>;
 
 export interface SiteChip {
@@ -45,6 +59,12 @@ export interface SiteFacts {
   readonly agentCard?: AgentCard;
   readonly security?: SecurityTxt;
   readonly page?: PageFact;
+  /** Package P2, added at the end: digests against the node's own list, the page's link rows,
+   *  the sustainability file and every Content-Signal group of robots.txt. */
+  readonly digests: DigestCheck;
+  readonly pageLinks?: readonly PageLinkRow[];
+  readonly sustainability?: Sustainability;
+  readonly robotsGroups?: readonly RobotsGroup[];
 }
 
 export interface FactsInput {
@@ -80,6 +100,12 @@ function reservedBy(input: FactsInput, aiTrain: boolean | undefined): boolean {
   return reserved === true || aiTrain === false || input.page?.tdm === '1';
 }
 
+/** At least one listed file was checked and none differs. */
+const digestsAllMatch = (facts: Omit<SiteFacts, 'chips'>): boolean =>
+  facts.node !== undefined &&
+  facts.digests.matched.length > 0 &&
+  facts.digests.mismatched.length === 0;
+
 function chips(facts: Omit<SiteFacts, 'chips'>, policyStated: boolean): SiteChip[] {
   const list: { id: ChipId; path: string; on: boolean }[] = [
     { id: 'linkset', path: '/.well-known/knowledge-linkset', on: facts.node !== undefined },
@@ -90,11 +116,17 @@ function chips(facts: Omit<SiteFacts, 'chips'>, policyStated: boolean): SiteChip
     { id: 'security', path: '/.well-known/security.txt', on: facts.security !== undefined },
     { id: 'ai-policy', path: '/robots.txt', on: policyStated },
     { id: 'structured-data', path: 'JSON-LD', on: facts.page?.source === 'JSON-LD' },
+    {
+      id: 'sustainability',
+      path: '/.well-known/sustainability-data',
+      on: facts.sustainability !== undefined,
+    },
+    { id: 'digest-match', path: '/.well-known/knowledge-linkset', on: digestsAllMatch(facts) },
   ];
   return list.filter((item) => item.on).map(({ id, path }) => ({ id, path }));
 }
 
-type Parts = Omit<SiteFacts, 'chips' | 'origin' | 'aiInput' | 'trainingReserved'>;
+type Parts = Omit<SiteFacts, 'chips' | 'origin' | 'aiInput' | 'trainingReserved' | 'digests'>;
 
 function parts(input: FactsInput): Parts {
   const { outcomes, origin } = input;
@@ -102,6 +134,7 @@ function parts(input: FactsInput): Parts {
   const cardFile = found(outcomes['agent-card']);
   const security = found(outcomes.security);
   const full = found(outcomes['llms-full']);
+  const sustain = found(outcomes.sustainability);
   const node = linksetOf(outcomes.linkset, origin, AGSC_PROFILE);
   const found_ = {
     llms: llmsFile ? parseLlms(llmsFile.text) : undefined,
@@ -111,8 +144,31 @@ function parts(input: FactsInput): Parts {
     agentCard: cardFile ? parseAgentCard(cardFile.text) : undefined,
     security: security ? parseSecurityTxt(security.text, origin, input.nowMs) : undefined,
     page: input.page ? pageFact(input.page) : undefined,
+    pageLinks: input.page ? nonEmpty(pageLinkRows(input.page, origin)) : undefined,
+    sustainability: sustain ? parseSustainability(sustain.text) : undefined,
   };
   return Object.fromEntries(Object.entries(found_).filter(([, value]) => value !== undefined));
+}
+
+const nonEmpty = <T>(list: readonly T[]): readonly T[] | undefined =>
+  list.length > 0 ? list : undefined;
+
+/** What a file that does not match the node's own list must not leave behind in the facts.
+ *  robots.txt and tdmrep.json are never dropped: ignoring a "no AI" statement is the unsafe way. */
+const DROPPED: Partial<Record<SiteFileId, keyof Parts>> = {
+  llms: 'llms',
+  'llms-full': 'llmsFullBytes',
+  'api-catalog': 'catalog',
+  'agent-card': 'agentCard',
+  security: 'security',
+  sustainability: 'sustainability',
+};
+
+function withoutMismatched(all: Parts, mismatched: readonly SiteFileId[]): Parts {
+  const dropped = new Set(mismatched.map((id) => DROPPED[id]));
+  return Object.fromEntries(
+    Object.entries(all).filter(([key]) => !dropped.has(key as keyof Parts)),
+  );
 }
 
 /** Everything the card knows about the site, from the outcomes of the file reads. */
@@ -120,11 +176,18 @@ export function buildSiteFacts(input: FactsInput): SiteFacts {
   const robots = found(input.outcomes.robots);
   const signal = robots ? parseRobots(robots.text) : {};
   const trainingReserved = reservedBy(input, signal.aiTrain);
+  const all = parts(input);
+  const digests = all.node
+    ? checkDigests(all.node, input.outcomes, input.origin)
+    : { matched: [], mismatched: [] };
+  const groups = robots ? nonEmpty(parseRobotsGroups(robots.text)) : undefined;
   const base = {
     origin: input.origin,
     aiInput: decideAiInput(input.outcomes.robots),
     trainingReserved,
-    ...parts(input),
+    ...withoutMismatched(all, digests.mismatched),
+    digests,
+    ...(groups ? { robotsGroups: groups } : {}),
   };
   const stated = signal.aiInput !== undefined || signal.aiTrain !== undefined || trainingReserved;
   return { ...base, chips: chips(base, stated) };

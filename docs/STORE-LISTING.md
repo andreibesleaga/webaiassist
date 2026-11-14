@@ -54,8 +54,7 @@ paste it without the leading `>` and without the angle brackets around links;
 >
 > Needs a Chromium browser. WebMCP is a draft web standard; Chrome offers it in recent versions.
 > Small models choose tools less reliably than large ones, and answers can be wrong: they come
-> from an AI model. Chrome's built-in model test: not verified on a real computer yet, so it
-> stays optional.
+> from an AI model. Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows): the model used a tool in 5 of 5 questions on the test node and in 1 of 5 on the live node, and an answer took 15 to 42 s. It stays optional.
 
 **Images** (sizes from <https://developer.chrome.com/docs/webstore/images>, read 12 Nov 2026):
 

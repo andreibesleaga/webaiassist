@@ -31,12 +31,12 @@ reads or may change something), and what the site publishes for machines. With n
 
 ## Four ways to run the model
 
-| Path                    | Runs on                                                                                                                                                                        | Picked by itself when                                                                                   |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| Chrome's built-in model | In Chrome on this computer: Chrome's own model (Gemini Nano)                                                                                                                   | Chrome reports it ready. Also as a last resort before an endpoint. Not verified on a real computer yet. |
-| Graphics card           | In this browser, on your graphics card (WebLLM on WebGPU): Qwen3 0.6B, Llama 3.2 3B, Qwen3.5 2B or Gemma 4 E2B                                                                 | Its first answer on this computer took 20 seconds or less, or the processor path cannot run here.       |
-| Processor and memory    | In this browser, on your processor and memory (llama.cpp in WebAssembly): Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B                                                                 | Otherwise, on Chrome 137 or newer.                                                                      |
-| Chat endpoint           | Your own server on this computer (localhost, 127.0.0.1) or a remote service: any OpenAI-compatible address (a remote address gets your questions and the page content you use) | You set it up in Options and nothing better is available. Questions then go to that address.            |
+| Path                    | Runs on                                                                                                                                                                        | Picked by itself when                                                                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Chrome's built-in model | In Chrome on this computer: Chrome's own model (Gemini Nano)                                                                                                                   | Chrome reports it ready. Also as a last resort before an endpoint. Measured on a real computer on 14 Nov 2026 (see Limits). |
+| Graphics card           | In this browser, on your graphics card (WebLLM on WebGPU): Qwen3 0.6B, Llama 3.2 3B, Qwen3.5 2B or Gemma 4 E2B                                                                 | Its first answer on this computer took 20 seconds or less, or the processor path cannot run here.                           |
+| Processor and memory    | In this browser, on your processor and memory (llama.cpp in WebAssembly): Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B                                                                 | Otherwise, on Chrome 137 or newer.                                                                                          |
+| Chat endpoint           | Your own server on this computer (localhost, 127.0.0.1) or a remote service: any OpenAI-compatible address (a remote address gets your questions and the page content you use) | You set it up in Options and nothing better is available. Questions then go to that address.                                |
 
 A model you choose yourself is kept. Details are under [Other runtimes](#other-runtimes).
 
@@ -62,7 +62,12 @@ A model you choose yourself is kept. Details are under [Other runtimes](#other-r
 
 For a site you allowed, the panel reads a fixed list of public files with a plain GET from the
 same site: `llms.txt`, `llms-full.txt`, `/.well-known/knowledge-linkset`, the API catalog, the
-agent card, `security.txt`, `robots.txt` and TDMRep, plus the page's own JSON-LD. Each is size
+agent card, `security.txt`, `robots.txt`, TDMRep and `/.well-known/sustainability-data`, plus the
+page's own JSON-LD and `<link rel>` rows. On a node the card also shows the bundle version, date,
+item counts and ledger head from the node's link set, and the chip "matches the node's own list" when
+the files read match the digests in it (the same site publishes both, so this shows the files
+are unchanged since the node published its list, not who wrote them). A file that does not match
+is not given to the model. Each is size
 limited, shown as published by the site, and (unless you turn it off in Options) given to the
 model in short form, only as untrusted data.
 
@@ -72,6 +77,18 @@ to the model, because you asked for them. **Use on this tab anyway** overrides t
 local model on that tab; it is not offered with a chat endpoint.
 
 ---
+
+## Shortcut, diagnostics and storage
+
+- **Keyboard shortcut**: Alt+Shift+A opens the side panel (Chrome may leave it unset if another
+  extension has it; change it at `chrome://extensions/shortcuts`). It does what the toolbar button
+  does.
+- **Copy diagnostics** (Options, and More in the panel): shows what it will copy, then copies it
+  on a second click: versions, model, graphics adapter, built-in model state, WebMCP on the tab
+  and the last error. No page text, no keys, nothing sent anywhere.
+- **Downloaded models**: after the first successful download the panel asks Chrome once to keep
+  them (`navigator.storage.persist()`; Chrome decides). Options shows their total size. What an
+  update does to them is in [docs/PRIVACY.md](docs/PRIVACY.md).
 
 ## Options
 
@@ -172,9 +189,7 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
 - Chromium browsers only (Chrome 124 or later; the processor models need Chrome 137).
 - WebMCP is a draft standard; its shape may still change.
 - Answers can be wrong: they come from an AI model. Check anything that matters.
-- Chrome's built-in model test: not verified on a real computer yet. The first hand test did not
-  start the model, so it stays optional and the automated tests use a stand-in for it. Use a
-  model in the browser (graphics card or processor) for now.
+- Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows). The download, started from the click, took 300 s; later starts took 3 to 14 s. The model used a tool in 5 of 5 questions on the test node and in 1 of 5 on the live node, and an answer took 15 to 42 s (report: docs/eval/EVAL-NANO-2026-11-14-157.0.8103.52.json). It stays optional. Small models choose tools less reliably than large ones.
 - A page has tools only if its own scripts register them through WebMCP.
 - The model in the browser needs WebGPU. Llama 3.2 3B and Qwen3.5 2B need about 2.3 GB of
   graphics memory, Gemma 4 E2B about 3.4 GB; Gemma 4 E2B is listed only when the graphics card

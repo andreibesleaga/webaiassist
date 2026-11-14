@@ -101,6 +101,12 @@ function checkAccess(m, variant) {
   return problems;
 }
 
+/** The one key the owner approved: the keyboard shortcut of the toolbar button. */
+function checkCommands(m) {
+  if (m.commands === undefined || same(Object.keys(m.commands), ['_execute_action'])) return [];
+  return ['commands may only declare _execute_action'];
+}
+
 function checkFiles(m, exists, variant) {
   const named = [
     m.background?.service_worker,
@@ -119,6 +125,7 @@ export function checkManifest(manifest, exists, variant = 'release') {
   return [
     ...checkIdentity(manifest),
     ...checkAccess(manifest, variant),
+    ...checkCommands(manifest),
     ...checkFiles(manifest, exists, variant),
   ];
 }

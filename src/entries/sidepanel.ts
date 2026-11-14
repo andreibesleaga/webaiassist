@@ -154,6 +154,7 @@ async function buildDeps(bridge: MessagingToolBridge): Promise<PanelDeps> {
     nowMs: () => performance.now(),
     isOnline: () => navigator.onLine,
     copyText,
+    persistStorage: () => navigator.storage?.persist?.() ?? Promise.resolve(false),
     version: chrome.runtime.getManifest().version,
     download,
     openOptions: () => void chrome.runtime.openOptionsPage(),
