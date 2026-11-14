@@ -141,6 +141,12 @@ with WebMCP off), and serve this page from `localhost` or `https`:
 3. Expected: the card says one WebMCP tool; **Tools** lists `ping`. Ask the model to call it.
 4. Press **Forget this site**. Expected: after a reload the page has no tools again.
 
+### F25.12: the keyboard shortcut opens the panel
+
+1. Install the build in Chrome, open any web page, press Alt+Shift+A.
+2. Expected: the side panel opens and the card reads the page (the same as a toolbar click). If
+   nothing happens, look at `chrome://extensions/shortcuts`: another extension may hold the key.
+
 ## When a check fails
 
 Write down the check id, Chrome version, operating system, what the panel said (copy the whole

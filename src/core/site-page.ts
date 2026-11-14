@@ -72,8 +72,9 @@ const MAX_DISTRIBUTIONS = 99;
 
 /** A creator as text: a string, or the name of an object, or of the first of a list. */
 function creatorOf(node: Entry): string | undefined {
-  const value = Array.isArray(node.creator) ? node.creator[0] : node.creator;
-  const text = isEntry(value) ? value.name : value;
+  const list: unknown = node.creator;
+  const value: unknown = Array.isArray(list) ? (list[0] as unknown) : list;
+  const text: unknown = isEntry(value) ? value.name : value;
   return typeof text === 'string' && text.trim() !== '' ? text.trim().slice(0, 120) : undefined;
 }
 

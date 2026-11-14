@@ -27,7 +27,7 @@ export const P2_EN = {
   pageNoWebmcp:
     '{host} — this browser has no WebMCP (turn on chrome://flags/#enable-webmcp-testing and relaunch Chrome; or use Read this page or Add WebMCP to this site)',
   pageNoToolsRegistered:
-    '{host} — this page registers no tools (use Read this page or Add WebMCP to this site)',
+    '{host} — no WebMCP tools: this page registers none (use Read this page or Add WebMCP to this site)',
   diagnostics: 'Copy diagnostics',
   diagnosticsCopy: 'Copy this text',
   diagnosticsHost: 'Include the host of the open site',

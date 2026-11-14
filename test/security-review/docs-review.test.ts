@@ -99,8 +99,12 @@ describe('F20.7 the store listing and the README state the limits', () => {
       expect(/answers can be wrong/i.test(text), 'can be wrong').toBe(true);
     });
 
-    it(`${path} states the result of the built-in model test`, () => {
-      expect(/built-in model test:/i.test(flat(read(path)))).toBe(true);
+    it(`${path} states the measured result of the built-in model test`, () => {
+      const text = flat(read(path));
+      expect(/built-in model test:/i.test(text)).toBe(true);
+      expect(text).toContain('measured on a real computer on 14 Nov 2026');
+      expect(text).toContain('5 of 5 questions on the test node and in 1 of 5 on the live node');
+      expect(/not verified on a real computer/i.test(text)).toBe(false);
     });
   }
 });
@@ -157,9 +161,9 @@ describe('audit L5 the public texts state what the code does', () => {
     );
   });
 
-  it('PRIVACY.md says a toolbar click starts the eight site-file reads', () => {
+  it('PRIVACY.md says a toolbar click starts the nine site-file reads', () => {
     const text = flat(read('docs/PRIVACY.md'));
-    expect(text).toMatch(/toolbar (button|click)[^|]*eight files|eight files[^|]*toolbar/i);
+    expect(text).toMatch(/toolbar (button|click)[^|]*nine files|nine files[^|]*toolbar/i);
     expect(text).toContain('A toolbar click on a page');
   });
 

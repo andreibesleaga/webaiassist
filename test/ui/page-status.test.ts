@@ -40,7 +40,7 @@ describe('page status line', () => {
       'example.org — this browser has no WebMCP (turn on chrome://flags/#enable-webmcp-testing and relaunch Chrome; or use Read this page or Add WebMCP to this site)',
     );
     expect(statusText(statusOf({ ...base, webmcp: true }))).toBe(
-      'example.org — this page registers no tools (use Read this page or Add WebMCP to this site)',
+      'example.org — no WebMCP tools: this page registers none (use Read this page or Add WebMCP to this site)',
     );
     expect(statusText(statusOf({ ...base, webmcp: false, tools: one }))).toBe(
       'example.org — 1 WebMCP tool',

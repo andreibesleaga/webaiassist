@@ -123,7 +123,7 @@ test('Options page: no axe violations, all fields by Tab, saved with the keyboar
   expect(await axe(options)).toEqual([]);
   await options.emulateMedia({ colorScheme: 'dark' });
   expect(await axe(options)).toEqual([]);
-  const { ids, shown } = await tabOrder(options, 10);
+  const { ids, shown } = await tabOrder(options, 11);
   expect(shown).toEqual(ids.map(() => true));
   // Automatic is the chosen radio; the fields of the other runtimes are hidden until chosen.
   expect(ids).toEqual([
@@ -135,6 +135,7 @@ test('Options page: no axe violations, all fields by Tab, saved with the keyboar
     'site-facts',
     'language',
     'forget-all',
+    'diagnostics',
     'save',
     'reset',
   ]);

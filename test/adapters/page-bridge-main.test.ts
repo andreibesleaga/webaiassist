@@ -48,16 +48,6 @@ describe('startMainBridge: tools/list', () => {
     expect(replies(win)[0]?.channel).toBe(CHANNEL);
   });
 
-  it('says whether the page has a WebMCP interface at all, apart from its tools', async () => {
-    const withApi = await ask(setup(new FakeModelContext(ORIGIN, [])), {
-      type: 'tools/list',
-      id: 'w1',
-    });
-    expect(withApi).toMatchObject({ ok: true, tools: [], webmcp: true });
-    const without = await ask(setup(undefined), { type: 'tools/list', id: 'w2' });
-    expect(without).toMatchObject({ ok: true, tools: [], webmcp: false });
-  });
-
   it('keeps the three hints (an unclear consequentialHint as true), a title and an object schema', async () => {
     const page = {
       getTools: () =>

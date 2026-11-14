@@ -59,23 +59,31 @@ function hostOf(origin: string | undefined): string | undefined {
   return origin === undefined ? undefined : origin.replace(/^https?:\/\//, '');
 }
 
-export function panelFacts(ctx: PanelController, includeHost: boolean): DiagnosticsFacts {
+/** The model, where it runs, the adapter and the last error: the parts that may be missing. */
+function optionalFacts(ctx: PanelController): Partial<DiagnosticsFacts> {
   const { state, deps } = ctx;
   const value = byId<HTMLSelectElement>(deps.doc, 'model').value;
   const choice = state.choices.find((c) => c.value === value);
   const model = state.runtime?.label;
   const where = whereOf(ctx, choice);
   const gpu = gpuOf(ctx);
+  return {
+    ...(model === undefined ? {} : { model }),
+    ...(where === undefined ? {} : { where }),
+    ...(gpu ? { gpu } : {}),
+    ...(state.lastError === undefined ? {} : { lastError: state.lastError }),
+  };
+}
+
+export function panelFacts(ctx: PanelController, includeHost: boolean): DiagnosticsFacts {
+  const { state, deps } = ctx;
   const host = includeHost ? hostOf(state.page?.origin) : undefined;
   return {
     version: deps.version,
     browser: browserOf(deps.doc.defaultView?.navigator.userAgent ?? ''),
     webmcp: webmcpOf(ctx),
     builtIn: state.env.builtIn ?? 'not checked',
-    ...(model === undefined ? {} : { model }),
-    ...(where === undefined ? {} : { where }),
-    ...(gpu ? { gpu } : {}),
-    ...(state.lastError === undefined ? {} : { lastError: state.lastError }),
+    ...optionalFacts(ctx),
     ...(host === undefined ? {} : { host }),
   };
 }

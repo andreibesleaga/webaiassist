@@ -69,12 +69,7 @@ function sustainLine(data: Sustainability): string {
   return t('factSustain', { values: values.join('; ') });
 }
 
-function pageLines(facts: SiteFacts): string[] {
-  const lines: string[] = [];
-  const rows = (facts.pageLinks ?? []).map(
-    (row) => `${shown(row.rel, 30)} ${shown(row.path, 100)}`,
-  );
-  if (rows.length > 0) lines.push(t('factPageLinks', { rows: rows.join(', ') }));
+function pageData(facts: SiteFacts): string[] {
   const page = facts.page;
   const more = [
     page?.distributions !== undefined && t('factPageDistributions', { count: page.distributions }),
@@ -82,8 +77,15 @@ function pageLines(facts: SiteFacts): string[] {
     page?.creator && t('factPageCreator', { creator: shown(page.creator, 100) }),
     page?.date && shown(page.date, 30),
   ].filter(Boolean);
-  if (more.length > 0) lines.push(t('factPageMore', { parts: more.join(', ') }));
-  return lines;
+  return more.length > 0 ? [t('factPageMore', { parts: more.join(', ') })] : [];
+}
+
+function pageLines(facts: SiteFacts): string[] {
+  const rows = (facts.pageLinks ?? []).map(
+    (row) => `${shown(row.rel, 30)} ${shown(row.path, 100)}`,
+  );
+  const links = rows.length > 0 ? [t('factPageLinks', { rows: rows.join(', ') })] : [];
+  return [...links, ...pageData(facts)];
 }
 
 function digestLines(facts: SiteFacts, chipName: (id: ChipId) => string): string[] {
