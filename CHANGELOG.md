@@ -170,7 +170,7 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Known limits
 
-- Chrome's built-in model is not verified on a real computer: the first hand test did not start it.
+- Chrome's built-in model was measured on 14 Nov 2026 (Chrome 157, Windows): a tool in 5 of 5 questions on the test node and 1 of 5 on the live node, 15 to 42 s an answer. The first hand test, before that, did not start it.
 - The graphics-card path was run on a laptop GPU (slow first answer; long prompts needed a
   smaller prefill chunk); Llama 3.2 3B lost the GPU device on its first question there (the chunk
   is now per model, not yet measured), and Qwen3.5 2B and Gemma 4 E2B are not run on a graphics card yet.

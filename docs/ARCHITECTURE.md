@@ -192,8 +192,8 @@ whose name no other entry uses.
 
 The chat request of the `ModelRuntime` port has an optional `onUsage` callback. Only the endpoint
 runtime calls it, once per chat, with the prompt and completion token counts and the price (US
-dollars) the service returned in the last chunk of the stream; an activity log reads them there
-(`src/core/ports/model-runtime.ts`).
+dollars) the service returned in the last chunk of the stream. Nothing in this release stores or shows them
+(`src/core/ports/model-runtime.ts`); the endpoint evaluation script prints them.
 
 WebLLM needs WebGPU. The panel probes for it when the user presses Start and uses the first host
 that has an adapter: the offscreen document, then the extension service worker

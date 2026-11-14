@@ -13,7 +13,10 @@ Chrome 124.
   offscreen document, and `document.modelContext` was present. With the extension on
   `agenticsystemcore.com`, the graphics-card model ran, with a first answer of about 40
   seconds (the GPU programs compile on it). Chrome's built-in model did not start in the first
-  hand test; its result is not verified ([MANUAL-CHECKS.md](MANUAL-CHECKS.md)).
+  hand test. It was measured on 14 Nov 2026 in Chrome 157.0.8103.52 on Windows: the download from
+  the click took 300 s, later starts 3 to 14 s, a tool was used in 5 of 5 questions on the test node
+  and 1 of 5 on the live node, and an answer took 15 to 42 s
+  (`docs/eval/EVAL-NANO-2026-11-14-157.0.8103.52.json`, [EVAL.md](EVAL.md)).
 - Headless Chromium 156 (Playwright 1.64.1, `--enable-features=WebMCPTesting`), in the automated
   smoke, scenario and accessibility tests, and in `npm run eval:cpu`, which ran the real processor
   models (llama.cpp in WebAssembly, 8 threads) on Linux under WSL: [EVAL.md](EVAL.md).
@@ -101,13 +104,13 @@ WebGPU it shows a plain error and **Use the processor instead**.
 
 "Not documented" means no vendor page was found today. It does not mean unsupported.
 
-| Browser | Install from store      | Load unpacked                 | Side panel     | WebGPU                             | WebMCP                                      | Built-in model                      | Tested by us                                                                                  |
-| ------- | ----------------------- | ----------------------------- | -------------- | ---------------------------------- | ------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
-| Chrome  | Yes (home store)        | `chrome://extensions`         | Yes, from 114  | Yes, from 113 (not Linux per page) | Origin trial from 149; flag for development | Prompt API, extensions from 138     | Chrome 157 (maintainer, Windows 10, spike page only); headless Chromium 156 (automated tests) |
-| Edge    | Yes, allow other stores | Developer mode, Load unpacked | Yes (sidebar)  | Not documented                     | Not documented                              | Prompt API preview, Canary/Dev only | Not tested                                                                                    |
-| Brave   | Not documented          | Not documented                | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                    |
-| Opera   | Add-on not verified     | `opera:extensions`            | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                    |
-| Vivaldi | Yes, Add to Vivaldi     | `vivaldi://extensions`        | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                    |
+| Browser | Install from store      | Load unpacked                 | Side panel     | WebGPU                             | WebMCP                                      | Built-in model                      | Tested by us                                                                                                                  |
+| ------- | ----------------------- | ----------------------------- | -------------- | ---------------------------------- | ------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Chrome  | Yes (home store)        | `chrome://extensions`         | Yes, from 114  | Yes, from 113 (not Linux per page) | Origin trial from 149; flag for development | Prompt API, extensions from 138     | Chrome 157 (maintainer, Windows 10: spike page; built-in model measured 14 Nov 2026); headless Chromium 156 (automated tests) |
+| Edge    | Yes, allow other stores | Developer mode, Load unpacked | Yes (sidebar)  | Not documented                     | Not documented                              | Prompt API preview, Canary/Dev only | Not tested                                                                                                                    |
+| Brave   | Not documented          | Not documented                | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                                                    |
+| Opera   | Add-on not verified     | `opera:extensions`            | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                                                    |
+| Vivaldi | Yes, Add to Vivaldi     | `vivaldi://extensions`        | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                                                    |
 
 ## WebMCP conformance
 
