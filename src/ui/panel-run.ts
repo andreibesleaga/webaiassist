@@ -13,6 +13,7 @@ import { note } from './panel-note';
 import type { PanelController } from './panel-controller';
 import { aiBlocked, refreshPage } from './panel-page';
 import { dismissFirstRun } from './panel-notices';
+import { graphToolFor } from './panel-graph-tool';
 import { shownText } from './panel-problems';
 
 /** The bridge used when the page has no tools or the user did not allow them. */
@@ -53,6 +54,12 @@ function setRunning(ctx: PanelController, controller: AbortController | undefine
   byId<HTMLButtonElement>(ctx.deps.doc, 'stop').disabled = controller === undefined;
 }
 
+/** Marks the run as started: the controls, the origin it is bound to, and no switch or page change yet. */
+function beginRun(ctx: PanelController, controller: AbortController, origin: string): void {
+  setRunning(ctx, controller);
+  Object.assign(ctx.state, { runOrigin: origin, stoppedBySwitch: false, pageChangedTo: undefined });
+}
+
 /** The read page text, used once and only on the tab and site it was read on. */
 function pageTextFor(ctx: PanelController, tabId: number, origin: string): string | undefined {
   const read = ctx.state.pageText;
@@ -82,16 +89,13 @@ async function runQuestion(ctx: PanelController, text: string, tabId: number): P
   const plan = await toolPlan(ctx);
   const memory = await deps.memory(state.settings);
   const controller = new AbortController();
-  setRunning(ctx, controller);
-  Object.assign(state, {
-    runOrigin: plan.origin,
-    stoppedBySwitch: false,
-    pageChangedTo: undefined,
-  });
+  beginRun(ctx, controller, plan.origin);
   const pageText = pageTextFor(ctx, tabId, plan.origin);
   const siteText = siteFactsFor(ctx, plan.origin);
   const notice = withSlowStartNotice(ui);
+  const graph = await graphToolFor(ctx, plan, tabId);
   const agentDeps = {
+    ...graph.deps,
     model,
     bridge: plan.bridge,
     memory,
@@ -108,6 +112,7 @@ async function runQuestion(ctx: PanelController, text: string, tabId: number): P
     signal: controller.signal,
     node: plan.node,
     confirmEveryCall: state.settings.confirmMode === 'every-call',
+    ...graph.scope,
     ...(pageText === undefined ? {} : { pageText }),
     ...(siteText === undefined ? {} : { siteContext: siteText }),
   });

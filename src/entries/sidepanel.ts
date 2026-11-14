@@ -23,6 +23,7 @@ import { parseMessage } from '../protocol/validate';
 import { applyI18n, setLanguage } from '../ui/i18n';
 import { startPanel, type PanelDeps } from '../ui/panel-controller';
 import { cpuTestModels } from './shared/cpu-engine';
+import { panelGraphQuery } from './shared/graph-query-deps';
 import { createModelStore } from './shared/model-store';
 import { createRuntime } from './shared/panel-runtimes';
 import { explorerQuery } from '../ui/explorer-url';
@@ -163,6 +164,7 @@ async function buildDeps(bridge: MessagingToolBridge): Promise<PanelDeps> {
       void chrome.tabs.create({
         url: chrome.runtime.getURL(`explorer.html?${explorerQuery({ tabId, origin })}`),
       }),
+    graphQuery: panelGraphQuery,
     builtInState: () =>
       builtInState((globalThis as { LanguageModel?: AvailabilityLike }).LanguageModel),
   };

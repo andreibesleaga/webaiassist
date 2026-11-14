@@ -85,3 +85,60 @@ Feature: Query and semantic tools
   Scenario: The query engine files are the published ones, byte for byte
     Given the copies of tokens.js, engine.js, view.js and the question list, and the oxigraph files
     Then each equals its size and SHA-256 in the pin file, and a changed byte is reported
+
+  # req: R4-7
+  # test: test/core/builtin-loop.test.ts
+  @smoke
+  Scenario: The model asks the node's graph with its built-in tool and no question is asked
+    Given a node page that publishes its graph as N-Quads and its vocabulary
+    And the side panel is open on that page with the scripted model
+    When the model calls the built-in graph tool with a count of the concepts
+    Then no question to run a tool was asked
+    And the transcript shows the call and the count 13
+
+  # req: R4-8
+  # test: test/core/builtin-loop.test.ts
+  @smoke
+  Scenario: An update asked by the model through the built-in tool is refused
+    Given a node page that publishes its graph as N-Quads and its vocabulary
+    And the side panel is open on that page with the scripted model
+    When the model calls the built-in graph tool with the query DROP ALL
+    Then the transcript says that an update is refused
+
+  # req: ASI07-2
+  # test: test/core/builtin-tools.test.ts, test/core/builtin-loop.test.ts
+  @smoke
+  Scenario: A page tool with the built-in tool's name is marked on the card and never answers
+    Given a node page that also registers a tool named like the built-in graph tool
+    And the side panel is open on that page with the scripted model
+    When the model calls the built-in graph tool with a count of the concepts
+    Then the card marks the page's tool as built-in and not offered
+    And the transcript shows the count 13 and nothing from the page's tool
+
+  # req: ASI07-2
+  # test: test/core/builtin-tools.test.ts
+  @unit
+  Scenario: A name that is or reads like a WebAIAssist name is reserved
+    Given page tool names with other letter case, hyphens, full-width letters, a zero-width space, Cyrillic or Greek look-alikes
+    Then each is reserved, and an ordinary name is not
+
+  # req: ASI07-2
+  # test: test/core/builtin-loop.test.ts
+  @unit
+  Scenario: The built-in tool is listed apart and its results are fenced as untrusted data
+    Given the model has the built-in graph tool and a graph value that holds an instruction
+    Then the prompt lists the tool under its own heading and the rows stay inside the untrusted fence
+
+  # req: R4-8
+  # test: test/core/builtin-loop.test.ts
+  @unit
+  Scenario: After a failed query the model may fix it once, and after two failures it queries no more
+    Given the model sends a query that fails, then another that fails, then a third
+    Then the first failure carries a repair line, and the third query is not run
+
+  # req: ASI07-2
+  # test: test/ui/panel-graph-tool.test.ts
+  @unit
+  Scenario: The panel offers the built-in tool only on a node that publishes its graph and allows AI input
+    Given a page that is not a node, a node that asks for no AI input, and a node that does not name graph.nq
+    Then none of them is given the built-in tool

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Builds the messages for one run: the system prompt with the tool list, then the chat.
+import { builtinSection, pageTools } from './builtin-prompt';
 import { NODE_HINT } from './node-mode';
 import type { ToolStat } from './ports/memory';
 import { cleanPageText, listableTool } from './sanitize';
@@ -52,7 +53,7 @@ export function buildSystemPrompt(
   options: PromptOptions = {},
 ): string {
   const hint = options.node === true ? `\n\n${NODE_HINT}` : '';
-  return `${RULES}${hint}\n\n${toolSection(tools)}${statsSection(stats)}`;
+  return `${RULES}${hint}\n\n${toolSection(pageTools(tools))}${builtinSection(tools)}${statsSection(stats)}`;
 }
 
 export function buildMessages(

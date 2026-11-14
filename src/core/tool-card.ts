@@ -3,6 +3,7 @@
 // (the page's own words, cut, with hidden characters made visible) and whether it reads or
 // changes. A tool the page does not mark as read-only counts as one that changes something,
 // the same rule as the confirmation gate.
+import { isReservedName } from './builtin-tools';
 import { needsConfirmation } from './gate';
 import { revealInvisible } from './sanitize';
 import type { ToolInfo } from './types';
@@ -20,6 +21,8 @@ export interface ToolRow {
   readonly unmarked: boolean;
   /** The page says the tool's results are page content. */
   readonly pageContent: boolean;
+  /** The name is, or reads like, a name of WebAIAssist's own tool: not offered to the model. */
+  readonly reserved?: boolean;
 }
 
 const NAME_CAP = 64;
@@ -58,6 +61,7 @@ export function toolRow(tool: ToolInfo): ToolRow {
     effect: needsConfirmation(tool) ? 'changes' : 'reads',
     unmarked: tool.annotations?.readOnlyHint === undefined,
     pageContent: tool.annotations?.untrustedContentHint === true,
+    ...(isReservedName(tool.name) ? { reserved: true } : {}),
   };
 }
 

@@ -4,6 +4,7 @@
 // it stays with the core, which validates every call against it. At most MAX_FULL_TOOLS tools
 // get a line and the lines must fit the budget; the others are named only, so the model always
 // knows every tool it may call. Tools are ranked by the words they share with the question.
+import { builtinCompact, pageTools } from './builtin-prompt';
 import { NODE_HINT_SHORT } from './node-mode';
 import { estimateTokens } from './history';
 import { cleanPageText, listableTool } from './sanitize';
@@ -74,6 +75,13 @@ function withLines(tools: readonly ToolInfo[], room: number): Set<ToolInfo> {
 }
 
 export function buildCompactPrompt(tools: readonly ToolInfo[], options: CompactOptions): string {
+  const own = builtinCompact(tools);
+  const budgetTokens = options.budgetTokens - estimateTokens(own);
+  const page = pagePrompt(pageTools(tools), { ...options, budgetTokens });
+  return own === '' ? page : `${page}\n${own}`;
+}
+
+function pagePrompt(tools: readonly ToolInfo[], options: CompactOptions): string {
   const listed = tools.filter(listableTool);
   if (listed.length === 0) return `${RULES}\nNo tools are available on this page.`;
   const head = options.node === true ? `${RULES}\n${NODE_HINT_SHORT}` : RULES;
