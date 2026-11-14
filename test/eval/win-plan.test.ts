@@ -13,6 +13,7 @@ describe('planWin', () => {
   it('copies the project without the build outputs and old results', () => {
     expect(plan.rsync[0]).toBe('rsync');
     expect(plan.rsync).toContain('node_modules');
+    expect(plan.rsync).toContain('.git'); // the repository's own files change while it copies
     expect(plan.rsync).toContain('docs/eval/EVAL-*.json');
     expect(plan.rsync).not.toContain('docs/eval/*.json'); // prompts.json is an input and must be copied
     expect(plan.rsync.at(-2)).toBe('/home/a/webaiassist/');

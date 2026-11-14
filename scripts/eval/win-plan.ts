@@ -11,6 +11,7 @@ export interface WinPlan {
 }
 
 const EXCLUDES = [
+  '.git',
   'node_modules',
   'dist',
   'dist-smoke',
