@@ -494,3 +494,11 @@ test/           unit tests (Vitest), fixture replay, adversarial tests (test/sec
   words the reason for "no tools" from it.
 - Diagnostics: `src/core/diagnostics.ts` (text), `src/ui/diagnostics-ui.ts` (preview and copy),
   `src/ui/panel-diagnostics.ts` (panel facts), `src/entries/options.ts` (Options facts).
+
+## Conformance page and its runs
+
+`conformance/` is a static page, outside the extension, that exercises the WebMCP interface; its
+`expect.json` drives the browser tests (`test/smoke/conformance-browser.spec.ts`,
+`test/smoke/conformance.spec.ts`) and the real-Chrome runs (`scripts/eval/conformance.ts`, with
+`conformance-run.ts` for the panel steps, `demos.ts` for Google's demo pages and `chrome-launch.ts`
+for starting Google Chrome). Nothing in `src/` depends on it.

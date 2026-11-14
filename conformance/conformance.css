@@ -1,0 +1,141 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1b1b1f;
+  --muted: #55565c;
+  --line: #c9cad1;
+  --pass: #0b6b2e;
+  --fail: #a31515;
+  --unsupported: #7a4b00;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15161a;
+    --fg: #ececf1;
+    --muted: #b0b2bb;
+    --line: #3a3c45;
+    --pass: #5fd388;
+    --fail: #ff8a8a;
+    --unsupported: #f0c36d;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font:
+    16px/1.5 system-ui,
+    sans-serif;
+}
+
+main {
+  box-sizing: border-box;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.lead {
+  font-size: 1.1rem;
+}
+
+.warn {
+  border: 2px solid var(--unsupported);
+  padding: 0.5rem 0.75rem;
+}
+
+code {
+  overflow-wrap: anywhere;
+}
+
+button {
+  font: inherit;
+  padding: 0.35rem 0.8rem;
+  margin: 0.15rem 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.3rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+td.detail {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+
+[data-status='pass'] .status,
+.outcome[data-status='pass'] {
+  color: var(--pass);
+}
+
+[data-status='fail'] .status,
+.outcome[data-status='fail'] {
+  color: var(--fail);
+  font-weight: 600;
+}
+
+[data-status='unsupported'] .status,
+.outcome[data-status='unsupported'] {
+  color: var(--unsupported);
+}
+
+.case {
+  border-top: 1px solid var(--line);
+  padding-top: 0.5rem;
+}
+
+.case h3,
+.spec,
+.log {
+  margin: 0.25rem 0;
+}
+
+.spec,
+.log,
+.note {
+  color: var(--muted);
+}
+
+.stage form {
+  border: 1px dashed var(--line);
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+}
+
+.stage form:tool-form-active {
+  outline: 3px solid var(--unsupported);
+}
+
+.stage form button:tool-submit-active {
+  outline: 3px solid var(--pass);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+iframe {
+  max-width: 100%;
+  border: 1px solid var(--line);
+}

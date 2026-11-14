@@ -6,14 +6,15 @@
 // and on the live node, and a second start. The report is docs/eval/EVAL-NANO-<date>.json.
 // Run it on a computer with Google Chrome (from WSL: `npm run eval:nano:win`). The profile is
 // kept between runs, because Chrome stores its model there (several gigabytes, once).
-import { chromium, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { release, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { parseEvalArgs } from './args.ts';
 import { openStubPanel } from './cpu-run.ts';
-import { chromeArgs, nanoVerdict } from './nano-plan.ts';
+import { launchChrome } from './chrome-launch.ts';
+import { nanoVerdict } from './nano-plan.ts';
 import { ask, modelStatus, pageTools, pressStart, startModel, type StartResult } from './panel.ts';
 import { loadPrompts, promptsFor, type EvalPrompt } from './prompts.ts';
 import { scorePrompt, type Row } from './score.ts';
@@ -39,25 +40,7 @@ const profile = (): string =>
   process.env.WEBAIASSIST_NANO_PROFILE ?? join(tmpdir(), 'webaiassist-nano-profile');
 
 /** Google Chrome with its own flags; the extension goes in over the debugging pipe. */
-const launchChrome: Launcher = async () => {
-  const context = await chromium.launchPersistentContext(profile(), {
-    channel: 'chrome',
-    headless: false,
-    viewport: null,
-    ignoreDefaultArgs: true,
-    args: chromeArgs(profile()),
-  });
-  const browser = context.browser();
-  if (!browser) throw new Error('no browser handle: cannot load the extension');
-  const cdp = await browser.newBrowserCDPSession();
-  const loaded = (await cdp.send(
-    'Extensions.loadUnpacked' as never,
-    {
-      path: EVAL_DIST,
-    } as never,
-  )) as { id: string };
-  return { context, extensionId: loaded.id };
-};
+const startChrome: Launcher = () => launchChrome({ profile: profile(), extension: EVAL_DIST });
 
 /** What Chrome answers for the text model in English: "available", "downloadable", ... */
 function availability(panel: Page): Promise<string> {
@@ -181,7 +164,7 @@ function writeNanoReport(body: Record<string, unknown> & { chrome: string }): st
 }
 
 async function main(): Promise<number> {
-  const session = await startSession(args, launchChrome);
+  const session = await startSession(args, startChrome);
   try {
     const panel = await openStubPanel(session);
     const before = await availability(panel);

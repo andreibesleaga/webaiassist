@@ -36,6 +36,9 @@ const SMOKE_HOSTS = ['http://127.0.0.1/*', 'http://127.0.0.2/*'];
 /** Install-time host access of the eval build only (scripts/eval/run.ts targets). */
 const EVAL_HOSTS = ['http://127.0.0.1/*', 'http://localhost/*', 'https://agenticsystemcore.com/*'];
 
+/** Install-time host access of the eval build made with `--demos` (Google's official demo pages). */
+export const DEMO_HOSTS = [...EVAL_HOSTS, 'https://googlechromelabs.github.io/*'];
+
 /** Files the extension loads by path, besides those the manifest names. */
 const EXTRA_FILES = [
   'offscreen.html',
@@ -71,13 +74,18 @@ function checkIdentity(m) {
   return problems;
 }
 
+/** The install-time hosts each build may have, with the words of the problem; the release build has none. */
+const HOSTS_OF = {
+  eval: [EVAL_HOSTS, 'eval build host_permissions must be'],
+  demos: [DEMO_HOSTS, 'eval build with --demos host_permissions must be'],
+  smoke: [SMOKE_HOSTS, 'host_permissions must be exactly'],
+};
+
 function checkHosts(m, variant) {
   const problems = [];
-  if (variant === 'eval' && !same(m.host_permissions, EVAL_HOSTS)) {
-    problems.push(`eval build host_permissions must be ${EVAL_HOSTS.join(', ')}`);
-  }
-  if (variant === 'smoke' && !same(m.host_permissions, SMOKE_HOSTS)) {
-    problems.push(`host_permissions must be exactly ${SMOKE_HOSTS.join(', ')}`);
+  const [wanted, words] = HOSTS_OF[variant] ?? [];
+  if (wanted && !same(m.host_permissions, wanted)) {
+    problems.push(`${words} ${wanted.join(', ')}`);
   }
   if (variant === 'release' && (m.host_permissions ?? []).length > 0) {
     problems.push('host_permissions must be empty');
@@ -197,12 +205,19 @@ function builtTexts(dir) {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const variant = process.argv.includes('--eval')
-    ? 'eval'
-    : process.argv.includes('--smoke')
-      ? 'smoke'
-      : 'release';
-  const folder = variant === 'eval' ? 'dist-eval' : variant === 'smoke' ? 'dist-smoke' : 'dist';
+  const variant = process.argv.includes('--demos')
+    ? 'demos'
+    : process.argv.includes('--eval')
+      ? 'eval'
+      : process.argv.includes('--smoke')
+        ? 'smoke'
+        : 'release';
+  const folder =
+    variant === 'eval' || variant === 'demos'
+      ? 'dist-eval'
+      : variant === 'smoke'
+        ? 'dist-smoke'
+        : 'dist';
   const dist = fileURLToPath(new URL(`../${folder}/`, import.meta.url));
   const manifest = JSON.parse(readFileSync(join(dist, 'manifest.json'), 'utf8'));
   const problems = [

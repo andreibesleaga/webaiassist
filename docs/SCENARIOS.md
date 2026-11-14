@@ -59,14 +59,14 @@ Scenarios whose wording changed when they stopped being pending:
 
 | Tag | Scenarios |
 |---|---|
-| @smoke | 116 |
-| @unit | 143 |
+| @smoke | 119 |
+| @unit | 144 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
-| @manual | 8 |
-| all | 272 |
-| run by `npm run test:bdd` now | 116 |
+| @manual | 9 |
+| all | 277 |
+| run by `npm run test:bdd` now | 119 |
 
 ### Every scenario
 
@@ -322,6 +322,11 @@ Scenarios whose wording changed when they stopped being pending:
 | F21.15 | Graph explorer tab | The explorer page is accessible in the light and the dark theme | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
 | F21.16 | Graph explorer tab | The manifest gains no permission, no host and no web_accessible_resources | @unit | `test/security-review/dist-review.test.ts` | unit test |
 | F21.17 | Graph explorer tab | On the two live nodes the explorer draws their graphs | @manual | `features/21-graph-explorer.feature` | manual check |
+| F23.1 | The WebMCP conformance page and suite | A conformance case registers exactly its tools and its own check ends as expected | @smoke | `features/23-webmcp-conformance.feature`, `test/ui/conformance-files.test.ts` | npm run test:bdd |
+| F23.2 | The WebMCP conformance page and suite | The side panel lists, asks and shows results for the conformance cases of errors, large and slow tools | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
+| F23.3 | The WebMCP conformance page and suite | A page that swaps a tool's description while the question to run it is open gets its call refused | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
+| F23.4 | The WebMCP conformance page and suite | Only the evaluation build made with the demos flag may script Google's demo pages | @unit | `test/scripts/check-dist.test.ts` | unit test |
+| F23.5 | The WebMCP conformance page and suite | The conformance page and the extension are run in real Google Chrome | @manual | `features/23-webmcp-conformance.feature` | manual check |
 | F25.1 | The node's own list, more site facts, the shortcut, diagnostics and storage | Files that match the node's own list get the chip "matches the node's own list" | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
 | F25.2 | The node's own list, more site facts, the shortcut, diagnostics and storage | A file that does not match the node's own list is marked and not given to the model | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
 | F25.3 | The node's own list, more site facts, the shortcut, diagnostics and storage | The digest is computed over the raw bytes of a body that was read whole | @unit | `test/adapters/site-page-scripts.test.ts` | unit test |

@@ -140,3 +140,10 @@ allowed site, with no cookie and no referrer, and nothing is sent anywhere else.
 thing: the width you give its side list, as `agsc-graph-panel` in this page's local storage (a number).
 Other nodes are read only after you tick them and press the button (see the host table above); the
 ticked origins are kept in memory for the life of the tab and are never stored.
+
+## Conformance page and demo pages
+
+The conformance page (`conformance/`) is not part of the extension and sends nothing. The one host
+`googlechromelabs.github.io` is an install-time host permission of the evaluation build made with
+`--demos` only; the released extension has no install-time host and contacts a site only after you
+allow it.

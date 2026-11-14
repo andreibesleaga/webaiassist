@@ -294,3 +294,18 @@ built files).
 - **Development tools** have open advisories (Vitest and markdownlint dependencies) whose fixes
   are major versions; they are not part of the package.
 - **Not tested here:** a screen reader, browsers other than Chromium, a real model in CI.
+
+## Conformance page and demo pages (14 Nov 2026)
+
+- The hostile cases (instructions in a description, hidden text, look-alike names, a name like the
+  planned built-in tool) are test fixtures. They run only on the conformance page under
+  `conformance/`, which is not part of the extension package: `scripts/build.mjs` and `scripts/zip.mjs`
+  do not name it and a test checks that.
+- The eval build made with `--demos` has one more install-time host, `googlechromelabs.github.io`.
+  It exists only in `dist-eval/`; `scripts/check-dist.mjs` accepts it only for that build and the
+  release check still refuses every install-time host (`test/scripts/check-dist.test.ts`).
+- Google's demo pages are third-party pages: their tools are untrusted like any page's. The demo run
+  uses the normal confirmation, calls only a tool the page marks read-only that needs no argument,
+  and never submits a form.
+- The conformance page sends nothing: it has no network call and no analytics (a test checks the
+  folder for `fetch`, sockets and outside hosts).

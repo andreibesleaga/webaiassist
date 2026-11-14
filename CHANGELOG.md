@@ -110,6 +110,13 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 - **Keyboard shortcut** Alt+Shift+A for the toolbar button (manifest `commands`, no permission).
 - **Copy diagnostics** with a preview, in Options and in the panel.
 - **Storage**: persistent storage asked once after the first download; total size in Options.
+- **WebMCP conformance page and suite** (`conformance/`): a plain static page with sixteen cases
+  that exercise every part of the WebMCP interface (registering, listing, running, annotations,
+  schemas, errors, cancelling, slow and large results, form tools, late and removed tools, frames,
+  hostile definitions), one `expect.json` as their single source, browser-only and extension
+  tests, and `npm run eval:conformance` (and `:win`) for real Google Chrome, with an optional
+  stage on Google's official demo pages. The evaluation build made with `--demos` adds the one
+  host `googlechromelabs.github.io`; the release build keeps no install-time host.
 
 ### Security
 

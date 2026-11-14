@@ -1,0 +1,539 @@
+{
+  "version": 1,
+  "cases": {
+    "c01": {
+      "title": "Register, remove and register again",
+      "tools": ["c01_removable", "c01_titled", "c01_untitled"],
+      "selfStatus": ["pass"],
+      "page": [
+        {
+          "click": "#c01-remove",
+          "listed": ["c01_titled", "c01_untitled"]
+        },
+        {
+          "click": "#c01-add",
+          "listed": ["c01_removable", "c01_titled", "c01_untitled"]
+        }
+      ],
+      "calls": [
+        {
+          "tool": "c01_titled",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: c01_titled"]
+        }
+      ]
+    },
+    "c02": {
+      "title": "getTools and the fields of a tool",
+      "tools": ["c02_inspect"],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c02_inspect",
+          "args": {
+            "word": "hi"
+          },
+          "confirm": false,
+          "shows": ["got hi"]
+        }
+      ]
+    },
+    "c03": {
+      "title": "Result forms",
+      "tools": [
+        "c03_empty",
+        "c03_json_string",
+        "c03_navigate",
+        "c03_null",
+        "c03_number",
+        "c03_object",
+        "c03_string"
+      ],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c03_string",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: hello"]
+        },
+        {
+          "tool": "c03_json_string",
+          "args": {},
+          "confirm": false,
+          "shows": ["{\"a\":1}"]
+        },
+        {
+          "tool": "c03_object",
+          "args": {},
+          "confirm": false,
+          "shows": ["\"list\":[1,2]"]
+        },
+        {
+          "tool": "c03_empty",
+          "args": {},
+          "confirm": false,
+          "shows": ["Operation succeeded"]
+        },
+        {
+          "tool": "c03_null",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: null"]
+        },
+        {
+          "tool": "c03_number",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: 5"]
+        }
+      ]
+    },
+    "c04": {
+      "title": "Tool-change events",
+      "tools": ["c04_keeper"],
+      "selfStatus": ["pass"],
+      "page": [
+        {
+          "click": "#c04-add",
+          "listed": ["c04_extra", "c04_keeper"]
+        },
+        {
+          "click": "#c04-remove",
+          "listed": ["c04_keeper"]
+        }
+      ],
+      "calls": [
+        {
+          "tool": "c04_keeper",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: c04_keeper"]
+        }
+      ]
+    },
+    "c05": {
+      "title": "Annotations",
+      "tools": [
+        "c05_all",
+        "c05_consequential",
+        "c05_debugging",
+        "c05_none",
+        "c05_read_only",
+        "c05_read_only_and_consequential",
+        "c05_untrusted"
+      ],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c05_read_only",
+          "args": {},
+          "confirm": false,
+          "shows": ["ran c05_read_only"]
+        },
+        {
+          "tool": "c05_untrusted",
+          "args": {},
+          "confirm": false,
+          "shows": ["ran c05_untrusted"]
+        },
+        {
+          "tool": "c05_none",
+          "args": {},
+          "confirm": true,
+          "shows": ["ran c05_none"]
+        },
+        {
+          "tool": "c05_consequential",
+          "args": {},
+          "confirm": true,
+          "shows": ["ran c05_consequential"]
+        },
+        {
+          "tool": "c05_read_only_and_consequential",
+          "args": {},
+          "confirm": true,
+          "shows": ["ran c05_read_only_and_consequential"]
+        },
+        {
+          "tool": "c05_all",
+          "args": {},
+          "confirm": true,
+          "shows": ["ran c05_all"]
+        }
+      ]
+    },
+    "c06": {
+      "title": "Input schemas",
+      "tools": [
+        "c06_array",
+        "c06_boolean",
+        "c06_enum",
+        "c06_integer",
+        "c06_nested",
+        "c06_no_schema",
+        "c06_number",
+        "c06_object",
+        "c06_one_of",
+        "c06_optional",
+        "c06_string",
+        "c06_strict"
+      ],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c06_string",
+          "args": {
+            "value": "text"
+          },
+          "confirm": false,
+          "shows": ["{\"value\":\"text\"}"]
+        },
+        {
+          "tool": "c06_number",
+          "args": {
+            "value": 1.5
+          },
+          "confirm": false,
+          "shows": ["{\"value\":1.5}"]
+        },
+        {
+          "tool": "c06_integer",
+          "args": {
+            "value": 3
+          },
+          "confirm": false,
+          "shows": ["{\"value\":3}"]
+        },
+        {
+          "tool": "c06_boolean",
+          "args": {
+            "value": true
+          },
+          "confirm": false,
+          "shows": ["{\"value\":true}"]
+        },
+        {
+          "tool": "c06_array",
+          "args": {
+            "value": ["a", "b"]
+          },
+          "confirm": false,
+          "shows": ["{\"value\":[\"a\",\"b\"]}"]
+        },
+        {
+          "tool": "c06_object",
+          "args": {
+            "value": {
+              "inner": "x"
+            }
+          },
+          "confirm": false,
+          "shows": ["{\"value\":{\"inner\":\"x\"}}"]
+        },
+        {
+          "tool": "c06_enum",
+          "args": {
+            "value": "green"
+          },
+          "confirm": false,
+          "shows": ["{\"value\":\"green\"}"]
+        },
+        {
+          "tool": "c06_one_of",
+          "args": {
+            "value": "large"
+          },
+          "confirm": false,
+          "shows": ["{\"value\":\"large\"}"]
+        },
+        {
+          "tool": "c06_nested",
+          "args": {
+            "order": {
+              "lines": [
+                {
+                  "sku": "A1",
+                  "qty": 2
+                }
+              ]
+            }
+          },
+          "confirm": false,
+          "shows": ["\"sku\":\"A1\""]
+        },
+        {
+          "tool": "c06_optional",
+          "args": {
+            "must": "yes"
+          },
+          "confirm": false,
+          "shows": ["{\"must\":\"yes\"}"]
+        },
+        {
+          "tool": "c06_strict",
+          "args": {
+            "only": "ok"
+          },
+          "confirm": false,
+          "shows": ["{\"only\":\"ok\"}"]
+        },
+        {
+          "tool": "c06_no_schema",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: no schema"]
+        },
+        {
+          "tool": "c06_number",
+          "args": {
+            "value": "not a number"
+          },
+          "confirm": false,
+          "shows": ["could not fill in the arguments for c06_number"],
+          "hides": ["The tool said: {\"value\":\"not a number\"}"]
+        }
+      ]
+    },
+    "c07": {
+      "title": "Tool errors",
+      "tools": ["c07_instant", "c07_reject", "c07_throw_error", "c07_throw_string"],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c07_throw_error",
+          "args": {},
+          "confirm": false,
+          "shows": ["Tool error"]
+        },
+        {
+          "tool": "c07_reject",
+          "args": {},
+          "confirm": false,
+          "shows": ["Tool error"]
+        },
+        {
+          "tool": "c07_throw_string",
+          "args": {},
+          "confirm": false,
+          "shows": ["Tool error"]
+        },
+        {
+          "tool": "c07_instant",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: instant"]
+        }
+      ]
+    },
+    "c08": {
+      "title": "Cancellation",
+      "tools": ["c08_cancellable"],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c08_cancellable",
+          "args": {},
+          "confirm": false,
+          "shows": ["Stopped."],
+          "stopAfterMs": 1500
+        }
+      ]
+    },
+    "c09": {
+      "title": "Slow tools",
+      "tools": ["c09_thirty_honours", "c09_thirty_ignores", "c09_two_seconds"],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c09_two_seconds",
+          "args": {},
+          "confirm": false,
+          "shows": ["The tool said: two seconds"]
+        },
+        {
+          "tool": "c09_thirty_ignores",
+          "args": {},
+          "confirm": false,
+          "shows": ["The page did not answer in time."]
+        }
+      ]
+    },
+    "c10": {
+      "title": "Large results",
+      "tools": ["c10_100kb", "c10_1kb", "c10_1mb", "c10_deep"],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c10_1kb",
+          "args": {},
+          "confirm": false,
+          "shows": ["xxxxxxxxxx"],
+          "hides": ["[cut:"]
+        },
+        {
+          "tool": "c10_100kb",
+          "args": {},
+          "confirm": false,
+          "shows": ["[cut: 98400 more characters]"]
+        },
+        {
+          "tool": "c10_1mb",
+          "args": {},
+          "confirm": false,
+          "shows": ["[cut: 996000 more characters]"]
+        },
+        {
+          "tool": "c10_deep",
+          "args": {},
+          "confirm": false,
+          "shows": ["bottom"]
+        }
+      ]
+    },
+    "c11": {
+      "title": "Declarative form tools",
+      "tools": ["c11_auto", "c11_navigate", "c11_select", "c11_wait"],
+      "selfStatus": ["pass", "unsupported"],
+      "calls": [
+        {
+          "tool": "c11_auto",
+          "args": {
+            "q": "x"
+          },
+          "confirm": true,
+          "shows": ["auto:x"]
+        },
+        {
+          "tool": "c11_select",
+          "args": {
+            "q": "a",
+            "s": "large"
+          },
+          "confirm": true,
+          "shows": ["select:alarge"]
+        },
+        {
+          "tool": "c11_wait",
+          "args": {
+            "q": "y"
+          },
+          "confirm": true,
+          "shows": ["wait:y"],
+          "whileWaiting": {
+            "click": "#c11_wait button"
+          }
+        }
+      ]
+    },
+    "c12": {
+      "title": "Tools added later",
+      "tools": ["c12_now"],
+      "listed": ["c12_after_three_seconds", "c12_now"],
+      "selfStatus": ["pass"],
+      "page": [
+        {
+          "click": "#c12-add",
+          "listed": ["c12_after_three_seconds", "c12_now", "c12_on_button"]
+        }
+      ]
+    },
+    "c13": {
+      "title": "Tool removed while a call runs",
+      "tools": ["c13_keeper", "c13_removes_itself"],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c13_removes_itself",
+          "args": {},
+          "confirm": false,
+          "shows": ["finished after removal"]
+        }
+      ],
+      "listedAfterCalls": ["c13_keeper"]
+    },
+    "c14": {
+      "title": "Frames",
+      "tools": ["c14_inner_same", "c14_top"],
+      "selfStatus": ["pass", "unsupported"],
+      "calls": [
+        {
+          "tool": "c14_top",
+          "args": {},
+          "confirm": false,
+          "shows": ["from the top window"]
+        }
+      ]
+    },
+    "c15": {
+      "title": "Hostile definitions",
+      "tools": [
+        "c15_account_deIete",
+        "c15_bidi",
+        "c15_clean",
+        "c15_delete_account",
+        "c15_hidden_text",
+        "c15_injected",
+        "c15_long_description",
+        {
+          "prefix": "c15_many_",
+          "count": 150,
+          "pad": 3
+        },
+        "c15_paypa1",
+        "c15_swap"
+      ],
+      "listed": [
+        "c15_account_deIete",
+        "c15_clean",
+        "c15_delete_account",
+        "c15_long_description",
+        {
+          "prefix": "c15_many_",
+          "count": 150,
+          "pad": 3
+        },
+        "c15_paypa1",
+        "c15_swap",
+        "c15_bidi",
+        "c15_hidden_text"
+      ],
+      "selfStatus": ["pass"],
+      "calls": [
+        {
+          "tool": "c15_clean",
+          "args": {},
+          "confirm": false,
+          "shows": ["ran c15_clean"]
+        },
+        {
+          "tool": "c15_delete_account",
+          "args": {},
+          "confirm": false,
+          "shows": ["ran c15_delete_account"]
+        },
+        {
+          "tool": "c15_swap",
+          "args": {},
+          "confirm": true,
+          "shows": ["The page changed the tool"],
+          "hides": ["ran c15_swap"],
+          "duringQuestion": {
+            "click": "#c15-swap"
+          }
+        }
+      ]
+    },
+    "c16": {
+      "title": "Name of a built-in tool",
+      "tools": [
+        "WebAIAssist-Query-Graph",
+        "webaiassist-query-graph",
+        "webaiassist_query_graph",
+        "webaiassist_query_graph_2"
+      ],
+      "selfStatus": ["pass"]
+    }
+  }
+}

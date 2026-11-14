@@ -302,6 +302,19 @@ decide.
 - Optional headers `HTTP-Referer` and `X-OpenRouter-Title` (`X-Title` also accepted) only identify the app on openrouter.ai rankings. They are optional and are not sent.
 - Price check for the evaluation: `meta-llama/llama-3.1-8b-instruct` at 0.02 USD per million prompt tokens and 0.04 per million completion tokens (`/api/v1/models`, 14 Nov 2026).
 
+## 21. WebMCP conformance page (14 Nov 2026)
+
+- Chrome documentation, each URL answered HTTP 200 on 14 Nov 2026:
+  <https://developer.chrome.com/docs/ai/webmcp/imperative-api>,
+  <https://developer.chrome.com/docs/ai/webmcp/declarative-api>,
+  <https://developer.chrome.com/docs/ai/webmcp/secure-tools>.
+- Specification: <https://webmachinelearning.github.io/webmcp/> (200 on 14 Nov 2026).
+- Interface facts: `webaiassist-notes/day-2/PARITY-2026-11-14.md` section 4 (owner's notes).
+- Google's demo pages: <https://googlechromelabs.github.io/webmcp-tools/demos/> (list from the
+  repository README, 14 Nov 2026); no code of them is copied.
+- Behaviour of Chromium 156.0.8078.4 measured locally on 14 Nov 2026 by the conformance suite.
+- No new library: Playwright and Vitest were already used.
+
 ## Not verified
 
 - MCP `ToolAnnotations` property names: neither tools page lists them and the schema page was truncated before that section.

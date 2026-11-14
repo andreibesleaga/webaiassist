@@ -319,3 +319,9 @@ Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 AgenticSystemCore™ is a trademark of Andrei N. Besleaga. WebAIAssist is a separate project by the
 same author; it is not part of AgenticSystemCore.
+
+## Check WebMCP in your browser
+
+The [`conformance/`](conformance/README.md) folder is a plain page that tests the WebMCP interface
+of any browser, with or without this extension, and sends nothing anywhere. The same folder is the
+test suite for the extension's own handling of page tools.

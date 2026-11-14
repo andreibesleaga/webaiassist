@@ -1,0 +1,24 @@
+{
+  "base": "https://googlechromelabs.github.io/webmcp-tools/demos/",
+  "source": "Google Chrome Labs, webmcp-tools repository README list, read 14 Nov 2026; kind is the README label, unknown where it gives none",
+  "pages": [
+    { "id": "explainer", "path": "explainer/", "kind": "imperative" },
+    { "id": "pizza-maker", "path": "pizza-maker/", "kind": "imperative" },
+    { "id": "react-flightsearch", "path": "react-flightsearch/", "kind": "imperative" },
+    { "id": "french-bistro", "path": "french-bistro/", "kind": "declarative" },
+    { "id": "doors", "path": "doors/", "kind": "both" },
+    { "id": "webmcp-maze", "path": "webmcp-maze/", "kind": "unknown" },
+    { "id": "ticket-booking", "path": "ticket-booking/", "kind": "unknown" },
+    { "id": "order-tracking", "path": "order-tracking/", "kind": "declarative" },
+    { "id": "hotel-chain", "path": "hotel-chain/", "kind": "both" },
+    { "id": "sport-shop-angular", "path": "sport-shop-angular/", "kind": "both" },
+    { "id": "coffee-shop", "path": "coffee-shop/", "kind": "unknown" },
+    { "id": "real-estate-map", "path": "real-estate-map/", "kind": "unknown" },
+    { "id": "leather-bag", "path": "leather-bag/", "kind": "declarative" },
+    { "id": "smart-home", "path": "smart-home/", "kind": "unknown" },
+    { "id": "page-agent", "path": "page-agent/", "kind": "unknown" },
+    { "id": "pixel-art-studio", "path": "pixel-art-studio/", "kind": "unknown" },
+    { "id": "proxx-lite", "path": "proxx-lite/", "kind": "unknown" },
+    { "id": "spreadsheet", "path": "spreadsheet/", "kind": "unknown" }
+  ]
+}

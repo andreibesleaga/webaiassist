@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { splitWinArgs } from '../../scripts/eval/nano-plan.ts';
 import { planWin } from '../../scripts/eval/win-plan.ts';
 import { offHosts } from '../../scripts/eval/hosts.ts';
 
@@ -61,5 +64,52 @@ describe('offHosts', () => {
     expect(
       offHosts(['https://example.com/a', 'https://example.com/b', 'https://cdn.evil.net/x']),
     ).toEqual(['cdn.evil.net', 'example.com']);
+  });
+});
+
+describe('eval:conformance on Windows (dry run)', () => {
+  const args = splitWinArgs([
+    '--script',
+    'eval:conformance',
+    '--extension',
+    '--demos',
+    '--dry-run',
+  ]);
+  const plan = planWin({
+    source: '/home/a/webaiassist/',
+    target: '/mnt/c/Users/a/webaiassist-eval-conformance/',
+    targetWin: 'C:\\Users\\a\\webaiassist-eval-conformance',
+    evalArgs: args.evalArgs,
+    script: args.script,
+  });
+  it('gets its own Windows folder and passes the stage flags on', () => {
+    expect(args.folder).toBe('webaiassist-eval-conformance');
+    expect(args.dryRun).toBe(true);
+    expect(args.evalArgs).toEqual(['--extension', '--demos']);
+    expect((plan.cmd[2] ?? '').endsWith('npm run eval:conformance -- --extension --demos')).toBe(
+      true,
+    );
+    expect(plan.copyBack.map((c) => c.to)).toEqual(['/home/a/webaiassist/docs/eval/']);
+  });
+  it('is what `npm run eval:conformance:win` prints, and runs nothing with --dry-run', () => {
+    const run = spawnSync(
+      process.execPath,
+      ['scripts/eval/win.ts', '--script', 'eval:conformance', '--extension', '--dry-run'],
+      { encoding: 'utf8', env: { ...process.env, WEBAIASSIST_WIN_USER: 'Tester' } },
+    );
+    expect(run.status).toBe(0);
+    expect(run.stdout).toContain('cd /d C:\\Users\\Tester\\webaiassist-eval-conformance');
+    expect(run.stdout).toContain('npm run eval:conformance -- --extension');
+    expect(run.stdout).toContain('dry run: nothing ran');
+  });
+  it('is wired in package.json', () => {
+    const scripts = (
+      JSON.parse(readFileSync('package.json', 'utf8')) as { scripts: Record<string, string> }
+    ).scripts;
+    expect(scripts['eval:conformance:win']).toBe(
+      'node scripts/eval/win.ts --script eval:conformance',
+    );
+    expect(scripts['eval:conformance']).toContain('node scripts/eval/conformance.ts');
+    expect(scripts['build:demos']).toContain('--demos');
   });
 });

@@ -1,0 +1,85 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebMCP conformance page</title>
+    <link rel="stylesheet" href="conformance.css" />
+  </head>
+  <body>
+    <main>
+      <h1>WebMCP conformance page</h1>
+      <p class="lead">
+        This page tests the WebMCP interface of your browser. It sends nothing anywhere, holds no
+        analytics and needs no account. It is independent of any browser extension.
+      </p>
+      <p>
+        WebMCP lets a page offer tools, such as &ldquo;add this to the cart&rdquo;, to an AI
+        assistant through <code>document.modelContext</code>. Each case below registers some tools
+        and checks one part of the interface: registering and removing tools, listing and running
+        them, the hints a tool can carry, input schemas, errors, cancelling, slow and large results,
+        forms that become tools, tools that appear or vanish later, and a few tools that try to
+        mislead an assistant. Open a case with its link to see only its tools, or use
+        <a href="?case=all">all cases at once</a> (more than 200 tools).
+      </p>
+      <p id="no-support" class="warn" hidden>
+        This browser has no <code>document.modelContext</code>. In Chrome 157, start it with
+        <code>--enable-features=WebMCP</code> or switch on the flag
+        <code>chrome://flags/#enable-webmcp-testing</code>, then reload.
+      </p>
+      <h2>This browser</h2>
+      <ul id="features"></ul>
+      <h2>Checks</h2>
+      <p>
+        <button id="run-all" type="button">Run all checks</button>
+        <span id="summary" role="status"></span>
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption class="visually-hidden">
+            Cases, their result and the detail of the check
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Case</th>
+              <th scope="col">What it covers</th>
+              <th scope="col">Result</th>
+              <th scope="col">Detail</th>
+            </tr>
+          </thead>
+          <tbody id="case-list"></tbody>
+        </table>
+      </div>
+      <p class="note">
+        A result of &ldquo;unsupported&rdquo; means the browser lacks that part of the interface
+        (the detail says which); it is not a failure.
+      </p>
+      <h2>Tools this page registers</h2>
+      <p>
+        <button id="list-tools" type="button">List the tools registered right now</button>
+      </p>
+      <ul id="tool-list"></ul>
+      <h2>Cases</h2>
+      <div id="cases"></div>
+    </main>
+    <script src="harness.js"></script>
+    <script src="cases/c01-register.js"></script>
+    <script src="cases/c02-get-tools.js"></script>
+    <script src="cases/c03-results.js"></script>
+    <script src="cases/c04-events.js"></script>
+    <script src="cases/c05-annotations.js"></script>
+    <script src="cases/c06-schemas.js"></script>
+    <script src="cases/c07-errors.js"></script>
+    <script src="cases/c08-cancel.js"></script>
+    <script src="cases/c09-slow.js"></script>
+    <script src="cases/c10-large.js"></script>
+    <script src="cases/c11-forms.js"></script>
+    <script src="cases/c12-late.js"></script>
+    <script src="cases/c13-removed-while-running.js"></script>
+    <script src="cases/c14-frames.js"></script>
+    <script src="cases/c15-hostile.js"></script>
+    <script src="cases/c16-builtin-collision.js"></script>
+    <script src="list-tools.js"></script>
+  </body>
+</html>
