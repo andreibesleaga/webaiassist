@@ -217,7 +217,7 @@ Chrome's built-in model still to download; the choice **Set up a chat endpoint**
 opens Options and loads nothing. The measurement is the wait from the first question after a
 load to the first token (`src/ui/first-token-timer.ts`), stored with the adapter's name in
 `chrome.storage.local` (`src/adapters/stored-panel-state.ts`); more than 20 seconds is slow
-(`src/adapters/gpu-speed.ts`: the owner's laptop took about 40 s on 13 Nov 2026, the first
+(`src/adapters/gpu-speed.ts`: the maintainer's laptop took about 40 s on 13 Nov 2026, the first
 answer compiles the GPU programs). So the graphics card becomes the default only after the user
 has tried it once and it was quick; a measurement made on another adapter is ignored. Settings
 saved before 13 Nov 2026 (version 1) that name Chrome's built-in model go back to the default

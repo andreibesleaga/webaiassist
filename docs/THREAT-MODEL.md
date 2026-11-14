@@ -154,7 +154,7 @@ Decisions, with the reason:
 - The MCP server card is not read: its path is not settled (13 Nov 2026). The skills index named
   by a node's link set is NOT read: its address would come from a file. (An earlier research note
   said it could be read; this decision stands until a later package changes it and this line.)
-- The cap was eight files (research note, rule F4). On 14 Nov 2026 the owner approved exactly one
+- The cap was eight files (research note, rule F4). On 14 Nov 2026 the maintainer approved exactly one
   more, `/.well-known/sustainability-data`: a fixed path, JSON, at most 8 KiB, read as data only.
   `api-catalog` and `agent-card` are kept. The reason and the cap sit in `src/core/site-files.ts`.
 - Digests: for a file that the node's own knowledge links list with a `sha-256` digest, the page
@@ -169,7 +169,7 @@ Decisions, with the reason:
   endpoint key and addresses are removed from the error text; the preview is the copied text.
 - The one manifest key added: `commands` with `_execute_action` (keyboard shortcut for the
   toolbar button, suggested Alt+Shift+A). It needs no permission, adds no host and runs the
-  existing toolbar-click handler. Approved by the owner on 14 Nov 2026; `scripts/check-dist.mjs`
+  existing toolbar-click handler. Approved by the maintainer on 14 Nov 2026; `scripts/check-dist.mjs`
   refuses any other command.
 - A `robots.txt` that cannot be read counts as "not stated", so a site outage does not turn the
   assistant off.
