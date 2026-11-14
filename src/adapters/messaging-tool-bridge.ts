@@ -16,6 +16,8 @@ export interface PageInfo {
   readonly origin: string;
   readonly linkset: boolean;
   readonly tools: readonly ToolInfo[];
+  /** The page has a WebMCP interface, with or without tools; undefined when it did not say. */
+  readonly webmcp?: boolean;
 }
 
 export type SendMessage = (message: object) => Promise<unknown>;
@@ -64,6 +66,7 @@ function pageInfo(result: ToolsListResult): PageInfo {
     origin: result.origin,
     linkset: result.linkset === true,
     tools: result.tools.map(toToolInfo),
+    ...(result.webmcp === undefined ? {} : { webmcp: result.webmcp }),
   };
 }
 

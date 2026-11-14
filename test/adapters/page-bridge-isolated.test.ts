@@ -50,6 +50,16 @@ describe('startIsolatedRelay', () => {
     expect(sent.message.tabId).toBeUndefined();
   });
 
+  it('passes the WebMCP-interface flag of the MAIN script on', async () => {
+    const { win, runtime } = setup();
+    startMainBridge(win, () => undefined);
+    const reply = (await runtime.deliver({ type: 'tools/list', id: 'w3', tabId: 3 })) as Record<
+      string,
+      unknown
+    >;
+    expect(reply).toMatchObject({ ok: true, webmcp: false });
+  });
+
   it('relays tools/call and re-addresses the reply to the request id', async () => {
     const { win, runtime } = setup();
     const context = new FakeModelContext(ORIGIN, AGSC_TOOLS);

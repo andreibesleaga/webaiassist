@@ -55,6 +55,9 @@ export interface ToolsListResult {
   origin?: string;
   /** True when the page links to /.well-known/knowledge-linkset (an AgenticSystemCore node). */
   linkset?: boolean;
+  /** The page has a WebMCP interface (`document.modelContext` or `navigator.modelContext`),
+   *  whether or not it registers a tool. Read by the MAIN-world script. */
+  webmcp?: boolean;
   /** Set by the service worker only, when it could not add the page scripts: the site is
    *  not allowed yet ('denied'), or no extension may script the page ('restricted'). */
   access?: 'denied' | 'restricted';

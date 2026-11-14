@@ -24,6 +24,10 @@ export const P2_EN = {
   factSustainSigned: 'signature present, not checked',
   factSignal: 'robots.txt, {agents}: {values}',
   factSignalMore: 'robots.txt: {count} more groups not shown',
+  pageNoWebmcp:
+    '{host} — this browser has no WebMCP (turn on chrome://flags/#enable-webmcp-testing and relaunch Chrome; or use Read this page or Add WebMCP to this site)',
+  pageNoToolsRegistered:
+    '{host} — this page registers no tools (use Read this page or Add WebMCP to this site)',
   startersLabel: 'Questions to start with',
   starterBrief: 'Give me a brief of the main items on this node.',
   starterSearch: 'Search this node for how to publish a node.',

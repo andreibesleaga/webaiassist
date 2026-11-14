@@ -65,6 +65,7 @@ function answer(deps: RelayDeps, request: Request, reply: PageResult): object {
     ...(reply.error !== undefined ? { error: reply.error } : {}),
     ...(HTTP_ORIGIN.test(origin) ? { origin } : {}),
     linkset: deps.hasLinkset(),
+    ...(reply.webmcp === undefined ? {} : { webmcp: reply.webmcp }),
   };
 }
 

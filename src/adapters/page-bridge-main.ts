@@ -133,7 +133,13 @@ async function listTools(
   try {
     const entries = await usableEntries(context, origin);
     const tools = entries.map(toWire).filter((t): t is WireTool => t !== undefined);
-    return { type: 'tools/list-result', id, ok: true, tools: tools.slice(0, MAX_TOOLS) };
+    return {
+      type: 'tools/list-result',
+      id,
+      ok: true,
+      tools: tools.slice(0, MAX_TOOLS),
+      webmcp: context !== undefined,
+    };
   } catch (error) {
     const text = errorText(error).slice(0, ERROR_CAP);
     return { type: 'tools/list-result', id, ok: false, tools: [], error: text };

@@ -109,6 +109,7 @@ const toolsListResult: JSONSchemaType<ToolsListResult> = {
     error: { type: 'string', maxLength: 2000, nullable: true },
     origin: ORIGIN,
     linkset: OPTIONAL_FLAG,
+    webmcp: OPTIONAL_FLAG,
     access: { type: 'string', enum: ['denied', 'restricted'], nullable: true },
   },
   required: ['type', 'id', 'ok', 'tools'],

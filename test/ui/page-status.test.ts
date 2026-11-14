@@ -34,6 +34,19 @@ describe('page status line', () => {
     );
   });
 
+  it('says why there are no tools: no WebMCP in this browser, or none registered by the page', () => {
+    const base = { origin: 'https://example.org', linkset: false, tools: [] };
+    expect(statusText(statusOf({ ...base, webmcp: false }))).toBe(
+      'example.org — this browser has no WebMCP (turn on chrome://flags/#enable-webmcp-testing and relaunch Chrome; or use Read this page or Add WebMCP to this site)',
+    );
+    expect(statusText(statusOf({ ...base, webmcp: true }))).toBe(
+      'example.org — this page registers no tools (use Read this page or Add WebMCP to this site)',
+    );
+    expect(statusText(statusOf({ ...base, webmcp: false, tools: one }))).toBe(
+      'example.org — 1 WebMCP tool',
+    );
+  });
+
   it('reports a page without tools as a plain state, not an error', () => {
     const page = { origin: 'https://example.org', linkset: false, tools: [] };
     expect(statusText(statusOf(page))).toBe(
