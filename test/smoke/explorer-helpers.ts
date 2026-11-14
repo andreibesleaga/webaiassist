@@ -87,3 +87,17 @@ export const explorerState = (page: Page, expected: string) =>
   expect(page.locator('.gx[data-state]')).toHaveAttribute('data-state', expected, {
     timeout: 20_000,
   });
+
+/** Also publishes graph.nq and the vocabulary file recorded from the live main node. The digests the
+ *  linkset declares for both are those of the recorded files (fixtures/graph/README.md). */
+export function serveQueryFiles(session: Session, files: { graphNq?: string } = {}): void {
+  const { routes } = session.site;
+  routes.set('/graph.nq', {
+    type: 'application/n-quads; charset=utf-8',
+    body: files.graphNq ?? fixture('asc-graph.nq'),
+  });
+  routes.set('/ns/agsc.ttl', {
+    type: 'text/turtle; charset=utf-8',
+    body: fixture('asc-ontology.ttl'),
+  });
+}

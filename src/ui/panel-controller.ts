@@ -9,6 +9,7 @@ import type { AllowResult } from '../adapters/site-access';
 import type { ArgsValidator } from '../core/ports/args-validator';
 import type { Clock } from '../core/ports/clock';
 import type { Memory } from '../core/ports/memory';
+import type { GraphQuery } from '../core/ports/graph-query';
 import type { ModelRuntime } from '../core/ports/model-runtime';
 import type { SiteGrants } from '../core/ports/site-grants';
 import type { ToolBridge } from '../core/ports/tool-bridge';
@@ -60,6 +61,8 @@ export interface PanelDeps {
   openOptions(): void;
   /** Opens the graph explorer tab for a tab and its site (the "Graph: N items" chip); absent in tests that skip it. */
   openGraph?(tabId: number, origin: string): void;
+  /** The model's read-only questions to the node's graph (the built-in tool); absent in tests that skip it. */
+  readonly graphQuery?: GraphQuery;
   /** The model files stored in this browser (for the question before a download). */
   readonly store: StoreLike;
   /** What the panel remembers besides the Options (welcome screen, measured first answer). */

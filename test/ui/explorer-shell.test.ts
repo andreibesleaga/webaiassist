@@ -24,8 +24,8 @@ function page() {
 beforeEach(() => document.body.replaceChildren());
 
 describe('the explorer tab list', () => {
-  it('ships the Graph tab only; the other tabs are added by their own package', () => {
-    expect(EXPLORER_TABS.map((tab) => tab.id)).toEqual(['graph']);
+  it('ships the Graph, Query, Vocabulary and Page data tabs', () => {
+    expect(EXPLORER_TABS.map((tab) => tab.id)).toEqual(['graph', 'query', 'vocab', 'page-data']);
   });
 
   it('builds tabs with the roles and the one that is selected in the tab order', () => {

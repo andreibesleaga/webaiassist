@@ -65,7 +65,7 @@ for a release.
   `import()` or `importScripts()` (`scripts/check-remote-code.mjs`);
 - a model library that is missing, changed (size or SHA-256), or not pinned;
 - in the zip only: a file that is not in `dist/`, a missing file, a source map or
-  source-map comment, a version other than `package.json`, more than 10 MiB (the 0.1.0 zip is 9.7 MB, 9.3 MiB).
+  source-map comment, a version other than `package.json`, more than 12 MiB (the 0.1.0 zip is about 11.4 MB, 10.9 MiB, with the query engine's 1.5 MB WebAssembly file).
 
 ## Tests
 

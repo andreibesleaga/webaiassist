@@ -348,8 +348,8 @@ The message hop `site` carries `site/file`, `site/page` and `site/graph-file` fr
 The card's "Graph: N items" button (built in code, `src/ui/page-card.ts`; N is the sum of the node's
 `agsc-counts`, `src/core/graph-files.ts`) makes the panel open `explorer.html?tabid=...&origin=...&src=...`
 in a new tab (`src/ui/explorer-url.ts`, `chrome.tabs.create`, no permission). The page is one extension page
-with a tab list (`src/ui/explorer/tabs.ts`, `shell.ts`); this release has the Graph tab, and the Query,
-Vocabulary and Page data tabs are added to that list by their own package (empty placeholder files exist).
+with a tab list (`src/ui/explorer/tabs.ts`, `shell.ts`); this release has the Graph, Query, Vocabulary and
+Page data tabs (see "Query and semantic tools" below).
 
 ```text
 core (pure)                              adapters                           ui / entry
@@ -372,6 +372,36 @@ script as the site files, with the `site/graph-file` message); a ticked peer is 
 refused. force-graph 1.52.0 is copied from `node_modules` by the build after its hash is checked
 (`scripts/explorer-pins.mjs`), in the folder layout of the site (`explorer-vendor/assets/...`). Threats and controls:
 [THREAT-MODEL.md](THREAT-MODEL.md), "Graph explorer tab".
+
+## Query and semantic tools
+
+One query worker serves the Query tab and the model's tool. The worker (`src/entries/query-worker.ts`, built as
+`query-worker.js`, a module Worker of the extension) holds Oxigraph and one store; a page posts the bytes of the node's
+`graph.nq` and then one query at a time; the worker has no address to ask. A page ends the worker to stop a query
+(the engine is synchronous).
+
+```text
+core (pure)                       adapters                              query/ (no browser API but Worker)   ui / entry
+ports/graph-query.ts GraphQuery   graph-load.ts  graph.nq or vocabulary   protocol.ts  messages, limits         ui/explorer/query-tab.ts
+builtin-tools.ts  QUERY_TOOL,       through the tab, digest checked       worker-core.ts  load, run, row cut      ui/explorer/vocab-tab.ts
+  isReservedName, mergeTools,     query-session.ts  one worker per node,  format.ts  rows as text, prefixes       ui/explorer/page-data-tab.ts
+  GRAPH_HINT, failureText           stop, time limit, one query at once   examples.ts  the ten questions           ui/explorer/result-table.ts
+                                  graph-query.ts  the port: run, summary   third_party/agsc-query/*  (unchanged)   entries/query-worker.ts
+```
+
+Read-only is the engine's own rule (`third_party/agsc-query/engine.js` `queryAnswer`, which calls the tokenizer
+`tokens.js` first); `src/query/worker-core.ts` only adds the limits (4,000 characters of query, 200,000 statements, the
+row cut). The tab's table is the site's `queryTable` tree turned into DOM with text nodes only
+(`src/ui/explorer/result-table.ts`). The vocabulary file is loaded as Turtle into a second store, only when the
+Vocabulary tab is first shown, and never merged with the graph.
+
+The model's tool is built from the same parts. `GraphQuery` (core port) has `available`, `summary` and `run`;
+`src/adapters/graph-query.ts` implements it. The tool is not a page tool and cannot be taken by one:
+`mergeTools` removes every page tool whose name is, or reads like, a name of WebAIAssist (`isReservedName`: compatibility
+forms folded, case dropped, look-alike letters mapped, everything but ASCII letters and digits removed, then "starts with
+webaiassist") before the list is built, so a call by name can only meet the built-in one; the prompt lists it in its own
+section; the card marks the removed tools. Its results are node-author text and are fenced as untrusted like any tool result.
+Threats and controls: [THREAT-MODEL.md](THREAT-MODEL.md), "Query and semantic tools".
 
 ## Look and feel
 
@@ -480,7 +510,8 @@ src/fakes/      in-memory fakes of the ports, the scripted test model
 src/spike/      browser check logic (report, stub node tools, WebMCP check)
 src/entries/    service worker, offscreen, side panel, Options, page scripts, polyfill, spike page
 static/         manifest template, extension HTML pages (including explorer.html), ui.css, explorer.css, icons (SVG source and PNGs)
-third_party/    unchanged copies of other repositories' files with their pins (agsc-explorer: the site's graph explorer)
+third_party/    unchanged copies of other repositories' files with their pins (agsc-explorer: the site's graph explorer; agsc-query: its query engine files)
+src/query/      the query worker's core, messages, result text and example questions (no page API)
 spike/          spike page HTML
 fixtures/       the ten tools of an AgenticSystemCore node page
 scripts/        build, dist and zip checks, model-library pins, validator generator, spike server

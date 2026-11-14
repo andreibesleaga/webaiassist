@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Builds the messages for one run: the system prompt with the tool list, then the chat.
+import { builtinSection, pageTools } from './builtin-prompt';
 import { NODE_HINT } from './node-mode';
 import { CHANGING_TOOLS_HEADING, TOOL_RULES, exampleCall } from './tool-rules';
 import type { ToolStat } from './ports/memory';
@@ -65,7 +66,7 @@ export function buildSystemPrompt(
   options: PromptOptions = {},
 ): string {
   const hint = options.node === true ? `\n\n${NODE_HINT}` : '';
-  const list = `${toolSection(tools)}${statsSection(stats)}`;
+  const list = `${toolSection(pageTools(tools))}${builtinSection(tools)}${statsSection(stats)}`;
   // The tool rules come after the tool list: a small model heeds the last lines before the
   // question most.
   const closing = hasTools(tools) ? `\n\n${toolRules(tools)}` : '';

@@ -29,6 +29,14 @@ a part of the extension imports it. Each keeps its own licence.
 - The graph explorer of https://agenticsystemcore.com (graph-data.js, graph-explorer.js,
   graph-explorer.css and its markup), copied unchanged into third_party/agsc-explorer/.
   Apache License, Version 2.0, Copyright 2026 Andrei N. Besleaga (the same author).
+- Oxigraph (npm `oxigraph` 0.5.13, the WebAssembly build), MIT OR Apache-2.0, Copyright (c)
+  Oxigraph contributors. https://github.com/oxigraph/oxigraph
+  Its web.js is bundled into query-worker.js and its web_bg.wasm ships as model-libs/oxigraph.wasm,
+  pinned by size and SHA-256. It is the SPARQL engine of the Query tab and of the built-in graph tool.
+- The query code of agentic-system-core 1.1.0 (tokens.js, engine.js, view.js and the list of
+  ten questions, ontology-questions.json), copied unchanged into third_party/agsc-query/.
+  Apache License, Version 2.0, Copyright 2026 Andrei N. Besleaga (the same author); the question
+  list is part of the specification text of that package (CC0-1.0).
 
 Test and spike data
 -------------------

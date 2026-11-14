@@ -56,6 +56,7 @@ function toolItem(doc: Document, row: ToolRow): HTMLLIElement {
     extra.title = t('toolPageContentTitle');
     marks.append(extra);
   }
+  if (row.reserved) marks.append(element(doc, 'span', t('toolReserved'), 'mark reserved'));
   const what = element(doc, 'span', row.summary, 'what');
   what.title = row.detail;
   item.append(element(doc, 'code', row.name), marks, what);

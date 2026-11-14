@@ -123,13 +123,17 @@ test.fixme('C15 the tool security review flags look-alike names and a destructiv
   await page.close();
 });
 
-test.fixme('C16 no page tool named like webaiassist_query_graph reaches the model, and the card marks them (P6)', async () => {
+test('C16 no page tool named like webaiassist_query_graph reaches the model, and the card marks each one', async () => {
   const { page, panel } = await open('c16');
-  expect(await listedNames(panel)).not.toContain('webaiassist_query_graph');
   await panel.click('#tools-toggle');
-  await expect(
-    panel.locator('#tools-rows li', { hasText: 'WebAIAssist-Query-Graph' }),
-  ).toContainText('built-in');
+  const rows = panel.locator('#tools-rows li');
+  await expect(rows).toHaveCount(4);
+  for (const row of await rows.all()) await expect(row).toContainText('built-in');
+  await startScripted(panel);
+  const seen = await askPanel(panel, '/tool webaiassist_query_graph {}');
+  expect(seen.questions).not.toContain('Run the tool webaiassist_query_graph?');
+  expect(seen.transcript).not.toContain('this came from the page, not from the assistant');
+  expect(seen.transcript).toContain('unknown tool');
   await page.close();
 });
 

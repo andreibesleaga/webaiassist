@@ -356,3 +356,33 @@ the explorer never gives the library HTML: it sets `nodeLabel(() => '')` and `li
 `graph-data.js` and `graph-explorer.js` contain none of `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`,
 `eval` or `new Function` (`test/security/explorer-no-html-sink.test.ts`). `npm install` adds 31 packages for
 `force-graph`, not 14 as the design note counted; only `force-graph.min.js` ships.
+
+## 22. Query and semantic tools (14 Nov 2026)
+
+The Query tab and the model's built-in graph tool run the query code of the AgenticSystemCore engine, copied
+unchanged, over the SPARQL engine Oxigraph.
+
+| What                                                           | Source                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Pinned by                                                                                                                                                                        |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tokens.js`, `engine.js`, `view.js`, `ontology-questions.json` | repository `agentic-system-core`, tag `v1.1.0` (commit `ec7a67ff7efa2aa42f83bb018596af37112384ea`; the files are the same at `87f446719cc1df3a0064b23e245207542275a066`), paths `src/distribution/query/*.js` and `docs/ontology-questions.json`, read on 14 Nov 2026. The owner's own code (Apache-2.0 AND CC0-1.0).                                                                                                                                       | `third_party/agsc-query/PINS.json`: size and SHA-256 of each file; the build stops on a difference                                                                               |
+| `oxigraph` 0.5.13                                              | npm, MIT OR Apache-2.0, published 22 Oct 2026 (23 days before; passes the two-week rule), unpacked 8,796,868 bytes, no dependencies. `web.js` 50,946 bytes SHA-256 `210c42fbba2915f668386f3285d28218db5865267e95b5403b82150431931f7c`; `web_bg.wasm` 4,324,920 bytes SHA-256 `75e3f0f4de67921e88e3f6d587b2a8e7aa822abbe3a3b79873f2b97f20d52c24`; both byte for byte the files the site ships (`www/query/vendor/oxigraph-0.5.13/`), compared on 14 Nov 2026 | `PINS.json` (web.js) and `scripts/model-libs.json` (the wasm, copied to `model-libs/oxigraph.wasm`, checked on every build, accepted by `check-remote-code` as a pinned runtime) |
+| recorded node files                                            | `fixtures/graph/asc-graph.nq` (74,431 bytes), `pat-graph.nq` (540,434 bytes) and `asc-ontology.ttl` (21,768 bytes), copied from the site repositories' `www/` on 14 Nov 2026; each digest equals the one in the node's linkset (`fixtures/graph/README.md`)                                                                                                                                                                                                 | the linkset fixtures                                                                                                                                                             |
+
+Notes for the next reader:
+
+- **Two-week rule.** The engine files were published with agentic-system-core 1.1.0 on 13 Nov 2026, one day before
+  they were copied. They are the owner's own files and have run on the site since 13 Nov; the exception is recorded
+  here and is to be looked at again on 27 Nov 2026. A later 1.1.x that exports `query/*` could replace the copy.
+- `node scripts/sync-agsc-query.mjs <path of agentic-system-core>` copies the files again from the tag and rewrites
+  `PINS.json`; `test/third-party/agsc-query-pins.test.ts` fails when a copy differs from its pin (and, with
+  `AGSC_ENGINE_REPO` set, when a pin differs from the tag).
+- `engine.js` also holds `queryWorkerMain`, the loader of the site's own worker, which reads an address with
+  `fetch`. It is in the bundle and is never called: WebAIAssist hands bytes to the worker instead
+  (`test/security/query-read-only-no-network.test.ts` checks that no file of ours names it).
+- The copied files are CommonJS, and the package has `"type": "module"`. `third_party/agsc-query/package.json`
+  (`"type": "commonjs"`, the only file there that is not a copy) lets Node load them; esbuild bundles them as
+  they are; Vitest reads them through `test/helpers/agsc-query/` and an alias in `vitest.config.ts`.
+- The engine refuses INSERT, DELETE, LOAD, CLEAR, CREATE, DROP, COPY, MOVE, ADD and SERVICE (also `SERVICE SILENT`)
+  by its own tokenizer before Oxigraph sees the text (`test/query/worker-core.test.ts` runs ten such queries).
+- Licence texts: the npm package holds no licence file; NOTICE names the licence (MIT OR Apache-2.0) and the
+  repository. This is a gap to close with the licence audit of the dependencies (the same as for the other packages).

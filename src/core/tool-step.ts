@@ -3,9 +3,11 @@
 // is unchanged, ask through the confirmation gate, check again, call, record, fence.
 import { needsConfirmation, sameTool } from './gate';
 import type { HistorySpan } from './history';
+import { listedTools, runBuiltin } from './builtin-step';
 import type { ArgsValidator } from './ports/args-validator';
 import type { ChatUI } from './ports/chat-ui';
 import type { Clock } from './ports/clock';
+import type { GraphQuery } from './ports/graph-query';
 import type { Memory } from './ports/memory';
 import type { ModelRuntime } from './ports/model-runtime';
 import type { ToolBridge, ToolCallResult, ToolListing } from './ports/tool-bridge';
@@ -24,6 +26,8 @@ export interface AgentDeps {
   /** Asked before each tool call, ahead of the question about that call: false when the user
    *  did not allow the tools of this site (site-consent.ts). Absent: the site is allowed. */
   readonly siteGate?: () => Promise<boolean>;
+  /** The built-in graph tool (builtin-tools.ts); offered only when the scope says so. */
+  readonly builtin?: GraphQuery;
 }
 
 /** What a tool step needs to know about the run. */
@@ -33,6 +37,8 @@ export interface RunScope {
   readonly origin: string;
   readonly signal?: CancelSignal;
   readonly confirmEveryCall?: boolean;
+  /** The panel offers the built-in graph tool on this run. */
+  readonly graphQuery?: boolean;
 }
 
 export interface LoopState {
@@ -69,7 +75,7 @@ export async function listOnSite(
 ): Promise<ToolListing | undefined> {
   const listing = await deps.bridge.list(scope.tabId);
   if (listing.origin === undefined || listing.origin === scope.origin) {
-    return { ...listing, tools: listing.tools.filter(listableTool) };
+    return { ...listing, tools: listedTools(deps, scope, listing.tools.filter(listableTool)) };
   }
   state.movedTo = listing.origin;
   return undefined;
@@ -138,6 +144,11 @@ export async function runTool(
   state: LoopState,
   call: Call,
 ): Promise<boolean> {
+  if (call.tool.builtin === true) {
+    // The built-in tool reads the site's graph, so the site question comes first for it too.
+    if (!(await siteOpen(deps, state, call))) return false;
+    return runBuiltin(deps, scope, state, call);
+  }
   // Checked before the question and again after it: the page may change the tool, or the
   // tab may leave the site, while the user decides.
   if (!(await stillSame(deps, scope, state, call))) return false;

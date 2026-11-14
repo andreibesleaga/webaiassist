@@ -99,6 +99,16 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   message; the graph must match the SHA-256 digest in the linkset or it is not drawn; other nodes are read only
   after you tick them and press a button (https, public name, three fixed paths, no redirect, 2 MiB). No new
   permission and no `web_accessible_resources`.
+- **Query and semantic tools**: the explorer tab gains **Query** (a text box, Run, Stop, a result table
+  built as text, ten example questions with "Put in editor"), **Vocabulary** (classes and properties from the
+  node's vocabulary file, in a store of its own) and **Page data** (the open page's JSON-LD as text). The
+  query engine is Oxigraph 0.5.13 (WebAssembly, `model-libs/oxigraph.wasm`, pinned) in a Worker; its read-only
+  rules are the query files of agentic-system-core 1.1.0, copied unchanged into `third_party/agsc-query/` and
+  pinned by SHA-256 (an update, `SERVICE` and a graph over 200,000 statements are refused; 10 seconds in the
+  tab, 8 seconds for the model; nothing leaves the computer). The model gets one built-in tool,
+  `webaiassist_query_graph` (port `GraphQuery`), listed apart from the page's tools; a page tool whose name
+  is, or reads like, a name of WebAIAssist is not offered and is marked on the card. The zip limit is now
+  12 MiB (the query engine is 1.5 MB compressed). No new permission and no `web_accessible_resources`.
 
 - **More of what a node and a site publish** (package P2): the chip "matches the node's own list"
   from the SHA-256 digests in the link set (a file that differs is marked and not given to the

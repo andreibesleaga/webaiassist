@@ -14,6 +14,7 @@
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import { copyExplorer } from './explorer-pins.mjs';
+import { checkQueryPins } from './query-pins.mjs';
 import { bundleModelLibs, webLlmNoRemoteLibs, wllamaNoRemote } from './model-libs.mjs';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
@@ -29,6 +30,9 @@ const root = new URL('../', import.meta.url);
 const outName = evalBuild ? 'dist-eval' : smoke ? 'dist-smoke' : 'dist';
 const out = new URL(`${outName}/`, root);
 const pkg = JSON.parse(readFileSync(new URL('package.json', root), 'utf8'));
+
+// The query engine files are bundled into query-worker.js: they must be the pinned bytes.
+checkQueryPins();
 
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
@@ -59,6 +63,7 @@ await build({
     options: 'src/entries/options.ts',
     explorer: 'src/entries/explorer.ts',
     'model-worker': 'src/entries/model-worker.ts',
+    'query-worker': 'src/entries/query-worker.ts',
   },
   format: 'esm',
   splitting: true,
