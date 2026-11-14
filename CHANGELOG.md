@@ -118,6 +118,18 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   stage on Google's official demo pages. The evaluation build made with `--demos` adds the one
   host `googlechromelabs.github.io`; the release build keeps no install-time host.
 
+- **The model uses the page's tools** (package P1). On a page with tools both prompts now say
+  that the model cannot see the site and must call a tool first for anything about it; that site
+  files are background and never the source of an answer; that read-only tools come first and a
+  tool that changes something is used only when the user asked for that action (the tool list
+  is split the same way); and that the first sufficient result ends the question. After a tool
+  result the loop adds one line (not saved with the chat) that lets the model answer at once, and
+  the site files come with a line that says they are not an answer. For a window of 4096 tokens or
+  less the site text is cut to 2,400 characters, so a site that fills every piece still fits. The
+  question "Use the tools of this site?" is now asked when a tool is first about to be used, not
+  before a question that needs no tool. The evaluation scores "First tool right" and "Tool used"
+  beside "Tool right".
+
 ### Security
 
 - Manifest V3 with five install permissions (`sidePanel`, `offscreen`, `storage`, `activeTab`,

@@ -24,11 +24,11 @@ async function panelWith(session: Session, config: Partial<FakeModelConfig>): Pr
   return panel;
 }
 
-async function ask(panel: Page, text: string, origin: string): Promise<void> {
+/** A question the fake model answers without a tool: the site question is not asked. */
+async function ask(panel: Page, text: string): Promise<void> {
   await panel.fill('#question', text);
   await panel.press('#question', 'Control+Enter');
-  await expect(panel.locator('#confirm-title')).toHaveText(`Use the tools of ${origin}?`);
-  await panel.click('#confirm-allow');
+  await expect(panel.locator('#confirm')).toBeHidden();
 }
 
 test('a window of 1024 tokens gets a compact tool list that still names every tool', async () => {
@@ -37,7 +37,7 @@ test('a window of 1024 tokens gets a compact tool list that still names every to
     const panel = await panelWith(session, { contextWindow: 1024 });
     await panel.click('#start');
     await expect(panel.locator('#model-status')).toContainText('Ready:');
-    await ask(panel, 'What can I do here?', session.origin);
+    await ask(panel, 'What can I do here?');
     await expect(panel.locator('#transcript')).toContainText('You can add numbers and echo text.');
     const log: FakeModelLog = await readLog(panel);
     const system = log.creates.at(-1)?.initialPrompts?.[0]?.content ?? '';
@@ -57,7 +57,7 @@ test('the reply is asked for as JSON that names only the page’s tools', async 
     const panel = await panelWith(session, {});
     await panel.click('#start');
     await expect(panel.locator('#model-status')).toContainText('Ready:');
-    await ask(panel, 'What can I do here?', session.origin);
+    await ask(panel, 'What can I do here?');
     await expect(panel.locator('#transcript')).toContainText('You can add numbers');
     const { prompts } = await readLog(panel);
     expect(prompts[0]?.omit).toBe(true);
@@ -126,7 +126,7 @@ test('a question that is too long for the window is named, not left hanging', as
         );
       void create;
     });
-    await ask(panel, 'What can I do here?', session.origin);
+    await ask(panel, 'What can I do here?');
     await expect(panel.locator('#transcript')).toContainText(
       "too long for Chrome's built-in model",
     );

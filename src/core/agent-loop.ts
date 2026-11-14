@@ -22,6 +22,7 @@ import { partialAnswer } from './stream';
 import { listOnSite, runTool, type AgentDeps, type LoopState, type RunScope } from './tool-step';
 import type { ToolStat } from './ports/memory';
 import type { ChatMessage, ToolInfo } from './types';
+import { AFTER_RESULT, SITE_BACKGROUND } from './tool-rules';
 import { PAGE_TEXT_TOOL, fenceSavedResult, wrapUntrusted } from './untrusted';
 
 export type { AgentDeps } from './tool-step';
@@ -90,7 +91,10 @@ async function startState(deps: AgentDeps, input: AgentInput): Promise<LoopState
     state.messages.splice(-1, 0, { role: 'tool', content: page });
   }
   if (input.siteContext !== undefined) {
-    const facts: ChatMessage = { role: 'tool', content: input.siteContext };
+    const facts: ChatMessage = {
+      role: 'tool',
+      content: `${SITE_BACKGROUND}\n${input.siteContext}`,
+    };
     state.messages.splice(-1, 0, facts);
     state.transient.add(facts);
   }
@@ -122,6 +126,19 @@ function fenceSaved(message: ChatMessage): ChatMessage {
   return message.role === 'tool'
     ? { ...message, content: fenceSavedResult(message.content) }
     : message;
+}
+
+/** After a tool result: one short line that lets the model answer now. It is the loop's own
+ *  text, never saved with the chat, and only the newest one stays in the request. */
+function addReminder(state: LoopState): void {
+  if (state.reminder) {
+    state.messages.splice(state.messages.indexOf(state.reminder), 1);
+    state.transient.delete(state.reminder);
+  }
+  const line: ChatMessage = { role: 'user', content: AFTER_RESULT };
+  state.messages.push(line);
+  state.transient.add(line);
+  state.reminder = line;
 }
 
 /** Remembers the size of the result a tool step just added. */
@@ -156,8 +173,9 @@ async function step(
   }
   const earlier = state.made.get(callKey(checked.tool.name, checked.args));
   if (earlier) return repeatedCall(deps, input, state, earlier);
-  await runTool(deps, input, state, { tool: checked.tool, args: checked.args });
+  const ran = await runTool(deps, input, state, { tool: checked.tool, args: checked.args });
   noteResult(state);
+  if (ran) addReminder(state);
   return undefined;
 }
 

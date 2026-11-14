@@ -60,12 +60,12 @@ Scenarios whose wording changed when they stopped being pending:
 | Tag | Scenarios |
 |---|---|
 | @smoke | 119 |
-| @unit | 144 |
+| @unit | 151 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 9 |
-| all | 277 |
+| all | 284 |
 | run by `npm run test:bdd` now | 119 |
 
 ### Every scenario
@@ -150,9 +150,9 @@ Scenarios whose wording changed when they stopped being pending:
 | F05.2 | Allowing and forgetting a site | Allow asks Chrome, and the toolbar button is the other way in | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
 | F05.3 | Allowing and forgetting a site | Allow names the site in Chrome's request and refuses a site that is not a plain web address | @unit | `test/ui/panel-access.test.ts`, `test/adapters/site-access.test.ts` | unit test |
 | F05.4 | Allowing and forgetting a site | Denying the site request gives a plain message and keeps the chat usable | @unit | `test/ui/panel-access.test.ts` | unit test |
-| F05.5 | Allowing and forgetting a site | The first question on a site asks once for its tools, per session | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
-| F05.6 | Allowing and forgetting a site | Denying the site means the answer uses no tools | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
-| F05.7 | Allowing and forgetting a site | Forgetting a site takes back its tool permission, and the next question asks again | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
+| F05.5 | Allowing and forgetting a site | The first tool use on a site asks once for its tools, per session | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
+| F05.6 | Allowing and forgetting a site | Denying the site at the first tool means the answer uses no tools | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
+| F05.7 | Allowing and forgetting a site | Forgetting a site takes back its tool permission, and the next tool use asks again | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
 | F05.8 | Allowing and forgetting a site | Forgetting a site removes its memory, its permission and its compatibility mode | @unit | `test/adapters/forget-site.test.ts`, `test/ui/panel-privacy.test.ts` | unit test |
 | F05.9 | Allowing and forgetting a site | Forgetting needs a plain web address and changes nothing otherwise | @unit | `test/adapters/forget-site.test.ts`, `test/ui/panel-privacy.test.ts` | unit test |
 | F05.10 | Allowing and forgetting a site | Options can forget all sites at once | @smoke | `features/05-allowing-and-forgetting-a-site.feature` | npm run test:bdd |
@@ -327,6 +327,13 @@ Scenarios whose wording changed when they stopped being pending:
 | F23.3 | The WebMCP conformance page and suite | A page that swaps a tool's description while the question to run it is open gets its call refused | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
 | F23.4 | The WebMCP conformance page and suite | Only the evaluation build made with the demos flag may script Google's demo pages | @unit | `test/scripts/check-dist.test.ts` | unit test |
 | F23.5 | The WebMCP conformance page and suite | The conformance page and the extension are run in real Google Chrome | @manual | `features/23-webmcp-conformance.feature` | manual check |
+| F24.1 | The model uses the tools of the page | The instructions tell the model it cannot see the site and must call a tool first | @unit | `test/core/prompt-tool-rules.test.ts` | unit test |
+| F24.2 | The model uses the tools of the page | Read-only tools come first and the others are used only when the user asked | @unit | `test/core/prompt-tool-rules.test.ts` | unit test |
+| F24.3 | The model uses the tools of the page | A tool result is followed by a line that lets the model answer at once | @unit | `test/core/agent-loop-tool-use.test.ts` | unit test |
+| F24.4 | The model uses the tools of the page | The site files are introduced as background, not as an answer | @unit | `test/core/agent-loop-tool-use.test.ts`, `test/core/agent-loop-site.test.ts` | unit test |
+| F24.5 | The model uses the tools of the page | A site that fills every piece of site text still fits a window of 4096 tokens | @unit | `test/adapters/context-fit.test.ts`, `test/core/site-facts.test.ts` | unit test |
+| F24.6 | The model uses the tools of the page | The site question comes when a tool is first about to be used | @unit | `test/core/agent-loop-site-gate.test.ts`, `test/core/site-consent.test.ts`, `test/ui/panel-controller.test.ts` | unit test |
+| F24.7 | The model uses the tools of the page | The evaluation scores the first tool and "a tool was used" beside the exact sequence | @unit | `test/eval/score.test.ts`, `test/eval/report.test.ts` | unit test |
 | F25.1 | The node's own list, more site facts, the shortcut, diagnostics and storage | Files that match the node's own list get the chip "matches the node's own list" | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
 | F25.2 | The node's own list, more site facts, the shortcut, diagnostics and storage | A file that does not match the node's own list is marked and not given to the model | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
 | F25.3 | The node's own list, more site facts, the shortcut, diagnostics and storage | The digest is computed over the raw bytes of a body that was read whole | @unit | `test/adapters/site-page-scripts.test.ts` | unit test |

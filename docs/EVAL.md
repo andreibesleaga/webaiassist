@@ -152,6 +152,24 @@ page does not offer, repeated calls (how many times the loop declined to run a c
 already made in that question; the summary counts the prompts with at least one), and the seconds
 to the first token and in total. Argument quality is read from the report's rows by hand.
 
+Three tool columns, from strict to loose: "Tool right" (the whole tool sequence equals the expected one), "First tool right" (the first tool equals the first expected one; for a prompt that expects no tool, none was called) and "Tool used" (any tool was called; counted only over prompts that expect a tool). A model that calls `ask` and then `read` for a question that expects `ask` is not "Tool right" but is "First tool right".
+
+### Tool use before and after the tool-use change (14 Nov 2026, processor, stub node, 5 prompts)
+
+Same five prompts, same machine (`npm run eval:cpu -- --model <key> --prompts 5`), the build
+before and after the change that tells the model it cannot see the site and must call a tool
+first (CHANGELOG, "The model uses the page's tools"). Reports: `docs/eval/EVAL-CPU-<key>-P1-BEFORE-2026-11-14.json`
+and `...-P1-AFTER-...json`. One run of five prompts each: the numbers show a direction, not a rate.
+
+| Model             | Whole sequence right | First tool right | A tool was used | Tool sequences after the change                            |
+| ----------------- | -------------------- | ---------------- | --------------- | ---------------------------------------------------------- |
+| Qwen3 0.6B before | 0 of 5               | 0 of 5           | 0 of 5          | none in all five                                           |
+| Qwen3 0.6B after  | 2 of 5               | 2 of 5           | 2 of 5          | ask; none; none; search; none                              |
+| Qwen3 1.7B before | 4 of 5               | 4 of 5           | 5 of 5          | explain; ask; search; search; search                       |
+| Qwen3 1.7B after  | 5 of 5               | 5 of 5           | 5 of 5          | ask; ask; search; search; search                           |
+| Qwen3.5 2B before | 0 of 5               | 2 of 5           | 2 of 5          | none; none; search, read, brief; search, read, brief; none |
+| Qwen3.5 2B after  | 2 of 5               | 3 of 5           | 5 of 5          | search; compose; search; search; search, read, read        |
+
 ## Results
 
 <!-- eval-results:start -->

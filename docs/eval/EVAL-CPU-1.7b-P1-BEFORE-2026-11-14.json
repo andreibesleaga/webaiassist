@@ -1,0 +1,203 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 53,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 133.6,
+    "status": "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3 1.7B on the processor (better answers; in this browser, on your processor and memory; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3 1.7B on the processor: 0 of 1107 MB (0%)",
+      "Downloading Qwen3 1.7B on the processor: 123 of 1107 MB (11%)",
+      "Downloading Qwen3 1.7B on the processor: 247 of 1107 MB (22%)",
+      "Downloading Qwen3 1.7B on the processor: 370 of 1107 MB (33%)",
+      "Downloading Qwen3 1.7B on the processor: 493 of 1107 MB (44%)",
+      "Downloading Qwen3 1.7B on the processor: 616 of 1107 MB (56%)",
+      "Downloading Qwen3 1.7B on the processor: 740 of 1107 MB (67%)",
+      "Downloading Qwen3 1.7B on the processor: 863 of 1107 MB (78%)",
+      "Downloading Qwen3 1.7B on the processor: 986 of 1107 MB (89%)",
+      "Downloading Qwen3 1.7B on the processor: 1107 of 1107 MB (100%)",
+      "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "explain"
+        ],
+        "toolRight": 0,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 0.3,
+        "totalS": 284.9
+      },
+      "answer": "The site says that 'handoffs' refer to the process by which work passes between agents, with context. It also mentions that 'review' is a process where a reviewer checks the result. Both processes are required and involve passing information between agents.",
+      "speeds": [
+        {
+          "promptTokens": 930,
+          "promptPerSecond": 4.2,
+          "replyTokens": 31,
+          "replyPerSecond": 1.4
+        },
+        {
+          "promptTokens": 113,
+          "promptPerSecond": 6,
+          "replyTokens": 56,
+          "replyPerSecond": 2.7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "ask"
+        ],
+        "toolRight": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 49.6,
+        "totalS": 100.8
+      },
+      "answer": "The items that best answer 'how do agents share work?' are 'handoff' (how work passes between agents, with context) and 'review' (a reviewer checks the result).",
+      "speeds": [
+        {
+          "promptTokens": 226,
+          "promptPerSecond": 5.5,
+          "replyTokens": 26,
+          "replyPerSecond": 3.1
+        },
+        {
+          "promptTokens": 108,
+          "promptPerSecond": 4.1,
+          "replyTokens": 44,
+          "replyPerSecond": 1.7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 86.4,
+        "totalS": 119.3
+      },
+      "answer": "The items about 'review' are 'review' (a reviewer checks the result) and 'release' (a release is a formal action to make something available).",
+      "speeds": [
+        {
+          "promptTokens": 389,
+          "promptPerSecond": 4.9,
+          "replyTokens": 16,
+          "replyPerSecond": 2.4
+        },
+        {
+          "promptTokens": 96,
+          "promptPerSecond": 5.1,
+          "replyTokens": 39,
+          "replyPerSecond": 2.8
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "gateShown": 1,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 122.3,
+        "totalS": 169.7
+      },
+      "answer": "The search for 'memory' did not return any items.",
+      "speeds": [
+        {
+          "promptTokens": 525,
+          "promptPerSecond": 4.4,
+          "replyTokens": 16,
+          "replyPerSecond": 4.6
+        },
+        {
+          "promptTokens": 96,
+          "promptPerSecond": 5.7,
+          "replyTokens": 18,
+          "replyPerSecond": 0.6
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "gateShown": 1,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 115.1,
+        "totalS": 135.7
+      },
+      "answer": "The search for 'guardrails' did not return any items.",
+      "speeds": [
+        {
+          "promptTokens": 647,
+          "promptPerSecond": 5.8,
+          "replyTokens": 17,
+          "replyPerSecond": 4.6
+        },
+        {
+          "promptTokens": 98,
+          "promptPerSecond": 6.4,
+          "replyTokens": 19,
+          "replyPerSecond": 3.6
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 16.3,
+    "status": "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 1.7B on the processor (better answers; in this browser, on your processor and memory; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0)…",
+      "Loading Qwen3 1.7B on the processor into memory…",
+      "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

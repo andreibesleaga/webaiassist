@@ -15,7 +15,7 @@ describe('runAgent: the same call again is not run again', () => {
     expect(deps.bridge.calls).toHaveLength(1);
     const messages = deps.model.requests[2]?.messages ?? [];
     expect(messages.at(-2)).toMatchObject({ role: 'tool' });
-    expect(messages.at(-2)?.content).toBe(messages.at(-4)?.content);
+    expect(messages.at(-2)?.content).toBe(messages.at(-5)?.content);
     expect(messages.at(-1)?.role).toBe('user');
     expect(messages.at(-1)?.content).toContain('already have this result');
     expect(deps.ui.events).toContainEqual({ kind: 'note', text: NOTE_AGAIN });

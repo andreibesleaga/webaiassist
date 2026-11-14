@@ -43,7 +43,7 @@ Feature: Allowing and forgetting a site
 
   # req: LLM06-1
   @smoke
-  Scenario: The first question on a site asks once for its tools, per session
+  Scenario: The first tool use on a site asks once for its tools, per session
     Given WebAIAssist is installed
     And a page with two WebMCP tools is open
     And the side panel is open on that page
@@ -58,7 +58,7 @@ Feature: Allowing and forgetting a site
     Then a dialog titled "Run the tool add?" is open
 
   @smoke
-  Scenario: Denying the site means the answer uses no tools
+  Scenario: Denying the site at the first tool means the answer uses no tools
     Given WebAIAssist is installed
     And a page with two WebMCP tools is open
     And the side panel is open on that page
@@ -70,7 +70,7 @@ Feature: Allowing and forgetting a site
 
   # req: NIST-MG-2
   @smoke
-  Scenario: Forgetting a site takes back its tool permission, and the next question asks again
+  Scenario: Forgetting a site takes back its tool permission, and the next tool use asks again
     Given WebAIAssist is installed
     And a page with two WebMCP tools is open on a site that is not allowed yet
     And the side panel is open on that page

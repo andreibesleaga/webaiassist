@@ -10,6 +10,7 @@
 // Any other text is echoed.
 import { REPAIR } from '../core/check-action';
 import { NUDGE } from '../core/repeat';
+import { AFTER_RESULT } from '../core/tool-rules';
 import type {
   ChatRequest,
   LoadProgress,
@@ -25,7 +26,11 @@ const REPAIR_START = REPAIR.slice(0, REPAIR.indexOf('%s'));
 /** The user's question: the last user turn that the loop did not write itself. */
 function questionIndex(messages: readonly ChatMessage[]): number {
   return messages.findLastIndex(
-    (m) => m.role === 'user' && !m.content.startsWith(REPAIR_START) && m.content !== NUDGE,
+    (m) =>
+      m.role === 'user' &&
+      !m.content.startsWith(REPAIR_START) &&
+      m.content !== NUDGE &&
+      m.content !== AFTER_RESULT,
   );
 }
 
@@ -42,7 +47,7 @@ function neverAnswers(command: RegExpExecArray, after: readonly ChatMessage[]): 
 
 /** The reply to "/tool": the call, or after its result an answer with the result's text. */
 function oneTool(command: RegExpExecArray, after: readonly ChatMessage[]): object {
-  const last = after.at(-1);
+  const last = after.filter((m) => m.content !== AFTER_RESULT).at(-1);
   if (last?.role !== 'tool') return toolCall(command[2] ?? '', command[3]);
   return { answer: `The tool said: ${FENCE.exec(last.content)?.[1] ?? last.content}` };
 }

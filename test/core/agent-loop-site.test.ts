@@ -11,7 +11,8 @@ describe('runAgent: site facts', () => {
     const deps = makeDeps([answer('A site.')]);
     await runAgent(deps, { ...base, siteContext: FACTS });
     const messages = deps.model.requests[0]?.messages ?? [];
-    expect(messages.at(-2)).toEqual({ role: 'tool', content: FACTS });
+    expect(messages.at(-2)?.role).toBe('tool');
+    expect(messages.at(-2)?.content.endsWith(FACTS)).toBe(true);
     expect(messages.at(-1)).toEqual({ role: 'user', content: base.userText });
     expect(messages[0]?.content).not.toContain('Guide');
   });

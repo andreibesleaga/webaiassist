@@ -35,6 +35,8 @@ const REPORT: EvalReport = {
       target: 'stub',
       prompts: 20,
       toolRight: 15,
+      firstToolRight: 17,
+      toolUsed: '18 of 18',
       gateShown: '17 of 17',
       factInAnswer: '12 of 18',
       hallucinated: 1,
@@ -68,7 +70,9 @@ describe('eval report', () => {
     expect(md).toContain(
       'Last run: 2026-11-13, Chrome 157.0.8103.52, win32 10.0.26300; WebGPU adapter: yes; report `docs/eval/EVAL-x.json`.',
     );
-    expect(md).toContain('| qwen | stub | 20 | 15 | 17 of 17 | 12 of 18 | 1 | 2 | 4 | 3.4 |');
+    expect(md).toContain(
+      '| qwen | stub | 20 | 15 | 17 | 18 of 18 | 17 of 17 | 12 of 18 | 1 | 2 | 4 | 3.4 |',
+    );
     expect(md).toContain('| storage access level | pass | setAccessLevel: ok |');
     expect(md).toContain('main thread');
   });

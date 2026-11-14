@@ -61,8 +61,8 @@ describe('the saved chat is cut to the reply size of the runtime', () => {
       role: i % 2 === 0 ? ('user' as const) : ('assistant' as const),
       content: `turn ${i} ${'word '.repeat(60)}`,
     }));
-    const roomy = { ...makeDeps([]), model: small({ contextTokens: 2000 }) };
-    const tight = { ...makeDeps([]), model: small({ contextTokens: 2000, replyTokens: 1400 }) };
+    const roomy = { ...makeDeps([]), model: small({ contextTokens: 3200 }) };
+    const tight = { ...makeDeps([]), model: small({ contextTokens: 3200, replyTokens: 2200 }) };
     await runAgent(roomy, { ...input, history: turns });
     await runAgent(tight, { ...input, history: turns });
     const count = (d: typeof roomy): number => d.model.requests[0]?.messages.length ?? 0;

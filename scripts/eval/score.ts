@@ -24,6 +24,10 @@ export interface Row {
   readonly target: string;
   readonly tools: readonly string[];
   readonly toolRight: 0 | 1;
+  /** The first tool is the first expected one (no tool at all when none is expected). */
+  readonly firstToolRight: 0 | 1;
+  /** A tool was used; null when the prompt expects no tool. */
+  readonly toolUsed: 0 | 1 | null;
   /** null when no tool ran. */
   readonly gateShown: 0 | 1 | null;
   /** null when the prompt or the target has no fact to check. */
@@ -47,6 +51,15 @@ const seconds = (ms: number): number => Math.round(ms / 100) / 10;
 function toolRight(prompt: EvalPrompt, seen: Observation): 0 | 1 {
   if (prompt.tools.length === 0) return bit(seen.tools.length === 0 && seen.answer.trim() !== '');
   return bit(JSON.stringify(seen.tools) === JSON.stringify(prompt.tools));
+}
+
+function firstToolRight(prompt: EvalPrompt, seen: Observation): 0 | 1 {
+  if (prompt.tools.length === 0) return toolRight(prompt, seen);
+  return bit(seen.tools[0] === prompt.tools[0]);
+}
+
+function toolUsed(prompt: EvalPrompt, seen: Observation): 0 | 1 | null {
+  return prompt.tools.length === 0 ? null : bit(seen.tools.length > 0);
 }
 
 function gateShown(seen: Observation): 0 | 1 | null {
@@ -76,6 +89,8 @@ export function scorePrompt(prompt: EvalPrompt, seen: Observation, ctx: ScoreCon
     target: ctx.target,
     tools: seen.tools,
     toolRight: toolRight(prompt, seen),
+    firstToolRight: firstToolRight(prompt, seen),
+    toolUsed: toolUsed(prompt, seen),
     gateShown: gateShown(seen),
     factInAnswer: factInAnswer(prompt, seen, ctx.target),
     hallucinated: hallucinated(seen, ctx.pageTools),
@@ -91,6 +106,8 @@ export interface SummaryRow {
   readonly target: string;
   readonly prompts: number;
   readonly toolRight: number;
+  readonly firstToolRight: number;
+  readonly toolUsed: string;
   readonly gateShown: string;
   readonly factInAnswer: string;
   readonly hallucinated: number;
@@ -121,6 +138,8 @@ function summaryOf(rows: readonly Row[]): SummaryRow {
     target: first.target,
     prompts: rows.length,
     toolRight: rows.filter((r) => r.toolRight === 1).length,
+    firstToolRight: rows.filter((r) => r.firstToolRight === 1).length,
+    toolUsed: ofScored(rows.map((r) => r.toolUsed)),
     gateShown: ofScored(rows.map((r) => r.gateShown)),
     factInAnswer: ofScored(rows.map((r) => r.factInAnswer)),
     hallucinated: rows.filter((r) => r.hallucinated.length > 0).length,

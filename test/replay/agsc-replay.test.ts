@@ -113,7 +113,7 @@ describe('fixture replay: the ten AgenticSystemCore tools through the whole mess
     const result = byId('transcript').querySelector('[data-trust="untrusted"] pre')?.textContent;
     expect(JSON.parse(result ?? '{}')).toMatchObject({ source: name, trust: 'untrusted' });
     expect(byId('transcript').textContent).toContain(`Done with ${name}.`);
-    const seen = model.requests[1]?.messages.at(-1)?.content ?? '';
+    const seen = model.requests[1]?.messages.at(-2)?.content ?? '';
     expect(seen).toMatch(new RegExp(`^<tool-result tool="${name}" trust="untrusted">`));
     expect(model.requests[0]?.messages[0]?.content).toContain('AgenticSystemCore node');
     expect(await deps.memoryStore.history(ORIGIN)).toEqual([

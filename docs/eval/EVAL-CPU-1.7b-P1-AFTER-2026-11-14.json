@@ -1,0 +1,213 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 72,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 66.5,
+    "status": "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3 1.7B on the processor (better answers; in this browser, on your processor and memory; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3 1.7B on the processor: 0 of 1107 MB (0%)",
+      "Downloading Qwen3 1.7B on the processor: 125 of 1107 MB (11%)",
+      "Downloading Qwen3 1.7B on the processor: 249 of 1107 MB (23%)",
+      "Downloading Qwen3 1.7B on the processor: 370 of 1107 MB (33%)",
+      "Downloading Qwen3 1.7B on the processor: 493 of 1107 MB (45%)",
+      "Downloading Qwen3 1.7B on the processor: 616 of 1107 MB (56%)",
+      "Downloading Qwen3 1.7B on the processor: 741 of 1107 MB (67%)",
+      "Downloading Qwen3 1.7B on the processor: 863 of 1107 MB (78%)",
+      "Downloading Qwen3 1.7B on the processor: 985 of 1107 MB (89%)",
+      "Downloading Qwen3 1.7B on the processor: 1107 of 1107 MB (100%)",
+      "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "ask"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 132.9,
+        "totalS": 157.8
+      },
+      "answer": "The site mentions that handoffs refer to the process by which work passes between agents, maintaining context. It also notes that review is a process where a reviewer checks the result.",
+      "speeds": [
+        {
+          "promptTokens": 1086,
+          "promptPerSecond": 8.4,
+          "replyTokens": 20,
+          "replyPerSecond": 5.1
+        },
+        {
+          "promptTokens": 128,
+          "promptPerSecond": 7.5,
+          "replyTokens": 40,
+          "replyPerSecond": 5.2
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "ask"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 48.3,
+        "totalS": 72.5
+      },
+      "answer": "The item 'handoff' best answers the question about how agents share work, as it directly addresses the process of work passing between agents while maintaining context.",
+      "speeds": [
+        {
+          "promptTokens": 338,
+          "promptPerSecond": 7.7,
+          "replyTokens": 22,
+          "replyPerSecond": 5.1
+        },
+        {
+          "promptTokens": 132,
+          "promptPerSecond": 7.6,
+          "replyTokens": 36,
+          "replyPerSecond": 5.3
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 62.5,
+        "totalS": 94.6
+      },
+      "answer": "The items about review are 'review' (a reviewer checks the result) and 'handoff' (how work passes between agents, with context). The facts include 'context', 'handoff', 'release', 'requires', 'review', 'reviewer'.",
+      "speeds": [
+        {
+          "promptTokens": 475,
+          "promptPerSecond": 7.9,
+          "replyTokens": 12,
+          "replyPerSecond": 4.6
+        },
+        {
+          "promptTokens": 120,
+          "promptPerSecond": 6.3,
+          "replyTokens": 59,
+          "replyPerSecond": 4.5
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 104.8,
+        "totalS": 136.7
+      },
+      "answer": "The search for 'memory' did not find any items. The items about 'review' are 'review' (a reviewer checks the result) and 'handoff' (how work passes between agents, with context).",
+      "speeds": [
+        {
+          "promptTokens": 641,
+          "promptPerSecond": 6.3,
+          "replyTokens": 12,
+          "replyPerSecond": 4.5
+        },
+        {
+          "promptTokens": 120,
+          "promptPerSecond": 6.3,
+          "replyTokens": 49,
+          "replyPerSecond": 3.8
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 121.7,
+        "totalS": 148.2
+      },
+      "answer": "There is no item related to 'guardrails' in the search results. The items available are 'handoff' and 'review'.",
+      "speeds": [
+        {
+          "promptTokens": 790,
+          "promptPerSecond": 6.7,
+          "replyTokens": 13,
+          "replyPerSecond": 4.5
+        },
+        {
+          "promptTokens": 122,
+          "promptPerSecond": 6.4,
+          "replyTokens": 33,
+          "replyPerSecond": 4.4
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 15.8,
+    "status": "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 1.7B on the processor (better answers; in this browser, on your processor and memory; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0)…",
+      "Loading Qwen3 1.7B on the processor into memory…",
+      "Ready: Qwen3 1.7B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { REPAIR } from '../../src/core/check-action';
 import { NUDGE } from '../../src/core/repeat';
+import { AFTER_RESULT } from '../../src/core/tool-rules';
 import { wrapUntrusted } from '../../src/core/untrusted';
 import { ScriptedModelRuntime } from '../../src/fakes/scripted-model-runtime';
 
@@ -27,6 +28,18 @@ describe('ScriptedModelRuntime (smoke-test build only)', () => {
     });
     expect(JSON.parse(reply)).toEqual({ answer: 'The tool said: 5' });
     expect(tokens.join('')).toBe(reply);
+  });
+
+  it('ignores the line the loop adds after a tool result', async () => {
+    const model = new ScriptedModelRuntime();
+    const reply = await model.chat({
+      messages: [
+        user('/tool add {"a":2,"b":3}'),
+        { role: 'tool', content: wrapUntrusted('add', '5') },
+        user(AFTER_RESULT),
+      ],
+    });
+    expect(JSON.parse(reply)).toEqual({ answer: 'The tool said: 5' });
   });
 
   it('echoes any other question, and a denial', async () => {

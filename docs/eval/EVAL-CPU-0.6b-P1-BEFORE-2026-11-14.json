@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 58,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 32,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor (small; in this browser, on your processor and memory; 397 MB download; needs about 0.8 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3 0.6B on the processor: 0 of 397 MB (0%)",
+      "Downloading Qwen3 0.6B on the processor: 44 of 397 MB (11%)",
+      "Downloading Qwen3 0.6B on the processor: 90 of 397 MB (23%)",
+      "Downloading Qwen3 0.6B on the processor: 133 of 397 MB (33%)",
+      "Downloading Qwen3 0.6B on the processor: 179 of 397 MB (45%)",
+      "Downloading Qwen3 0.6B on the processor: 221 of 397 MB (56%)",
+      "Downloading Qwen3 0.6B on the processor: 265 of 397 MB (67%)",
+      "Downloading Qwen3 0.6B on the processor: 310 of 397 MB (78%)",
+      "Downloading Qwen3 0.6B on the processor: 354 of 397 MB (89%)",
+      "Downloading Qwen3 0.6B on the processor: 397 of 397 MB (100%)",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 0.3,
+        "totalS": 69.4
+      },
+      "answer": "The site discusses handoffs as a part of the AGSC-07 closure algebra, involving selections of item slugs and their interactions. Specifically, it outlines how handoffs are managed through proposals and link checks to ensure proper item relationships and closure.",
+      "speeds": [
+        {
+          "promptTokens": 930,
+          "promptPerSecond": 20.3,
+          "replyTokens": 56,
+          "replyPerSecond": 2.4
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 8.9,
+        "totalS": 8.9
+      },
+      "answer": "The site discusses how agents share work through proposals, where agents can claim, progress, or finish tasks, ensuring proper task assignments and closure in the AGSC-07 closure algebra.",
+      "speeds": [
+        {
+          "promptTokens": 80,
+          "promptPerSecond": 16.9,
+          "replyTokens": 43,
+          "replyPerSecond": 10.5
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 6.8,
+        "totalS": 6.8
+      },
+      "answer": "The site provides information about review items, which are part of the AgenticSystemCore's tools for managing task interactions and item relationships.",
+      "speeds": [
+        {
+          "promptTokens": 61,
+          "promptPerSecond": 17.2,
+          "replyTokens": 33,
+          "replyPerSecond": 11.1
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 6.9,
+        "totalS": 7
+      },
+      "answer": "The site includes a search function for 'memory' items, which are used to find related items and manage their connections within the AgenticSystemCore.",
+      "speeds": [
+        {
+          "promptTokens": 51,
+          "promptPerSecond": 17.7,
+          "replyTokens": 36,
+          "replyPerSecond": 8.9
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 6.7,
+        "totalS": 6.7
+      },
+      "answer": "The site includes information about guardrails, which are part of the AGSC-07 closure algebra and ensure proper item relationships and closure when omitted.",
+      "speeds": [
+        {
+          "promptTokens": 57,
+          "promptPerSecond": 18.2,
+          "replyTokens": 36,
+          "replyPerSecond": 10.6
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 8.6,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor into memory…",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

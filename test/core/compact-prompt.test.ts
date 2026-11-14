@@ -81,6 +81,17 @@ describe('buildCompactPrompt', () => {
     expect(prompt.match(/^- tool\d+\(/gm)?.length ?? 0).toBeLessThan(12);
   });
 
+  it('at a window of 1024 tokens keeps a line for each tool and one short tool rule', () => {
+    const prompt = buildCompactPrompt(
+      [tool('search'), tool('read')],
+      options(compactBudget(1024), 'What can I do here?'),
+    );
+    expect(prompt).toMatch(/^- search\(/m);
+    expect(prompt).toMatch(/^- read\(/m);
+    expect(prompt).toMatch(/call a tool first/i);
+    expect(prompt).not.toContain('Example:');
+  });
+
   it('fits the budget when the tools are few', () => {
     const budget = compactBudget(1024);
     const prompt = buildCompactPrompt(

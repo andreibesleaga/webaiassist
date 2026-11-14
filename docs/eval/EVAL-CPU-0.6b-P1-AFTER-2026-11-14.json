@@ -1,0 +1,189 @@
+{
+  "date": "2026-11-14",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 68,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 27.1,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor (small; in this browser, on your processor and memory; 397 MB download; needs about 0.8 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3 0.6B on the processor: 0 of 397 MB (0%)",
+      "Downloading Qwen3 0.6B on the processor: 46 of 397 MB (12%)",
+      "Downloading Qwen3 0.6B on the processor: 88 of 397 MB (22%)",
+      "Downloading Qwen3 0.6B on the processor: 132 of 397 MB (33%)",
+      "Downloading Qwen3 0.6B on the processor: 178 of 397 MB (45%)",
+      "Downloading Qwen3 0.6B on the processor: 222 of 397 MB (56%)",
+      "Downloading Qwen3 0.6B on the processor: 266 of 397 MB (67%)",
+      "Downloading Qwen3 0.6B on the processor: 310 of 397 MB (78%)",
+      "Downloading Qwen3 0.6B on the processor: 355 of 397 MB (89%)",
+      "Downloading Qwen3 0.6B on the processor: 397 of 397 MB (100%)",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "ask"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 61,
+        "totalS": 74.2
+      },
+      "answer": "The site mentions handoffs as how work passes between agents, with context, and includes a reviewer checking the result.",
+      "speeds": [
+        {
+          "promptTokens": 1086,
+          "promptPerSecond": 18.8,
+          "replyTokens": 24,
+          "replyPerSecond": 8.2
+        },
+        {
+          "promptTokens": 132,
+          "promptPerSecond": 14.2,
+          "replyTokens": 29,
+          "replyPerSecond": 7.9
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 24.4,
+        "totalS": 24.4
+      },
+      "answer": "handoff",
+      "speeds": [
+        {
+          "promptTokens": 331,
+          "promptPerSecond": 14.2,
+          "replyTokens": 8,
+          "replyPerSecond": 7.6
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 3,
+        "totalS": 3
+      },
+      "answer": "review",
+      "speeds": [
+        {
+          "promptTokens": 26,
+          "promptPerSecond": 12.5,
+          "replyTokens": 7,
+          "replyPerSecond": 8.6
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "firstToolRight": 1,
+        "toolUsed": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 21.8,
+        "totalS": 40.9
+      },
+      "answer": "handoff, review",
+      "speeds": [
+        {
+          "promptTokens": 25,
+          "promptPerSecond": 5.1,
+          "replyTokens": 16,
+          "replyPerSecond": 0.9
+        },
+        {
+          "promptTokens": 124,
+          "promptPerSecond": 7,
+          "replyTokens": 10,
+          "replyPerSecond": 7.2
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "firstToolRight": 0,
+        "toolUsed": 0,
+        "gateShown": null,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 35.4,
+        "totalS": 35.6
+      },
+      "answer": "review",
+      "speeds": [
+        {
+          "promptTokens": 485,
+          "promptPerSecond": 14.1,
+          "replyTokens": 7,
+          "replyPerSecond": 8.1
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 9.1,
+    "status": "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor (small; in this browser, on your processor and memory; 397 MB download; needs about 0.8 GB of memory; Apache-2.0)…",
+      "Loading Qwen3 0.6B on the processor into memory…",
+      "Ready: Qwen3 0.6B on the processor. Running in this browser, on your processor and memory (8 threads)."
+    ]
+  }
+}

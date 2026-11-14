@@ -21,6 +21,9 @@ export interface AgentDeps {
   readonly ui: ChatUI;
   readonly clock: Clock;
   readonly validator: ArgsValidator;
+  /** Asked before each tool call, ahead of the question about that call: false when the user
+   *  did not allow the tools of this site (site-consent.ts). Absent: the site is allowed. */
+  readonly siteGate?: () => Promise<boolean>;
 }
 
 /** What a tool step needs to know about the run. */
@@ -51,6 +54,8 @@ export interface LoopState {
   largestResult: number;
   /** Messages of this run that are never saved with the chat (the site facts). */
   readonly transient: Set<ChatMessage>;
+  /** The line after the latest tool result (tool-rules.ts, AFTER_RESULT): only the newest stays. */
+  reminder?: ChatMessage;
 }
 
 export type Call = { readonly tool: ToolInfo; readonly args: ToolArgs };
@@ -89,6 +94,14 @@ async function stillSame(deps: AgentDeps, scope: RunScope, state: LoopState, cal
   return false;
 }
 
+/** The site question, asked when a tool is first about to be used. */
+async function siteOpen(deps: AgentDeps, state: LoopState, call: Call): Promise<boolean> {
+  if (!deps.siteGate || (await deps.siteGate())) return true;
+  const text = `The user did not allow the tools of this site. "${quoteName(call.tool.name)}" was not run.`;
+  state.messages.push({ role: 'tool', content: text });
+  return false;
+}
+
 /** The confirmation gate; a tool denied once in this run is refused without asking. */
 async function allowed(deps: AgentDeps, scope: RunScope, state: LoopState, call: Call) {
   const name = call.tool.name;
@@ -118,17 +131,19 @@ async function safeCall(deps: AgentDeps, scope: RunScope, call: Call): Promise<T
   }
 }
 
+/** Runs one call through the gates; true when it ran and its result is now in the chat. */
 export async function runTool(
   deps: AgentDeps,
   scope: RunScope,
   state: LoopState,
   call: Call,
-): Promise<void> {
+): Promise<boolean> {
   // Checked before the question and again after it: the page may change the tool, or the
   // tab may leave the site, while the user decides.
-  if (!(await stillSame(deps, scope, state, call))) return;
-  if (!(await allowed(deps, scope, state, call))) return;
-  if (!(await stillSame(deps, scope, state, call))) return;
+  if (!(await stillSame(deps, scope, state, call))) return false;
+  if (!(await siteOpen(deps, state, call))) return false;
+  if (!(await allowed(deps, scope, state, call))) return false;
+  if (!(await stillSame(deps, scope, state, call))) return false;
   const name = call.tool.name;
   deps.ui.show({ kind: 'tool-call', name, args: call.args });
   const result = await safeCall(deps, scope, call);
@@ -136,4 +151,5 @@ export async function runTool(
   deps.ui.show({ kind: 'tool-result', name, ok: result.ok, text: result.text });
   state.made.set(callKey(name, call.args), { name, text: result.text });
   state.messages.push({ role: 'tool', content: wrapUntrusted(name, result.text) });
+  return true;
 }
