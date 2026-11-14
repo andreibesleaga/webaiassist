@@ -129,7 +129,7 @@ the endpoint API key wherever it appears, even in text you typed.
   chat, an error text or a log; a service's error text is cut to 200 characters and has the key
   and bearer-shaped strings removed before it is shown.
 - **What is read back.** The reply text, and the token counts and price the service reports for
-  the call (kept in memory for the activity log; nothing is sent anywhere).
+  the call (not stored and not shown in this release; nothing is sent anywhere).
 
 ## The graph explorer tab (14 Nov 2026)
 

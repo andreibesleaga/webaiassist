@@ -142,7 +142,8 @@ pending now, and a test keeps it so; see [MANUAL-CHECKS.md](MANUAL-CHECKS.md)). 
    `package-lock.json`; the build copies it into the manifest.
 3. Run `npm run verify:release` on a clean checkout.
 4. Commit, then push a tag `vx.y.z`. `release.yml` creates the GitHub release with the zip.
-5. Upload the same zip to the Chrome Web Store: [STORE-RUNBOOK.md](STORE-RUNBOOK.md).
+5. Upload the same zip to the Chrome Web Store. The listing text and the permission reasons are in
+   [STORE-LISTING.md](STORE-LISTING.md); the dashboard steps are kept by the maintainer, outside this repository.
 
 ## Updates
 

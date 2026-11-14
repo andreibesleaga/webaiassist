@@ -1,7 +1,34 @@
 # WebAIAssist
 
 A chat in your browser's side panel, with a small AI model that runs on your own computer.
-It can use the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/), and asks you before each one runs.
+It can use the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/),
+and asks you before each one runs.
+
+WebAIAssist is the browser client of the [AgenticSystemCore](https://agenticsystemcore.com) project,
+by the same author. It works with AgenticSystemCore nodes and with any site that offers WebMCP tools.
+
+**Read first, in plain words:**
+
+- [What is WebMCP](docs/WHAT-IS-WEBMCP.md): what a page's tools are, the draft's status, and the Chrome switch you must turn on.
+- [What the extension reads](docs/WHAT-THE-EXTENSION-READS.md): what it reads from a site and why, what stays in the browser, what can leave and when.
+- [Standards table](docs/STANDARDS.md): every standard, draft and profile it reads, what it does with each, and what it does not do.
+
+**WebMCP is off in Chrome until you turn it on.** Open `chrome://flags/#enable-webmcp-testing`, set
+**WebMCP for testing** to Enabled and relaunch Chrome. Without the switch, sites' tools do not appear.
+
+## Works with AgenticSystemCore 1.1.0
+
+| Part                            | Version                                                                                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| This extension                  | 0.1.0 (first release; not yet tagged)                                                                                                                               |
+| AgenticSystemCore specification | 1.1.0: the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 Nov 2026                                             |
+| AgenticSystemCore engine        | 1.1.0: a node page offers ten WebMCP tools; the extension's test fixture is taken from that engine                                                                  |
+| Chrome                          | Needs 124 or later; the processor models need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 14 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
+| WebMCP draft                    | Draft Community Group Report of 13 Nov 2026, Web Machine Learning Community Group. A draft: not a W3C Standard                                                      |
+
+"Works with" says the extension can read what a node publishes and call its tools. It does not say
+that any body or company has checked the extension, or that it meets a specification. A problem on a node? Use the
+["works with" issue form](.github/ISSUE_TEMPLATE/works-with.yml) (see [SUPPORT.md](SUPPORT.md)).
 
 ## Install
 
@@ -29,20 +56,26 @@ WebAIAssist may work on it, the page's WebMCP tools (each with what it does and 
 reads or may change something), and what the site publishes for machines. With no tools it says
 `— no WebMCP tools`.
 
-## Four ways to run the model
+## Where the model runs
 
-| Path                    | Runs on                                                                                                                                                                        | Picked by itself when                                                                                                       |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| Chrome's built-in model | In Chrome on this computer: Chrome's own model (Gemini Nano)                                                                                                                   | Chrome reports it ready. Also as a last resort before an endpoint. Measured on a real computer on 14 Nov 2026 (see Limits). |
-| Graphics card           | In this browser, on your graphics card (WebLLM on WebGPU): Qwen3 0.6B, Llama 3.2 3B, Qwen3.5 2B or Gemma 4 E2B                                                                 | Its first answer on this computer took 20 seconds or less, or the processor path cannot run here.                           |
-| Processor and memory    | In this browser, on your processor and memory (llama.cpp in WebAssembly): Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B                                                                 | Otherwise, on Chrome 137 or newer.                                                                                          |
-| Chat endpoint           | Your own server on this computer (localhost, 127.0.0.1) or a remote service: any OpenAI-compatible address (a remote address gets your questions and the page content you use) | You set it up in Options and nothing better is available. Questions then go to that address.                                |
+Pick one in the panel or in Options. The panel picks one for you, and says why in a sentence.
+
+| Where it runs                               | What runs it                                                                               | What leaves the computer                                                                                                                                            |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| In the browser, on the graphics card        | WebLLM on WebGPU: Qwen3 0.6B, Llama 3.2 3B, Qwen3.5 2B or Gemma 4 E2B                      | Only the download of the model files, once, from `huggingface.co`. Your questions, the page text and the results stay.                                              |
+| In the browser, on the processor and memory | llama.cpp in WebAssembly: Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B (Chrome 137 or newer)       | The same: the model download only.                                                                                                                                  |
+| Chrome's built-in model                     | Chrome's own model (Gemini Nano), under Google's terms                                     | Nothing from this extension. Chrome downloads and runs the model.                                                                                                   |
+| Your own server on this computer            | An address on `localhost` or `127.0.0.1`: Ollama, LM Studio or another OpenAI-style server | The conversation goes to that local address. It does not leave the computer.                                                                                        |
+| A remote service                            | Any `https` OpenAI-style address, for example OpenRouter                                   | Your questions, the page's tool list, tool results, any page text you read and your API key go to that host, which may charge. The panel asks first, once per host. |
+
+Model licences: [docs/MODEL-LICENCES.md](docs/MODEL-LICENCES.md). Measured speeds and tool use:
+[docs/EVAL.md](docs/EVAL.md).
 
 A model you choose yourself is kept. Details are under [Other runtimes](#other-runtimes).
 
-## Works with
+## What it works with
 
-- Any website that offers WebMCP tools.
+- Any website that offers WebMCP tools, once you have turned on the Chrome switch (above).
 - AgenticSystemCore nodes: pages published with the engine offer ten tools, and the panel marks
   the site as a node.
 - Any other page, through **Read this page**: the model gets the page text to answer from.
@@ -60,7 +93,8 @@ A model you choose yourself is kept. Details are under [Other runtimes](#other-r
 
 ## What it reads from a site
 
-For a site you allowed, the panel reads a fixed list of public files with a plain GET from the
+The plain version is [What the extension reads](docs/WHAT-THE-EXTENSION-READS.md); the table of
+standards is [docs/STANDARDS.md](docs/STANDARDS.md). In short: for a site you allowed, the panel reads a fixed list of public files with a plain GET from the
 same site: `llms.txt`, `llms-full.txt`, `/.well-known/knowledge-linkset`, the API catalog, the
 agent card, `security.txt`, `robots.txt`, TDMRep and `/.well-known/sustainability-data`, plus the
 page's own JSON-LD and `<link rel>` rows. On a node the card also shows the bundle version, date,
@@ -206,12 +240,15 @@ An endpoint address must use `https`, or plain `http` on `localhost` or `127.0.0
 
 ## WebMCP in your browser
 
-A site that uses WebMCP turns it on for its visitors in Chrome 149 and later (Chrome's origin
-trial), so usually there is nothing to set. If the panel says a page has no WebMCP tools on a
-site you know has them, either turn on **WebMCP for testing** at
-`chrome://flags/#enable-webmcp-testing` and relaunch Chrome, or press
-**Add WebMCP to this site** in the panel (compat mode: it loads the WebMCP polyfill on that
-site, after you allow access to it). Other browsers: [docs/BROWSERS.md](docs/BROWSERS.md).
+WebMCP is off in Chrome until you turn it on. Open `chrome://flags/#enable-webmcp-testing`, set
+**WebMCP for testing** to Enabled and press **Relaunch**. **Without the switch, sites' tools do not
+appear in the panel.** (Chrome's page also names an origin trial for sites, from Chrome 149; do not
+count on it. [What is WebMCP](docs/WHAT-IS-WEBMCP.md) explains both.) The panel shows the address
+with a Copy button, because an extension cannot open that page.
+
+Two routes need no switch: **Read this page** gives the model the page text, and **Add WebMCP to
+this site** (compat mode) loads the WebMCP polyfill on that one site, after you allow access to it.
+Other browsers: [docs/BROWSERS.md](docs/BROWSERS.md).
 
 ## Privacy
 
@@ -226,7 +263,8 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
 ## Limits
 
 - Chromium browsers only (Chrome 124 or later; the processor models need Chrome 137).
-- WebMCP is a draft standard; its shape may still change.
+- WebMCP is a draft, not a W3C Standard; its shape may still change. In Chrome it needs the switch
+  described above, so sites' tools do not appear without it.
 - Answers can be wrong: they come from an AI model. Check anything that matters.
 - Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows). The download, started from the click, took 300 s; later starts took 3 to 14 s. The model used a tool in 5 of 5 questions on the test node and in 1 of 5 on the live node, and an answer took 15 to 42 s (report: docs/eval/EVAL-NANO-2026-11-14-157.0.8103.52.json). It stays optional. Small models choose tools less reliably than large ones.
 - A page has tools only if its own scripts register them through WebMCP.
@@ -322,10 +360,11 @@ release steps. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains the design.
 - [docs/EVAL.md](docs/EVAL.md): the 20-prompt evaluation of the models (`npm run eval:gpu`, `npm run eval:cpu`) and its results.
 - [docs/BROWSERS.md](docs/BROWSERS.md): Chrome, Edge, Brave, Opera and Vivaldi.
 - [docs/ENGINEERING.md](docs/ENGINEERING.md): build, test, CI, release, updates.
-- [docs/STORE-LISTING.md](docs/STORE-LISTING.md) and
-  [docs/STORE-RUNBOOK.md](docs/STORE-RUNBOOK.md): the Chrome Web Store text and steps.
-- [docs/PITCH.md](docs/PITCH.md) and [docs/VIDEO-SCRIPT.md](docs/VIDEO-SCRIPT.md): the one-page
-  description and the demo video script.
+- [docs/WHAT-IS-WEBMCP.md](docs/WHAT-IS-WEBMCP.md), [docs/WHAT-THE-EXTENSION-READS.md](docs/WHAT-THE-EXTENSION-READS.md)
+  and [docs/STANDARDS.md](docs/STANDARDS.md): the three plain pages.
+- [docs/MODEL-LICENCES.md](docs/MODEL-LICENCES.md): every offered model, its source and its licence.
+- [docs/STORE-LISTING.md](docs/STORE-LISTING.md): the Chrome Web Store text and the measured tables.
+- [ROADMAP.md](ROADMAP.md): candidates for later releases, no dates. [SUPPORT.md](SUPPORT.md): where to ask.
 - [docs/SPIKE.md](docs/SPIKE.md): the browser check and its recorded results.
 - [docs/SOURCES.md](docs/SOURCES.md): specifications and pages the design relies on.
 - [docs/GOVERNANCE.md](docs/GOVERNANCE.md): the roles and the uses that are not offered.
@@ -337,8 +376,9 @@ release steps. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains the design.
 
 Apache License 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-AgenticSystemCore™ is a trademark of Andrei N. Besleaga. WebAIAssist is a separate project by the
-same author; it is not part of AgenticSystemCore.
+AgenticSystemCore™ is a trademark of Andrei N. Besleaga. WebAIAssist is the browser client of the
+AgenticSystemCore project, by the same author. It works with AgenticSystemCore nodes; it is not an
+official WebMCP extension and is not from Google.
 
 ## Check WebMCP in your browser
 

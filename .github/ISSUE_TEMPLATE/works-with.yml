@@ -1,0 +1,57 @@
+name: Works with report
+description: A site, node or model that does not work with WebAIAssist, or one that works and should be listed.
+title: 'Works with: '
+labels: ['works-with']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Do not paste API keys or private page text. In the panel, **Copy diagnostics** shows what it will copy before it copies it.
+  - type: input
+    id: site
+    attributes:
+      label: Site or node address
+      description: For example https://example.com/. For an AgenticSystemCore node, also the specification version the card shows.
+    validations:
+      required: true
+  - type: dropdown
+    id: result
+    attributes:
+      label: What happened
+      options:
+        - It works
+        - The panel shows no tools
+        - The tools are listed but a call fails
+        - A file the site publishes is read wrongly
+        - Something else
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Extension version and Chrome version
+      description: The extension version is on chrome://extensions; the Chrome version is on chrome://version.
+    validations:
+      required: true
+  - type: dropdown
+    id: switch
+    attributes:
+      label: Is the Chrome switch on?
+      description: chrome://flags/#enable-webmcp-testing set to Enabled, then Chrome relaunched.
+      options:
+        - Yes
+        - No
+        - I do not know
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model and where it runs
+      description: For example "Qwen3 1.7B on the processor", "Chrome's built-in model", "Ollama on localhost".
+  - type: textarea
+    id: details
+    attributes:
+      label: What you did and what you saw
+    validations:
+      required: true

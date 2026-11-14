@@ -192,8 +192,8 @@ whose name no other entry uses.
 
 The chat request of the `ModelRuntime` port has an optional `onUsage` callback. Only the endpoint
 runtime calls it, once per chat, with the prompt and completion token counts and the price (US
-dollars) the service returned in the last chunk of the stream; an activity log reads them there
-(`src/core/ports/model-runtime.ts`).
+dollars) the service returned in the last chunk of the stream. Nothing in this release stores or shows them
+(`src/core/ports/model-runtime.ts`); the endpoint evaluation script prints them.
 
 WebLLM needs WebGPU. The panel probes for it when the user presses Start and uses the first host
 that has an adapter: the offscreen document, then the extension service worker
@@ -217,7 +217,7 @@ Chrome's built-in model still to download; the choice **Set up a chat endpoint**
 opens Options and loads nothing. The measurement is the wait from the first question after a
 load to the first token (`src/ui/first-token-timer.ts`), stored with the adapter's name in
 `chrome.storage.local` (`src/adapters/stored-panel-state.ts`); more than 20 seconds is slow
-(`src/adapters/gpu-speed.ts`: the owner's laptop took about 40 s on 13 Nov 2026, the first
+(`src/adapters/gpu-speed.ts`: the maintainer's laptop took about 40 s on 13 Nov 2026, the first
 answer compiles the GPU programs). So the graphics card becomes the default only after the user
 has tried it once and it was quick; a measurement made on another adapter is ignored. Settings
 saved before 13 Nov 2026 (version 1) that name Chrome's built-in model go back to the default

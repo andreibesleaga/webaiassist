@@ -109,6 +109,47 @@ describe('F20.7 the store listing and the README state the limits', () => {
   }
 });
 
+describe('the store description does not repeat a word more than five times', () => {
+  // The Chrome Web Store treats a word repeated many times in a description as keyword spam.
+  // Function words are left out; every other word, counted as written (lower case), stays at
+  // five uses or fewer.
+  const FUNCTION_WORDS = new Set(
+    (
+      'a an the and or but if so as at by for from in into of on onto to up with without it its ' +
+      'is are was be been you your yours we our they them their this that these those what which ' +
+      'who how when where why not no yes can may might will would should do does did has have had ' +
+      'than then there here only also more most such any all each every other some one two'
+    ).split(' '),
+  );
+
+  /** The text of the quote block that follows the "**Description:**" label. */
+  function description(): string {
+    const text = read('docs/STORE-LISTING.md');
+    const start = text.indexOf('**Description:**');
+    const block: string[] = [];
+    for (const line of text.slice(start).split('\n').slice(1)) {
+      if (line.startsWith('>')) block.push(line.slice(1));
+      else if (block.length > 0 && line.trim() !== '') break;
+    }
+    return block.join('\n');
+  }
+
+  it('has a description to count', () => {
+    expect(description().length).toBeGreaterThan(500);
+  });
+
+  it('uses no content word more than five times', () => {
+    const counts = new Map<string, number>();
+    for (const word of description()
+      .toLowerCase()
+      .match(/[a-z0-9][a-z0-9'-]*/g) ?? []) {
+      if (!FUNCTION_WORDS.has(word)) counts.set(word, (counts.get(word) ?? 0) + 1);
+    }
+    const over = [...counts].filter(([, n]) => n > 5);
+    expect(over).toEqual([]);
+  });
+});
+
 describe('F20.8 the governance note', () => {
   it('names the provider and the deployer and excludes high-risk uses', () => {
     const text = read('docs/GOVERNANCE.md').toLowerCase();

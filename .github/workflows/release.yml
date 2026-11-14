@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # On a version tag (v0.1.0 and so on): runs `npm run verify:release`, then creates the
 # GitHub release with the CHANGELOG section as its text and attaches the zip and its
-# SHA-256. It does not upload to the Chrome Web Store (docs/STORE-RUNBOOK.md).
+# SHA-256. It does not upload to the Chrome Web Store (the store steps are kept outside this repository).
 name: release
 
 on:
