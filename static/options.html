@@ -1,0 +1,216 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAIAssist options</title>
+    <link rel="stylesheet" href="ui.css" />
+  </head>
+  <body>
+    <main class="options">
+      <h1 data-i18n="optionsTitle"></h1>
+      <form id="options">
+        <fieldset>
+          <legend data-i18n="runtimeLegend"></legend>
+          <div class="field">
+            <input
+              type="radio"
+              id="rt-auto"
+              name="runtime"
+              value="auto"
+              aria-describedby="rt-auto-help"
+            />
+            <label for="rt-auto" data-i18n="runtimeAuto"></label>
+            <p id="rt-auto-help" class="hint" data-i18n="runtimeAutoHelp"></p>
+          </div>
+          <div class="field">
+            <input
+              type="radio"
+              id="rt-cpu"
+              name="runtime"
+              value="cpu"
+              aria-describedby="rt-cpu-help"
+            />
+            <label for="rt-cpu" data-i18n="runtimeCpu"></label>
+            <p id="rt-cpu-help" class="hint"></p>
+          </div>
+          <div class="field">
+            <input
+              type="radio"
+              id="rt-webllm"
+              name="runtime"
+              value="webllm"
+              aria-describedby="rt-webllm-help"
+            />
+            <label for="rt-webllm" data-i18n="runtimeWebllm"></label>
+            <p id="rt-webllm-help" class="hint" data-i18n="runtimeWebllmHelp"></p>
+          </div>
+          <div class="field">
+            <input
+              type="radio"
+              id="rt-prompt-api"
+              name="runtime"
+              value="prompt-api"
+              aria-describedby="rt-prompt-api-help"
+            />
+            <label for="rt-prompt-api" data-i18n="runtimePromptApi"></label>
+            <p id="rt-prompt-api-help" class="hint" data-i18n="runtimePromptApiHelp"></p>
+          </div>
+          <div class="field">
+            <input
+              type="radio"
+              id="rt-endpoint"
+              name="runtime"
+              value="endpoint"
+              aria-describedby="rt-endpoint-help"
+            />
+            <label for="rt-endpoint" data-i18n="runtimeEndpoint"></label>
+            <p id="rt-endpoint-help" class="hint" data-i18n="runtimeEndpointHelp"></p>
+          </div>
+          <div id="cpu-model-field" class="field">
+            <label for="cpu-model" data-i18n="cpuModelLabel"></label><br />
+            <select id="cpu-model" aria-describedby="cpu-model-help"></select>
+            <p id="cpu-model-help" class="hint" data-i18n="cpuModelHelp"></p>
+          </div>
+          <div id="webllm-model-field" class="field">
+            <label for="webllm-model" data-i18n="webllmModelLabel"></label><br />
+            <select id="webllm-model" aria-describedby="webllm-model-help"></select>
+            <p id="webllm-model-help" class="hint" data-i18n="webllmModelHelp"></p>
+          </div>
+          <div id="endpoint-fields">
+            <div class="field">
+              <label for="endpoint-preset" data-i18n="endpointPreset"></label><br />
+              <select id="endpoint-preset"></select>
+            </div>
+            <div class="field">
+              <label for="endpoint-url" data-i18n="endpointUrl"></label>
+              <input
+                type="url"
+                id="endpoint-url"
+                aria-describedby="endpoint-url-help"
+                spellcheck="false"
+              />
+              <p id="endpoint-url-help" class="hint" data-i18n="endpointUrlHelp"></p>
+            </div>
+            <div class="field">
+              <label for="endpoint-model" data-i18n="endpointModel"></label>
+              <input type="text" id="endpoint-model" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="endpoint-key" data-i18n="endpointKey"></label>
+              <input
+                type="password"
+                id="endpoint-key"
+                aria-describedby="endpoint-key-help"
+                autocomplete="off"
+              />
+              <p id="endpoint-key-help" class="hint" data-i18n="endpointKeyHelp"></p>
+            </div>
+            <div class="field">
+              <label for="endpoint-context" data-i18n="endpointContext"></label><br />
+              <input
+                type="number"
+                id="endpoint-context"
+                min="1024"
+                max="1000000"
+                step="1024"
+                aria-describedby="endpoint-context-help"
+              />
+              <p id="endpoint-context-help" class="hint" data-i18n="endpointContextHelp"></p>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="confirmLegend"></legend>
+          <div class="field">
+            <input
+              type="radio"
+              id="cm-every"
+              name="confirm"
+              value="every-call"
+              aria-describedby="cm-every-help"
+            />
+            <label for="cm-every" data-i18n="confirmEvery"></label>
+            <p id="cm-every-help" class="hint" data-i18n="confirmEveryHelp"></p>
+          </div>
+          <div class="field">
+            <input
+              type="radio"
+              id="cm-site"
+              name="confirm"
+              value="per-site"
+              aria-describedby="cm-site-help"
+            />
+            <label for="cm-site" data-i18n="confirmPerSite"></label>
+            <p id="cm-site-help" class="hint" data-i18n="confirmPerSiteHelp"></p>
+          </div>
+          <div class="field">
+            <label for="max-steps" data-i18n="maxSteps"></label><br />
+            <input
+              type="number"
+              id="max-steps"
+              min="1"
+              max="12"
+              step="1"
+              aria-describedby="max-steps-help"
+            />
+            <p id="max-steps-help" class="hint" data-i18n="maxStepsHelp"></p>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="memoryLabel"></legend>
+          <div class="field">
+            <input type="checkbox" id="memory" aria-describedby="memory-help" />
+            <label for="memory" data-i18n="memoryLabel"></label>
+            <p id="memory-help" class="hint" data-i18n="memoryHelp"></p>
+            <button id="clear-memory" type="button" data-i18n="clearMemory"></button>
+          </div>
+          <div class="field">
+            <input type="checkbox" id="site-facts" aria-describedby="site-facts-help" />
+            <label for="site-facts" data-i18n="siteFactsLabel"></label>
+            <p id="site-facts-help" class="hint" data-i18n="siteFactsHelp"></p>
+          </div>
+          <div class="field">
+            <label for="language" data-i18n="languageLabel"></label><br />
+            <select id="language" aria-describedby="language-help">
+              <option value="en">English</option>
+            </select>
+            <p id="language-help" class="hint" data-i18n="languageHelp"></p>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="storeLegend"></legend>
+          <p id="model-store-empty" class="hint" data-i18n="storeEmpty" hidden></p>
+          <ul id="model-store" class="store"></ul>
+          <p class="hint" data-i18n="storeChrome"></p>
+          <div class="row">
+            <button id="remove-all-models" type="button" data-i18n="removeAll" hidden></button>
+          </div>
+          <div id="remove-confirm" role="group" aria-labelledby="remove-confirm-text" hidden>
+            <p id="remove-confirm-text"></p>
+            <div class="row">
+              <button id="remove-confirm-ok" type="button" data-i18n="removeOk"></button>
+              <button id="remove-confirm-no" type="button" data-i18n="removeKeep"></button>
+            </div>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="privacyLegend"></legend>
+          <p data-i18n="privacyLine"></p>
+          <div class="field">
+            <button id="forget-all" type="button" data-i18n="forgetAll"></button>
+            <p class="hint" data-i18n="forgetAllHelp"></p>
+          </div>
+        </fieldset>
+        <div class="footer">
+          <div class="row">
+            <button id="save" class="primary" type="submit" data-i18n="save"></button>
+            <button id="reset" type="button" data-i18n="reset"></button>
+          </div>
+          <p id="options-status" class="status" role="status"></p>
+        </div>
+      </form>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

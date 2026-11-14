@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAIAssist eval: stub AgenticSystemCore node</title>
+    <link rel="describedby" href="/.well-known/knowledge-linkset" type="application/linkset+json" />
+  </head>
+  <body>
+    <h1>Stub node with the ten AgenticSystemCore page tools</h1>
+    <p id="status">Registering…</p>
+    <script type="module">
+      const status = document.getElementById('status');
+      const context = document.modelContext;
+      if (!context) {
+        status.textContent = 'no document.modelContext';
+      } else {
+        const [tools, answers] = await Promise.all([
+          fetch('/tools.json').then((r) => r.json()),
+          fetch('/answers.json').then((r) => r.json()),
+        ]);
+        for (const tool of tools.tools) {
+          await context.registerTool({
+            name: tool.name,
+            description: tool.description,
+            inputSchema: tool.inputSchema,
+            annotations: tool.annotations,
+            execute: (args) =>
+              `${answers.answers[tool.name] ?? 'Stub node answer.'} Arguments: ${JSON.stringify(args)}`,
+          });
+        }
+        status.textContent = `registered ${tools.tools.length} tools`;
+      }
+    </script>
+  </body>
+</html>

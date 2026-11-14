@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAIAssist smoke-test page</title>
+  </head>
+  <body>
+    <h1>Smoke-test page with two WebMCP tools</h1>
+    <p id="status">Registering…</p>
+    <script type="module">
+      const status = document.getElementById('status');
+      const context = document.modelContext;
+      if (!context) {
+        status.textContent = 'no document.modelContext';
+      } else {
+        await context.registerTool({
+          name: 'add',
+          description: 'Add two numbers and return the sum.',
+          inputSchema: {
+            type: 'object',
+            properties: { a: { type: 'number' }, b: { type: 'number' } },
+            required: ['a', 'b'],
+          },
+          execute: ({ a, b }) => String(a + b),
+        });
+        await context.registerTool({
+          name: 'echo',
+          description: 'Return the text it is given.',
+          inputSchema: { type: 'object', properties: { text: { type: 'string' } } },
+          annotations: { readOnlyHint: true },
+          execute: ({ text }) => String(text),
+        });
+        // A test calls this to show the panel a tool the page registers later.
+        window.registerThird = () =>
+          context.registerTool({
+            name: 'third',
+            description: 'A third tool, registered later.',
+            inputSchema: { type: 'object', properties: {} },
+            annotations: { readOnlyHint: true },
+            execute: () => 'third',
+          });
+        status.textContent = 'registered 2 tools';
+      }
+    </script>
+  </body>
+</html>

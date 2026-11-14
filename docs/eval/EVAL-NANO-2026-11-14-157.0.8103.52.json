@@ -1,0 +1,180 @@
+{
+  "date": "2026-11-14",
+  "os": "win32 10.0.26300",
+  "chrome": "157.0.8103.52",
+  "availability": {
+    "before": "available",
+    "after": "available"
+  },
+  "picked": {
+    "value": "prompt-api",
+    "why": "Why: you chose this model.",
+    "builtInLine": "Chrome’s built-in model: downloaded and ready to start."
+  },
+  "start": {
+    "ready": true,
+    "loadS": 14.4,
+    "status": "Ready: Chrome's built-in model. Running in Chrome on this computer; Chrome manages the model.",
+    "texts": [
+      "Loading Chrome's built-in model (in Chrome on this computer; optional: Gemini Nano, which Chrome downloads only when you choose it)…",
+      "Chrome’s model is on this computer; starting it… (Chrome's state: available)",
+      "Ready: Chrome's built-in model. Running in Chrome on this computer; Chrome manages the model."
+    ]
+  },
+  "secondStart": {
+    "ready": true,
+    "loadS": 3.1,
+    "status": "Ready: Chrome's built-in model. Running in Chrome on this computer; Chrome manages the model.",
+    "texts": [
+      "Ready: Chrome's built-in model. Running in Chrome on this computer; Chrome manages the model."
+    ]
+  },
+  "rows": [
+    {
+      "n": 1,
+      "model": "nano",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 0,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 0.3,
+      "totalS": 31.3
+    },
+    {
+      "n": 2,
+      "model": "nano",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 5.9,
+      "totalS": 15.3
+    },
+    {
+      "n": 3,
+      "model": "nano",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 6.1,
+      "totalS": 16.7
+    },
+    {
+      "n": 4,
+      "model": "nano",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 6.1,
+      "totalS": 17.9
+    },
+    {
+      "n": 5,
+      "model": "nano",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 6.8,
+      "totalS": 20.3
+    },
+    {
+      "n": 1,
+      "model": "nano",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 0.3,
+      "totalS": 17.2
+    },
+    {
+      "n": 2,
+      "model": "nano",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 31.5,
+      "totalS": 31.5
+    },
+    {
+      "n": 3,
+      "model": "nano",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 42,
+      "totalS": 42
+    },
+    {
+      "n": 4,
+      "model": "nano",
+      "target": "live",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 8.1,
+      "totalS": 17.4
+    },
+    {
+      "n": 5,
+      "model": "nano",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 21.8,
+      "totalS": 21.8
+    }
+  ],
+  "verdict": {
+    "ok": true,
+    "line": "ready; 10 prompts, right tool in 5, errors 0"
+  }
+}

@@ -1,0 +1,43 @@
+# SPDX-License-Identifier: Apache-2.0
+# Every push to main and every pull request: lint, type checks, unit tests with coverage,
+# markdownlint, release build, zip content test, and the browser tests (smoke and
+# accessibility) in headless Chromium from Playwright. No GPU: the tests use the scripted
+# test model. Same steps as `npm run verify:release` on a developer machine.
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Audit the runtime dependencies
+        run: npm audit --omit=dev --audit-level=moderate
+      - name: Cache the Playwright browser
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Cache the pinned model libraries (checked by SHA-256 on every build)
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: vendor/model-libs
+          key: model-libs-${{ hashFiles('scripts/model-libs.json') }}
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - run: npm run verify:release

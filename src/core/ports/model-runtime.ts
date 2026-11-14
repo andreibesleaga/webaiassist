@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: Apache-2.0
+import type { CancelSignal, ChatMessage, JsonSchema } from '../types';
+
+export interface ModelCapabilities {
+  /** The runtime accepts tool definitions and returns native tool calls. */
+  readonly nativeToolCalls: boolean;
+  /** The runtime can constrain output to a JSON schema. */
+  readonly jsonConstraint: boolean;
+  /** The context window in tokens; the agent loop keeps the saved chat inside it. */
+  readonly contextTokens: number;
+  /** The runtime has a small window: the core sends the short rules and tool list. */
+  readonly compactPrompt?: boolean;
+  /** Tokens the runtime keeps free for the reply; the core's default applies when absent. */
+  readonly replyTokens?: number;
+}
+
+export interface LoadProgress {
+  /** 0 to 1. */
+  readonly fraction: number;
+  readonly text: string;
+}
+
+export interface ChatRequest {
+  readonly messages: readonly ChatMessage[];
+  /** When set, the runtime should constrain its reply to this schema. */
+  readonly jsonSchema?: JsonSchema;
+  readonly signal?: CancelSignal;
+  readonly onToken?: (token: string) => void;
+}
+
+/** Port: a language model that runs on the user's machine. */
+export interface ModelRuntime {
+  /** Loads (and downloads, the first time) a model; `signal` cancels the download. */
+  load(
+    modelId: string,
+    onProgress: (progress: LoadProgress) => void,
+    signal?: CancelSignal,
+  ): Promise<void>;
+  /** Streams tokens through `onToken` and resolves with the full reply text. */
+  chat(request: ChatRequest): Promise<string>;
+  unload(): Promise<void>;
+  capabilities(): ModelCapabilities;
+  /** Where the loaded model runs, when the runtime knows (for the panel's status line). */
+  where?(): string | undefined;
+}

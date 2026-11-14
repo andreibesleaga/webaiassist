@@ -1,0 +1,198 @@
+{
+  "date": "2026-11-13",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": null,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 60.9,
+    "status": "Ready: Qwen3 1.7B on the processor (better answers; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0), running in memory on the processor (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Loading Qwen3 1.7B on the processor (better answers; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0)…",
+      "Downloading Qwen3 1.7B on the processor: 0 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 7 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 25 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 44 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 59 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 77 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 92 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 107 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 125 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 140 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 156 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 173 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 184 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 203 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 221 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 238 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 253 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 270 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 286 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 300 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 319 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 335 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 351 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 368 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 383 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 398 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 413 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 430 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 447 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 463 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 479 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 495 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 507 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 523 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 540 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 557 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 572 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 588 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 605 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 621 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 637 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 653 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 669 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 686 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 699 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 718 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 727 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 741 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 754 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 846 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 862 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 876 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 888 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 906 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 921 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 937 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 953 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 969 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 982 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1000 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1014 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1027 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1043 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1061 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1075 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1091 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1106 of 1107 MB",
+      "Downloading Qwen3 1.7B on the processor: 1107 of 1107 MB",
+      "Checking the downloaded file (SHA-256)…",
+      "Loading Qwen3 1.7B on the processor into memory…",
+      "Ready: Qwen3 1.7B on the processor (better answers; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0), running in memory on the processor (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "ask"
+        ],
+        "toolRight": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 0.1,
+        "totalS": 116.2
+      },
+      "answer": "The site discusses handoffs as the process by which work passes between agents, maintaining context. It also mentions a review, where a reviewer checks the result.",
+      "speeds": [
+        {
+          "promptTokens": 915,
+          "promptPerSecond": 9.8,
+          "replyTokens": 24,
+          "replyPerSecond": 5.9
+        },
+        {
+          "promptTokens": 104,
+          "promptPerSecond": 8.8,
+          "replyTokens": 37,
+          "replyPerSecond": 5.8
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 0,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 26.7,
+        "totalS": 46.8
+      },
+      "answer": "The items that best answer 'how do agents share work' are 'handoff' (how work passes between agents, with context) and 'review' (a reviewer checks the result).",
+      "speeds": [
+        {
+          "promptTokens": 198,
+          "promptPerSecond": 8.6,
+          "replyTokens": 20,
+          "replyPerSecond": 5.7
+        },
+        {
+          "promptTokens": 104,
+          "promptPerSecond": 8.4,
+          "replyTokens": 44,
+          "replyPerSecond": 5.7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [
+          "search"
+        ],
+        "toolRight": 1,
+        "gateShown": 1,
+        "factInAnswer": 1,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 43.4,
+        "totalS": 59.3
+      },
+      "answer": "The item about 'review' is 'review (a reviewer checks the result)'.",
+      "speeds": [
+        {
+          "promptTokens": 348,
+          "promptPerSecond": 8.6,
+          "replyTokens": 16,
+          "replyPerSecond": 5.6
+        },
+        {
+          "promptTokens": 96,
+          "promptPerSecond": 8.3,
+          "replyTokens": 23,
+          "replyPerSecond": 5.4
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 14.4,
+    "status": "Ready: Qwen3 1.7B on the processor (better answers; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0), running in memory on the processor (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 1.7B on the processor into memory…",
+      "Ready: Qwen3 1.7B on the processor (better answers; 1.1 GB download; needs about 1.5 GB of memory; Apache-2.0), running in memory on the processor (8 threads)."
+    ]
+  }
+}

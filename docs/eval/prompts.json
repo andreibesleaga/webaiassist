@@ -1,0 +1,152 @@
+{
+  "about": "The 20 prompts of docs/EVAL.md, read by npm run eval:gpu (scripts/eval/run.ts). {a} and {b} are item slugs of the target. tools: the expected tool calls in order ([] = answer without a tool). facts: the answer must contain one of them on the stub node (fixtures/agsc-answers.json); the live site has no fixed answers, so facts are not scored there. scripted: what the scripted test model is told, for the flow check without a GPU.",
+  "targets": {
+    "stub": { "slugs": { "a": "handoff", "b": "review" } },
+    "live": {
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "slugs": { "a": "agentic-knowledge", "b": "compliance" }
+    }
+  },
+  "prompts": [
+    {
+      "n": 1,
+      "text": "What does this site say about handoffs?",
+      "tools": ["ask"],
+      "facts": ["context"],
+      "scripted": "/tool ask {\"question\": \"handoffs\"}"
+    },
+    {
+      "n": 2,
+      "text": "Which items best answer: how do agents share work?",
+      "tools": ["ask"],
+      "facts": ["handoff"],
+      "scripted": "/tool ask {\"question\": \"how do agents share work?\"}"
+    },
+    {
+      "n": 3,
+      "text": "Find items about review.",
+      "tools": ["search"],
+      "facts": ["reviewer"],
+      "scripted": "/tool search {\"query\": \"review\"}"
+    },
+    {
+      "n": 4,
+      "text": "Search for \"memory\".",
+      "tools": ["search"],
+      "facts": ["review", "handoff"],
+      "scripted": "/tool search {\"query\": \"memory\"}"
+    },
+    {
+      "n": 5,
+      "text": "Is there anything on guardrails here?",
+      "tools": ["search"],
+      "facts": ["review", "handoff"],
+      "scripted": "/tool search {\"query\": \"guardrails\"}"
+    },
+    {
+      "n": 6,
+      "text": "Read the item {a}.",
+      "tools": ["read"],
+      "facts": ["context"],
+      "scripted": "/tool read {\"slug\": \"{a}\"}"
+    },
+    {
+      "n": 7,
+      "text": "Show me the full text of {a}.",
+      "tools": ["read"],
+      "facts": ["context"],
+      "scripted": "/tool read {\"slug\": \"{a}\"}"
+    },
+    {
+      "n": 8,
+      "text": "What links to and from {a}?",
+      "tools": ["links"],
+      "facts": ["requires", "release"],
+      "scripted": "/tool links {\"slug\": \"{a}\"}"
+    },
+    {
+      "n": 9,
+      "text": "List the links of {a}.",
+      "tools": ["links"],
+      "facts": ["requires", "release"],
+      "scripted": "/tool links {\"slug\": \"{a}\"}"
+    },
+    {
+      "n": 10,
+      "text": "Why is {a} linked to {b}?",
+      "tools": ["explain"],
+      "facts": ["requires", "passed"],
+      "scripted": "/tool explain {\"key\": \"requires\", \"source\": \"{a}\", \"target\": \"{b}\"}"
+    },
+    {
+      "n": 11,
+      "text": "Does {a} require {b}?",
+      "tools": ["explain"],
+      "facts": ["requires"],
+      "scripted": "/tool explain {\"key\": \"requires\", \"source\": \"{a}\", \"target\": \"{b}\"}"
+    },
+    {
+      "n": 12,
+      "text": "Compose {a} and {b}.",
+      "tools": ["compose"],
+      "facts": ["owner", "checklist", "gap"],
+      "scripted": "/tool compose {\"selection\": [\"{a}\", \"{b}\"]}"
+    },
+    {
+      "n": 13,
+      "text": "Give me the brief for {a} and {b}.",
+      "tools": ["brief"],
+      "facts": ["first", "no gaps"],
+      "scripted": "/tool brief {\"selection\": [\"{a}\", \"{b}\"]}"
+    },
+    {
+      "n": 14,
+      "text": "Check {a} and {b} for link warnings.",
+      "tools": ["check"],
+      "facts": ["no warnings", "0 warnings", "none"],
+      "scripted": "/tool check {\"selection\": [\"{a}\", \"{b}\"]}"
+    },
+    {
+      "n": 15,
+      "text": "Propose {a} as my next task.",
+      "tools": ["propose"],
+      "facts": ["claim", "proposal", "nothing was written"],
+      "scripted": "/tool propose {\"slug\": \"{a}\"}"
+    },
+    {
+      "n": 16,
+      "text": "Remember a note titled \"Reviews\": keep reviews short.",
+      "tools": ["remember"],
+      "facts": ["Reviews", "note"],
+      "scripted": "/tool remember {\"title\": \"Reviews\", \"body\": \"Keep reviews short.\", \"kind\": \"note\"}"
+    },
+    {
+      "n": 17,
+      "text": "Hello, what can you do?",
+      "tools": [],
+      "facts": [],
+      "scripted": "Hello, what can you do?"
+    },
+    {
+      "n": 18,
+      "text": "Summarise our conversation so far.",
+      "tools": [],
+      "facts": [],
+      "scripted": "Summarise our conversation so far."
+    },
+    {
+      "n": 19,
+      "text": "Find the item about review and read it.",
+      "tools": ["search", "read"],
+      "facts": ["context", "reviewer"],
+      "scripted": "/tool search {\"query\": \"review\"}"
+    },
+    {
+      "n": 20,
+      "text": "Search for handoff, then show the links of the first result.",
+      "tools": ["search", "links"],
+      "facts": ["requires", "release"],
+      "scripted": "/tool search {\"query\": \"handoff\"}"
+    }
+  ]
+}

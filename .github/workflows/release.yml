@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: Apache-2.0
+# On a version tag (v0.1.0 and so on): runs `npm run verify:release`, then creates the
+# GitHub release with the CHANGELOG section as its text and attaches the zip and its
+# SHA-256. It does not upload to the Chrome Web Store (docs/STORE-RUNBOOK.md).
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Check that the tag matches package.json
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+      - run: npm ci
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - run: npm run verify:release
+      - name: Create the release and attach the zip
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          zip="webaiassist-${version}.zip"
+          sha256sum "$zip" > "$zip.sha256"
+          node scripts/release-notes.mjs "$version" > release-notes.md
+          gh release create "$GITHUB_REF_NAME" "$zip" "$zip.sha256" \
+            --title "WebAIAssist $version" --notes-file release-notes.md --verify-tag

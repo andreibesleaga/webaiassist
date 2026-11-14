@@ -1,0 +1,15 @@
+{
+  "about": "Canned answers of the stub node (scripts/eval/stub-node.html) for npm run eval:gpu: one text per tool, holding every fact docs/eval/prompts.json expects for that tool, so a correct tool call makes the fact appear in the answer. Apache-2.0.",
+  "answers": {
+    "ask": "Stub node answer of ask. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: context, handoff.",
+    "search": "Stub node answer of search. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: context, handoff, release, requires, review, reviewer.",
+    "read": "Stub node answer of read. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: context, reviewer.",
+    "links": "Stub node answer of links. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: release, requires.",
+    "explain": "Stub node answer of explain. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: passed, requires.",
+    "compose": "Stub node answer of compose. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: checklist, gap, owner.",
+    "brief": "Stub node answer of brief. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: first, no gaps.",
+    "check": "Stub node answer of check. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: 0 warnings, no warnings, none.",
+    "propose": "Stub node answer of propose. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: claim, nothing was written, proposal.",
+    "remember": "Stub node answer of remember. Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: Reviews, note."
+  }
+}

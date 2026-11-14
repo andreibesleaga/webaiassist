@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- SPDX-License-Identifier: Apache-2.0 -->
+  <!-- WebAIAssist icon for 16 and 32 px: the same bubble with one "w", which stays readable when small. -->
+  <rect x="4" y="4" width="120" height="120" rx="24" fill="#0b57d0"/>
+  <path d="M28 26h72a10 10 0 0 1 10 10v40a10 10 0 0 1-10 10H60l-22 20V86h-10a10 10 0 0 1-10-10V36a10 10 0 0 1 10-10z" fill="#ffffff"/>
+  <path d="M38 42l10 30 16-24 16 24 10-30" fill="none" stroke="#0b57d0" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

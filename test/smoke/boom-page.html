@@ -1,0 +1,29 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAIAssist failing-tool page</title>
+  </head>
+  <body>
+    <h1>Smoke-test page whose one tool always throws</h1>
+    <p id="status">Registering…</p>
+    <script type="module">
+      const status = document.getElementById('status');
+      const context = document.modelContext;
+      if (!context) {
+        status.textContent = 'no document.modelContext';
+      } else {
+        await context.registerTool({
+          name: 'boom',
+          description: 'Always fails.',
+          inputSchema: { type: 'object', properties: {} },
+          execute: () => {
+            throw new Error('the page blew up');
+          },
+        });
+        status.textContent = 'registered the failing tool';
+      }
+    </script>
+  </body>
+</html>

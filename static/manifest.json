@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "WebAIAssist",
+  "short_name": "WebAIAssist",
+  "version": "0.1.0",
+  "description": "A local AI model in your side panel that uses the WebMCP tools of the open page. Works with AgenticSystemCore nodes.",
+  "minimum_chrome_version": "124",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": ["sidePanel", "offscreen", "storage", "activeTab", "scripting"],
+  "optional_host_permissions": ["https://*/*", "http://localhost/*", "http://127.0.0.1/*"],
+  "background": {
+    "service_worker": "service-worker.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "options_page": "options.html",
+  "action": {
+    "default_title": "Open WebAIAssist",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
+}

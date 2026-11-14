@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebAIAssist browser check</title>
+    <style>
+      body {
+        font:
+          14px/1.5 system-ui,
+          sans-serif;
+        margin: 1rem auto;
+        max-width: 60rem;
+        padding: 0 1rem;
+      }
+      pre {
+        background: #f4f4f4;
+        border: 1px solid #ccc;
+        overflow-x: auto;
+        padding: 0.75rem;
+        white-space: pre-wrap;
+      }
+      button {
+        font: inherit;
+        margin-right: 0.5rem;
+        padding: 0.4rem 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>WebAIAssist browser check</h1>
+      <p>
+        This page checks WebGPU, Chrome's Prompt API and the WebMCP tool registry in this browser.
+        It registers ten stub tools shaped like those of an AgenticSystemCore node, reads them back
+        and runs one. It downloads no model and sends nothing anywhere.
+      </p>
+      <p>
+        <button id="run" type="button">Run the checks</button>
+        <button id="copy" type="button" disabled>Copy the report</button>
+      </p>
+      <pre id="report" aria-live="polite">Press "Run the checks".</pre>
+    </main>
+    <script src="spike.js"></script>
+  </body>
+</html>

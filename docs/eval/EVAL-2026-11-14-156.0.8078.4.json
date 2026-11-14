@@ -1,0 +1,434 @@
+{
+  "date": "2026-11-14",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true
+  },
+  "models": [
+    {
+      "key": "qwen",
+      "id": "Qwen3-0.6B-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 4.6,
+      "status": "Ready: Qwen3 0.6B (small and fast; needs about 1.4 GB of GPU memory), running in the offscreen document."
+    },
+    {
+      "key": "llama",
+      "id": "Llama-3.2-3B-Instruct-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 16.5,
+      "status": "Ready: Llama 3.2 3B (better answers; needs about 2.3 GB of GPU memory), running in the offscreen document."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:52438/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    },
+    {
+      "name": "live",
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 0.4,
+      "totalS": 17.5
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 8.8,
+      "totalS": 8.8,
+      "error": "Error: The model could not fill in the arguments for propose. It takes: slug (string, required), agent (string), at (string), task_state (string)."
+    },
+    {
+      "n": 3,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3.7,
+      "totalS": 12.9
+    },
+    {
+      "n": 4,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 32.2,
+      "totalS": 38.4
+    },
+    {
+      "n": 5,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 0,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 16.8,
+      "totalS": 22.2
+    },
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 0.3,
+      "totalS": 22.6
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "propose",
+        "propose",
+        "propose"
+      ],
+      "toolRight": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 1,
+      "firstTokenS": 18.6,
+      "totalS": 40.1
+    },
+    {
+      "n": 3,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 1,
+      "firstTokenS": 21.7,
+      "totalS": 33.7
+    },
+    {
+      "n": 4,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "search",
+        "links",
+        "links",
+        "links",
+        "links",
+        "links"
+      ],
+      "toolRight": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 28.2,
+      "totalS": 120.3,
+      "error": "Error: The assistant stopped after 6 tool steps (the limit in Options)."
+    },
+    {
+      "n": 5,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 38.9,
+      "totalS": 38.9
+    },
+    {
+      "n": 1,
+      "model": "llama",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3.7,
+      "totalS": 3.7,
+      "error": "Error: Error: Object has already been disposed"
+    },
+    {
+      "n": 2,
+      "model": "llama",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 3,
+      "model": "llama",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 4,
+      "model": "llama",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 5,
+      "model": "llama",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 1,
+      "model": "llama",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 2,
+      "model": "llama",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 3,
+      "model": "llama",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 4,
+      "model": "llama",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    },
+    {
+      "n": 5,
+      "model": "llama",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 3.3,
+      "error": "Error: ModelNotLoadedError: Model not loaded before trying to complete ChatCompletionRequest. Please ensure you have called MLCEngine.reload(model) to load the model before initiating APIs, or initialize your engine using CreateMLCEngine() with a valid model configuration."
+    }
+  ],
+  "summary": [
+    {
+      "model": "qwen",
+      "target": "stub",
+      "prompts": 5,
+      "toolRight": 2,
+      "gateShown": "3 of 3",
+      "factInAnswer": "3 of 5",
+      "hallucinated": 0,
+      "errors": 1,
+      "repeated": 0,
+      "medianFirstTokenS": 8.8
+    },
+    {
+      "model": "qwen",
+      "target": "live",
+      "prompts": 5,
+      "toolRight": 0,
+      "gateShown": "3 of 3",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 0,
+      "errors": 1,
+      "repeated": 2,
+      "medianFirstTokenS": 21.7
+    },
+    {
+      "model": "llama",
+      "target": "stub",
+      "prompts": 5,
+      "toolRight": 0,
+      "gateShown": "0 of 0",
+      "factInAnswer": "0 of 5",
+      "hallucinated": 0,
+      "errors": 5,
+      "repeated": 0,
+      "medianFirstTokenS": 3.7
+    },
+    {
+      "model": "llama",
+      "target": "live",
+      "prompts": 5,
+      "toolRight": 0,
+      "gateShown": "0 of 0",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 0,
+      "errors": 5,
+      "repeated": 0,
+      "medianFirstTokenS": null
+    }
+  ],
+  "checks": [
+    {
+      "name": "Cancel stops the download",
+      "result": "pass",
+      "detail": "Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0"
+    },
+    {
+      "name": "storage.local.setAccessLevel",
+      "result": "pass",
+      "detail": "resolved in the service worker"
+    },
+    {
+      "name": "Hosts contacted on first Start",
+      "result": "review",
+      "detail": "7 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start"
+    },
+    {
+      "name": "Idle 2 min, then a question",
+      "result": "fail",
+      "detail": "no answer after the idle wait"
+    },
+    {
+      "name": "Corrupted cached library is refused",
+      "result": "skipped",
+      "detail": "no cached .wasm (scripted or library served from the package)"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

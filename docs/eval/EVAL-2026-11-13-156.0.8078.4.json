@@ -1,0 +1,153 @@
+{
+  "date": "2026-11-13",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true
+  },
+  "models": [
+    {
+      "key": "qwen",
+      "id": "Qwen3-0.6B-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 0,
+      "status": "Ready: Qwen3 0.6B (small and fast; needs about 1.4 GB of GPU memory), running in the offscreen document."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:50365/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "firstTokenS": 0.3,
+      "totalS": 52.3
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "firstTokenS": 7.8,
+      "totalS": 7.8,
+      "error": "Error: The model gave no valid action: the arguments do not match the schema: (arguments) fails \"required\" (missing \"slug\")."
+    },
+    {
+      "n": 3,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links",
+        "read"
+      ],
+      "toolRight": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "firstTokenS": 2.3,
+      "totalS": 20.9,
+      "error": "Error: The model gave no valid action: the arguments do not match the schema: (arguments) fails \"required\" (missing \"slug\")."
+    },
+    {
+      "n": 4,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "firstTokenS": 15.9,
+      "totalS": 23.9,
+      "error": "Error: The model gave no valid action: the arguments do not match the schema: (arguments) fails \"required\" (missing \"slug\")."
+    },
+    {
+      "n": 5,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "check"
+      ],
+      "toolRight": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "firstTokenS": 17.8,
+      "totalS": 21.2
+    }
+  ],
+  "summary": [
+    {
+      "model": "qwen",
+      "target": "stub",
+      "prompts": 5,
+      "toolRight": 1,
+      "gateShown": "3 of 3",
+      "factInAnswer": "1 of 5",
+      "hallucinated": 0,
+      "errors": 3,
+      "medianFirstTokenS": 7.8
+    }
+  ],
+  "checks": [
+    {
+      "name": "Cancel stops the download",
+      "result": "skipped",
+      "detail": "model already cached; rerun with --fresh-profile"
+    },
+    {
+      "name": "storage.local.setAccessLevel",
+      "result": "pass",
+      "detail": "resolved in the service worker"
+    },
+    {
+      "name": "Hosts contacted on first Start",
+      "result": "review",
+      "detail": "0 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start"
+    },
+    {
+      "name": "Idle 0 min, then a question",
+      "result": "skipped",
+      "detail": "--idle 0"
+    },
+    {
+      "name": "Corrupted cached library is refused",
+      "result": "skipped",
+      "detail": "no cached .wasm (scripted or library served from the package)"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

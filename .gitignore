@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+dist-smoke/
+dist-eval/
+test-results/
+playwright-report/
+vendor/
+*.zip
+.features-gen/

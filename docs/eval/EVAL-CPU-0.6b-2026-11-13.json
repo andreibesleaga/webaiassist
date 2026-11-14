@@ -1,0 +1,195 @@
+{
+  "date": "2026-11-13",
+  "os": "linux 6.6.114.1-microsoft-standard-WSL2",
+  "chrome": "156.0.8078.4",
+  "cancel": {
+    "answeredMs": 43,
+    "left": []
+  },
+  "firstStart": {
+    "ready": true,
+    "loadS": 35.6,
+    "status": "Ready: Qwen3 0.6B on the processor (small; 397 MB download; needs about 0.8 GB of memory; Apache-2.0), running in memory on the processor (8 threads).",
+    "downloaded": true,
+    "texts": [
+      "Downloading Qwen3 0.6B on the processor: 0 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 4 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 6 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 10 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 14 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 18 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 22 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 26 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 30 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 34 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 38 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 43 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 47 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 51 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 54 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 58 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 62 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 67 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 71 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 75 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 80 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 84 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 89 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 90 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 91 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 98 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 111 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 129 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 145 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 154 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 168 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 183 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 195 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 208 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 224 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 237 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 326 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 341 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 356 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 372 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 387 of 397 MB",
+      "Downloading Qwen3 0.6B on the processor: 397 of 397 MB",
+      "Checking the downloaded file (SHA-256)…",
+      "Loading Qwen3 0.6B on the processor into memory…",
+      "Ready: Qwen3 0.6B on the processor (small; 397 MB download; needs about 0.8 GB of memory; Apache-2.0), running in memory on the processor (8 threads)."
+    ]
+  },
+  "answers": [
+    {
+      "row": {
+        "n": 1,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 0.1,
+        "totalS": 42.7
+      },
+      "answer": "The site mentions handoffs as a process that involves transitions between different components or systems, ensuring smooth operations and minimizing errors. Handoffs are critical for maintaining system stability and facilitating efficient communication between different entities.",
+      "speeds": [
+        {
+          "promptTokens": 915,
+          "promptPerSecond": 23.9,
+          "replyTokens": 46,
+          "replyPerSecond": 11.3
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 2,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 7.4,
+        "totalS": 7.4
+      },
+      "answer": "The items that best answer how agents share work include the 'agents' and 'work' items, as they directly relate to the process of task allocation and distribution between agents.",
+      "speeds": [
+        {
+          "promptTokens": 70,
+          "promptPerSecond": 19.3,
+          "replyTokens": 41,
+          "replyPerSecond": 11.1
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 3,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 6.2,
+        "totalS": 6.2
+      },
+      "answer": "The items about review include the 'review' and 'review_process' items, which discuss the process and responsibilities involved in reviewing content.",
+      "speeds": [
+        {
+          "promptTokens": 59,
+          "promptPerSecond": 19.1,
+          "replyTokens": 33,
+          "replyPerSecond": 10.9
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 4,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 6.2,
+        "totalS": 6.2
+      },
+      "answer": "The items related to 'memory' include the 'memory' and 'memory_process' items, which describe the process and role of storing and retrieving information.",
+      "speeds": [
+        {
+          "promptTokens": 51,
+          "promptPerSecond": 18.7,
+          "replyTokens": 37,
+          "replyPerSecond": 10.7
+        }
+      ]
+    },
+    {
+      "row": {
+        "n": 5,
+        "model": "cpu",
+        "target": "stub",
+        "tools": [],
+        "toolRight": 0,
+        "gateShown": null,
+        "factInAnswer": 0,
+        "hallucinated": [],
+        "repeated": 0,
+        "firstTokenS": 7.4,
+        "totalS": 7.4
+      },
+      "answer": "The items related to guardrails include the 'guardrails' and 'guardrail_process' items, which describe the policies and procedures that ensure safe and secure operations within the system.",
+      "speeds": [
+        {
+          "promptTokens": 58,
+          "promptPerSecond": 17.9,
+          "replyTokens": 42,
+          "replyPerSecond": 10.5
+        }
+      ]
+    }
+  ],
+  "cores": 16,
+  "secondStart": {
+    "ready": true,
+    "loadS": 7.7,
+    "status": "Ready: Qwen3 0.6B on the processor (small; 397 MB download; needs about 0.8 GB of memory; Apache-2.0), running in memory on the processor (8 threads).",
+    "downloaded": false,
+    "texts": [
+      "Loading Qwen3 0.6B on the processor into memory…",
+      "Ready: Qwen3 0.6B on the processor (small; 397 MB download; needs about 0.8 GB of memory; Apache-2.0), running in memory on the processor (8 threads)."
+    ]
+  }
+}

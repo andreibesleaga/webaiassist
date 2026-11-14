@@ -1,0 +1,164 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WebAIAssist</title>
+    <link rel="stylesheet" href="ui.css" />
+  </head>
+  <body>
+    <main class="panel">
+      <header>
+        <h1 data-i18n="appName"></h1>
+        <button
+          id="help-toggle"
+          class="ghost"
+          type="button"
+          aria-expanded="false"
+          aria-controls="help"
+          data-i18n="help"
+        ></button>
+        <button id="open-options" class="ghost" type="button" data-i18n="options"></button>
+      </header>
+      <section id="help" aria-labelledby="help-title" hidden>
+        <h2 id="help-title" data-i18n="helpTitle"></h2>
+        <ol>
+          <li data-i18n="help1"></li>
+          <li data-i18n="help2"></li>
+          <li data-i18n="help3"></li>
+          <li data-i18n="help4"></li>
+          <li data-i18n="help5"></li>
+          <li data-i18n="help6"></li>
+          <li data-i18n="help7"></li>
+        </ol>
+        <p id="builtin-state" class="hint"></p>
+        <p data-dev-only>
+          <a href="spike/index.html" target="_blank" data-i18n="browserCheck"></a>
+        </p>
+        <button id="help-close" type="button" data-i18n="closeHelp"></button>
+      </section>
+      <section id="page-card" class="card" aria-labelledby="page-card-title">
+        <div class="site-row">
+          <h2 id="page-card-title" data-i18n="thisPage"></h2>
+          <span id="access-badge" class="badge" data-i18n="badgeNone"></span>
+        </div>
+        <p id="page-title" class="title-row"></p>
+        <div class="state-row">
+          <p id="page-status" class="status" role="status" data-i18n="pageNone"></p>
+          <p
+            id="node-badge"
+            class="badge accent"
+            data-i18n="nodeBadge"
+            data-i18n-label="nodeBadgeLabel"
+            hidden
+          ></p>
+        </div>
+        <p id="site-ai" class="hint" hidden></p>
+        <button id="use-anyway" type="button" data-i18n="useAnyway" hidden></button>
+        <p id="site-looking" class="hint" data-i18n="siteLooking" hidden></p>
+        <ul id="site-chips" class="chips" data-i18n-label="siteChipsLabel"></ul>
+        <ul id="site-facts-list" class="facts"></ul>
+        <p id="page-note" class="status" role="status"></p>
+        <div class="row actions">
+          <button id="allow-site" type="button" data-i18n="allowHere" hidden></button>
+          <button id="read-page" type="button" data-i18n="readPage"></button>
+          <details id="more" class="more">
+            <summary id="more-toggle" data-i18n="more"></summary>
+            <div class="row">
+              <button id="compat" type="button" data-i18n="compat"></button>
+              <button id="forget" type="button" data-i18n="forget"></button>
+              <button id="export" type="button" data-i18n="exportChat"></button>
+            </div>
+          </details>
+        </div>
+        <button
+          id="tools-toggle"
+          class="ghost"
+          type="button"
+          aria-expanded="false"
+          aria-controls="tools-list"
+          hidden
+        ></button>
+        <div id="tools-list" class="tools" hidden>
+          <p class="hint" data-i18n="toolsNote"></p>
+          <ul id="tools-rows"></ul>
+        </div>
+      </section>
+      <section aria-labelledby="model-label">
+        <div class="row">
+          <label id="model-label" for="model" data-i18n="modelLabel"></label>
+          <select id="model"></select>
+          <button id="start" type="button" data-i18n="start"></button>
+          <button id="cancel-load" type="button" data-i18n="cancelLoad" hidden></button>
+        </div>
+        <p id="model-why" class="hint"></p>
+        <div id="consent" class="consent" role="group" aria-labelledby="consent-title" hidden>
+          <h2 id="consent-title"></h2>
+          <p id="consent-body"></p>
+          <div class="row">
+            <button id="consent-ok" type="button"></button>
+            <button id="consent-no" type="button" data-i18n="consentNo"></button>
+          </div>
+        </div>
+        <progress id="progress" max="1" value="0" aria-labelledby="model-label"></progress>
+        <p id="model-status" class="status" role="status" data-i18n="notStarted"></p>
+      </section>
+      <p id="offline-banner" class="banner" role="status" data-i18n="offline" hidden></p>
+      <section
+        id="conversation"
+        class="conversation"
+        aria-labelledby="conversation-title"
+        tabindex="0"
+      >
+        <h2 id="conversation-title" class="visually-hidden" data-i18n="conversation"></h2>
+        <section id="first-run" class="first-run" aria-labelledby="first-run-title" hidden>
+          <h2 id="first-run-title" tabindex="-1" data-i18n="firstRunTitle"></h2>
+          <p data-i18n="firstRunIntro"></p>
+          <ol>
+            <li data-i18n="firstRun1"></li>
+            <li data-i18n="firstRun2"></li>
+            <li data-i18n="firstRun3"></li>
+          </ol>
+          <p id="first-run-model"></p>
+          <p class="hint" data-i18n="privacyLine"></p>
+          <p class="hint" data-i18n="aiNote"></p>
+          <div class="row">
+            <button id="first-run-ok" type="button" data-i18n="gotIt"></button>
+            <button id="first-run-other" type="button" data-i18n="chooseOther"></button>
+          </div>
+        </section>
+        <p id="chat-empty" class="hint" data-i18n="chatEmpty"></p>
+        <div role="log" aria-live="polite" aria-labelledby="conversation-title">
+          <ol id="transcript"></ol>
+        </div>
+        <p id="draft" aria-hidden="true"></p>
+      </section>
+      <div id="error-banner" class="banner error" role="alert" hidden>
+        <p id="error-text"></p>
+        <div class="row">
+          <span id="error-actions" class="row"></span>
+          <button id="error-dismiss" type="button" data-i18n="dismiss"></button>
+        </div>
+      </div>
+      <form id="ask">
+        <label for="question" data-i18n="question"></label>
+        <textarea id="question" rows="3" aria-describedby="ask-hint"></textarea>
+        <p id="ask-hint" class="hint" data-i18n="askHint"></p>
+        <p id="ai-note" class="hint" data-i18n="aiNote"></p>
+        <div class="row">
+          <button id="send" type="submit" data-i18n="send"></button>
+          <button id="stop" type="button" data-i18n="stop" disabled></button>
+        </div>
+      </form>
+    </main>
+    <dialog id="confirm" aria-labelledby="confirm-title">
+      <h2 id="confirm-title"></h2>
+      <div id="confirm-body"></div>
+      <div class="row">
+        <button id="confirm-deny" type="button" data-i18n="deny"></button>
+        <button id="confirm-allow" type="button" data-i18n="allowOnce"></button>
+      </div>
+    </dialog>
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Smoke-test page with thirty WebMCP tools</title>
+  </head>
+  <body>
+    <h1>Smoke-test page with thirty WebMCP tools</h1>
+    <p id="status">Registering…</p>
+    <script type="module">
+      const status = document.getElementById('status');
+      const context = document.modelContext;
+      if (!context) {
+        status.textContent = 'no document.modelContext';
+      } else {
+        for (let i = 1; i <= 30; i += 1) {
+          const name = `tool${String(i).padStart(2, '0')}`;
+          await context.registerTool({
+            name,
+            description: `Tool number ${i} returns its own name. It has a second sentence.`,
+            inputSchema: { type: 'object', properties: {} },
+            annotations: { readOnlyHint: i % 3 !== 0 },
+            execute: () => name,
+          });
+        }
+        status.textContent = 'registered 30 tools';
+      }
+    </script>
+  </body>
+</html>
