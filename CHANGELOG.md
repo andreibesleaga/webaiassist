@@ -92,6 +92,13 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 - **Documents**: README, architecture, engineering, threat model, privacy, governance, accessibility,
   scenarios, manual checks, evaluation, browsers, sources, store listing and runbook, pitch and
   video script.
+- **Graph explorer tab**: on a node whose linkset gives counts, the card shows "Graph: N items"; one
+  press opens `explorer.html` with the 2D graph explorer of the AgenticSystemCore site (its code copied
+  unchanged into `third_party/agsc-explorer/` and pinned by SHA-256, with `force-graph` 1.52.0). The node's
+  linkset, `graph.jsonld` and chunks are read through the tab with a new fixed list and a `site/graph-file`
+  message; the graph must match the SHA-256 digest in the linkset or it is not drawn; other nodes are read only
+  after you tick them and press a button (https, public name, three fixed paths, no redirect, 2 MiB). No new
+  permission and no `web_accessible_resources`.
 
 - **More of what a node and a site publish** (package P2): the chip "matches the node's own list"
   from the SHA-256 digests in the link set (a file that differs is marked and not given to the

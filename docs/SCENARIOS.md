@@ -59,14 +59,14 @@ Scenarios whose wording changed when they stopped being pending:
 
 | Tag | Scenarios |
 |---|---|
-| @smoke | 108 |
-| @unit | 135 |
+| @smoke | 116 |
+| @unit | 143 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
-| @manual | 7 |
-| all | 255 |
-| run by `npm run test:bdd` now | 108 |
+| @manual | 8 |
+| all | 272 |
+| run by `npm run test:bdd` now | 116 |
 
 ### Every scenario
 
@@ -305,6 +305,23 @@ Scenarios whose wording changed when they stopped being pending:
 | F20.17 | Security and governance requirements that can be observed | For a site that asks for no AI input the panel says which parts are held back | @unit | `test/ui/panel-policy.test.ts`, `test/security-review/docs-review.test.ts` | unit test |
 | F20.18 | Security and governance requirements that can be observed | The export is marked as AI-generated in a front-matter block and names the endpoint host when one wrote it | @unit | `test/core/export.test.ts`, `test/ui/panel-export.test.ts` | unit test |
 | F20.19 | Security and governance requirements that can be observed | The privacy and governance texts state the saved tool results, the toolbar reads and the per-site exception | @unit | `test/security-review/docs-review.test.ts` | unit test |
+| F21.1 | Graph explorer tab | The chip adds up the node's counts and is built in code | @unit | `test/ui/panel-graph-chip.test.ts`, `test/core/site-graph-facts.test.ts` | unit test |
+| F21.2 | Graph explorer tab | An allowed node page shows the Graph chip and one press opens the explorer | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.3 | Graph explorer tab | With only the toolbar click as access, the explorer still reads the node through the tab | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.4 | Graph explorer tab | The explorer can ask only for the fixed files of the node and of ticked peers | @unit | `test/adapters/graph-fetch-guard.test.ts`, `test/core/graph-files.test.ts`, `test/adapters/graph-fetch-shim.test.ts` | unit test |
+| F21.5 | Graph explorer tab | The message that carries a graph file has its own schema, ids and size cap | @unit | `test/adapters/graph-files.test.ts`, `test/protocol/graph-file-message.test.ts` | unit test |
+| F21.6 | Graph explorer tab | A graph that does not match the digest in the linkset is not drawn | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.7 | Graph explorer tab | A graph over the size cap is refused with a plain message | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.8 | Graph explorer tab | Nothing from the graph becomes markup, a script or a link that runs | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.9 | Graph explorer tab | The copied explorer code and the new code have no HTML or code sink | @unit | `test/security/explorer-no-html-sink.test.ts` | unit test |
+| F21.10 | Graph explorer tab | A copied explorer file that differs from its pin fails a test and stops the build | @unit | `test/ui/agsc-explorer-pins.test.ts` | unit test |
+| F21.11 | Graph explorer tab | The Patterns node comes out as one connected piece without vocabulary terms | @unit | `test/ui/agsc-explorer-graph.test.ts` | unit test |
+| F21.12 | Graph explorer tab | Other nodes are read only after they are ticked and the button is pressed | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.13 | Graph explorer tab | Only an https origin with a public name qualifies as a peer | @unit | `test/adapters/peers.test.ts`, `test/ui/explorer-peers-block.test.ts` | unit test |
+| F21.14 | Graph explorer tab | A tab that left the site is not read again | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.15 | Graph explorer tab | The explorer page is accessible in the light and the dark theme | @smoke | `features/21-graph-explorer.feature` | npm run test:bdd |
+| F21.16 | Graph explorer tab | The manifest gains no permission, no host and no web_accessible_resources | @unit | `test/security-review/dist-review.test.ts` | unit test |
+| F21.17 | Graph explorer tab | On the two live nodes the explorer draws their graphs | @manual | `features/21-graph-explorer.feature` | manual check |
 | F25.1 | The node's own list, more site facts, the shortcut, diagnostics and storage | Files that match the node's own list get the chip "matches the node's own list" | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
 | F25.2 | The node's own list, more site facts, the shortcut, diagnostics and storage | A file that does not match the node's own list is marked and not given to the model | @unit | `test/ui/panel-node-extras.test.ts`, `test/core/site-node-extras.test.ts` | unit test |
 | F25.3 | The node's own list, more site facts, the shortcut, diagnostics and storage | The digest is computed over the raw bytes of a body that was read whole | @unit | `test/adapters/site-page-scripts.test.ts` | unit test |
@@ -341,8 +358,8 @@ Scenarios whose wording changed when they stopped being pending:
 | ASI04-2 | F10.10 |
 | ASI05-1 | F17.5 |
 | ASI06-1 | F14.9 |
-| ASI07-1 | F09.5, F20.13 |
-| ASI07-2 | F20.9 |
+| ASI07-1 | F09.5, F20.13, F21.8 |
+| ASI07-2 | F20.9, F21.5 |
 | ASI08-1 | F10.9 |
 | ASI09-1 | F07.4 |
 | ASI09-2 | F10.11, F20.15 |
@@ -363,7 +380,7 @@ Scenarios whose wording changed when they stopped being pending:
 | EU-3 | F01.2 |
 | EU-5 | F20.8 |
 | LLM01-1 | F09.1, F09.2 |
-| LLM01-2 | F09.3 |
+| LLM01-2 | F09.3, F21.8, F21.9 |
 | LLM01-3 | F06.4, F20.16 |
 | LLM01-4 | F10.10 |
 | LLM01-5 | F14.9 |
@@ -413,8 +430,8 @@ Scenarios whose wording changed when they stopped being pending:
 | R4-4 | F10.18 |
 | R4-5 | F10.6 |
 | R4-6 | F10.7 |
-| R4-7 | F10.4, F11.6 |
-| R4-8 | F11.5 |
+| R4-7 | F10.4, F11.6, F21.1 |
+| R4-8 | F11.5, F21.4, F21.12, F21.14 |
 | R4-9 | F10.10 |
 
 <!-- scenarios:end -->

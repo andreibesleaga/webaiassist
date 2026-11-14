@@ -147,6 +147,20 @@ with WebMCP off), and serve this page from `localhost` or `https`:
 2. Expected: the side panel opens and the card reads the page (the same as a toolbar click). If
    nothing happens, look at `chrome://extensions/shortcuts`: another extension may hold the key.
 
+### F21.17: the explorer draws the two live nodes
+
+1. Run `node scripts/check-live-graph.mjs` (needs the network; it reads both nodes with a browser
+   User-Agent). Expected: for each node "digest verified", one connected piece, and the chip numbers 17
+   (agenticsystemcore.com) and 70 (patterns.agenticsystemcore.com).
+2. Open `https://agenticsystemcore.com/`, allow WebAIAssist on it (toolbar button), press **Graph: 17 items**.
+   Expected: a tab with the picture of `https://agenticsystemcore.com/graph/` (same colours, legend, list,
+   detail panel); the "Other nodes" block lists `patterns.agenticsystemcore.com`, unticked, and nothing was
+   requested from it (DevTools, Network of the explorer tab).
+3. Tick it and press **Read the ticked nodes**. Expected: two nodes read, the two graphs drawn together,
+   and only `/.well-known/knowledge-linkset` and `/graph.jsonld` of the second node requested.
+4. On `https://patterns.agenticsystemcore.com/` the chip says **Graph: 70 items**; the graph is one connected piece
+   with no loose vocabulary node.
+
 ## When a check fails
 
 Write down the check id, Chrome version, operating system, what the panel said (copy the whole

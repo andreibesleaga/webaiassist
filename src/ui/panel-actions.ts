@@ -110,6 +110,13 @@ function exportChat(ctx: PanelController): void {
   ctx.deps.download('webaiassist-conversation.md', markdown);
 }
 
+/** The "Graph: N items" chip opens the explorer in a new tab, for the tab and site on the card. */
+function openGraph(ctx: PanelController): void {
+  const page = ctx.state.page;
+  if (page?.origin === undefined) return note(ctx, t('noTab'));
+  ctx.deps.openGraph?.(page.tabId, page.origin);
+}
+
 function bindHelp(ctx: PanelController): void {
   const doc = ctx.deps.doc;
   const toggle = byId(doc, 'help-toggle');
@@ -137,6 +144,10 @@ export function bindActions(ctx: PanelController): void {
   byId(doc, 'forget').addEventListener('click', () => forget(ctx));
   byId(doc, 'export').addEventListener('click', () => exportChat(ctx));
   byId(doc, 'open-options').addEventListener('click', () => ctx.deps.openOptions());
+  // The chip is drawn in code, after the files are read: one listener on the row serves it.
+  byId(doc, 'site-chips').addEventListener('click', (event) => {
+    if ((event.target as Element).closest('#open-graph')) openGraph(ctx);
+  });
   bindHelp(ctx);
   bindPanelDiagnostics(ctx);
 }

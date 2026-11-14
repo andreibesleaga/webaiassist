@@ -4,6 +4,7 @@
 // with one link context whose anchor is on the tab's own origin; anything else is not that
 // site's document. Relation names are kept as written, unknown ones are ignored, nothing is
 // fetched from it.
+import { parseCounts } from './graph-files';
 import { resolveAddress, type Address } from './site-url';
 
 export const AGSC_PROFILE = 'https://w3id.org/agentic-system-core/profile/agentic-knowledge';
@@ -34,6 +35,10 @@ export interface Linkset {
   readonly links: readonly LinksetLink[];
   readonly specVersion?: string;
   readonly bundleVersion?: string;
+  /** What the node says its graph holds (`agsc-counts`: clusters, concepts ...). */
+  readonly counts?: Readonly<Record<string, number>>;
+  /** The node's JSON-LD graph, when the linkset names it on the node's own origin. */
+  readonly graphHref?: string;
   readonly restricted: boolean;
   readonly tombstone: boolean;
   /** Node dashboard values (package P2), all text from the node's own list. */
@@ -127,6 +132,17 @@ function dashboardOf(about: Entry, links: readonly LinksetLink[]) {
   return Object.fromEntries(defined);
 }
 
+/** The node's graph: its counts, and its address when it is on the node's own origin. */
+function graphFacts(about: Entry, anchor: Address): Pick<Linkset, 'counts' | 'graphHref'> {
+  const counts = parseCounts(Array.isArray(about['agsc-counts']) ? about['agsc-counts'] : []);
+  const graph =
+    typeof about.href === 'string' ? resolveAddress(about.href, anchor.origin) : undefined;
+  return {
+    ...(Object.keys(counts).length === 0 ? {} : { counts }),
+    ...(graph?.origin === anchor.origin ? { graphHref: graph.href } : {}),
+  };
+}
+
 export function parseLinkset(raw: string, origin: string, profile: boolean): LinksetResult {
   let root: unknown;
   try {
@@ -154,6 +170,7 @@ export function parseLinkset(raw: string, origin: string, profile: boolean): Lin
       ...(specVersion === undefined ? {} : { specVersion }),
       ...(bundleVersion === undefined ? {} : { bundleVersion }),
       ...dashboardOf(about, links),
+      ...graphFacts(about, anchor),
     },
   };
 }

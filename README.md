@@ -71,6 +71,11 @@ is not given to the model. Each is size
 limited, shown as published by the site, and (unless you turn it off in Options) given to the
 model in short form, only as untrusted data.
 
+On a node that publishes a knowledge linkset with counts, the card shows **Graph: N items**. One press
+opens a tab with the graph explorer of the AgenticSystemCore site (2D), drawn in your browser from the node's
+`graph.jsonld`, checked against the digest in its linkset. Other nodes it names are read only after you tick
+them and press **Read the ticked nodes** (see [docs/PRIVACY.md](docs/PRIVACY.md)).
+
 A site that says it wants no AI input (`Content-Signal: ai-input=no` in `robots.txt`) gets no
 text sent to the model and no **Read this page**. The results of the site's own tools still go
 to the model, because you asked for them. **Use on this tab anyway** overrides this for the

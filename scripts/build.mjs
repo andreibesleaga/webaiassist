@@ -13,6 +13,7 @@
 // check (spike) page. The release build, dist/, has none of these (scripts/check-dist.mjs).
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
+import { copyExplorer } from './explorer-pins.mjs';
 import { bundleModelLibs, webLlmNoRemoteLibs, wllamaNoRemote } from './model-libs.mjs';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
@@ -53,6 +54,7 @@ await build({
     offscreen: 'src/entries/offscreen.ts',
     sidepanel: 'src/entries/sidepanel.ts',
     options: 'src/entries/options.ts',
+    explorer: 'src/entries/explorer.ts',
     'model-worker': 'src/entries/model-worker.ts',
   },
   format: 'esm',
@@ -84,6 +86,10 @@ cpSync(new URL('static/icons/', root), new URL('icons/', out), {
   recursive: true,
   filter: (source) => !source.endsWith('.svg'),
 });
+// The explorer page: the site's own explorer files and force-graph, checked against PINS.json.
+for (const file of ['explorer.html', 'explorer.css'])
+  cpSync(new URL(`static/${file}`, root), new URL(file, out));
+copyExplorer(fileURLToPath(out));
 await bundleModelLibs(fileURLToPath(out));
 cpSync(new URL('LICENSE', root), new URL('LICENSE', out));
 cpSync(new URL('NOTICE', root), new URL('NOTICE', out));

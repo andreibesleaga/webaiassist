@@ -1,0 +1,173 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* The explorer page. The site's own stylesheet (explorer-vendor/assets/graph-explorer.css) is built on
+   the site's colour tokens; they are defined here, the light set, the dark set under the system's
+   dark scheme, and the few rules that make the site's explorer fit an extension tab. */
+:root {
+  --bg: #fbfbfa;
+  --bg-alt: #f1f1ee;
+  --fg: #1a1a1a;
+  --muted: #5c5c5c;
+  --rule: #d9d9d4;
+  --link: #245a9c;
+  --focus: #245a9c;
+  --accent: #245a9c;
+  --control: #767676;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --bg-alt: #171a20;
+    --fg: #e8e8e6;
+    --muted: #a3a3a0;
+    --rule: #30343b;
+    --link: #8ab4f8;
+    --focus: #8ab4f8;
+    --accent: #8ab4f8;
+    --control: #8b8f98;
+  }
+}
+body {
+  margin: 0;
+  padding: 0.5rem 1rem 1rem;
+  background: var(--bg);
+  color: var(--fg);
+  font:
+    16px/1.5 system-ui,
+    sans-serif;
+}
+a {
+  color: var(--link);
+}
+a:focus-visible,
+[tabindex]:focus-visible,
+input:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  z-index: 5;
+}
+.skip:focus {
+  top: 0.5rem;
+}
+header.page h1 {
+  font-size: 1.3rem;
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+}
+header.page .note {
+  margin: 0.1rem 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Tabs */
+#explorer-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 0.5rem;
+}
+#explorer-tabs button {
+  font: inherit;
+  color: var(--fg);
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  padding: 0.3rem 0.9rem;
+  min-height: 36px;
+  cursor: pointer;
+}
+#explorer-tabs button[aria-selected='true'] {
+  background: var(--bg-alt);
+  border-color: var(--rule);
+  font-weight: 600;
+}
+
+/* Notes and problems that WebAIAssist adds around the explorer */
+#graph-note,
+#graph-problem {
+  margin: 0.25rem 0 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  background: var(--bg-alt);
+  border-left: 4px solid var(--accent);
+}
+#graph-problem {
+  border-left-color: var(--fg);
+  font-weight: 600;
+}
+.peers {
+  background: var(--bg-alt);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.25rem 0.9rem 0.6rem;
+  margin: 0 0 0.6rem;
+}
+.peers h2 {
+  font-size: 1rem;
+  margin: 0.4rem 0 0.2rem;
+}
+.peers p {
+  margin: 0.2rem 0;
+  font-size: 0.9rem;
+}
+.peers ul {
+  list-style: none;
+  margin: 0.3rem 0;
+  padding: 0;
+}
+.peers li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 32px;
+}
+.peers .why {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.peers button {
+  font: inherit;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--control);
+  border-radius: 4px;
+  padding: 0.2rem 0.8rem;
+  min-height: 32px;
+  cursor: pointer;
+}
+.peers button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* The site's explorer, in a tab: it fills the window. The node address field, the Load button, the
+   Peers box, the 2D/3D buttons and the rotate button are not offered here: the node is the open tab's
+   site, peers have their own block above, and 3D is not in this release. display:none also takes
+   them out of the tab order. */
+#panel-graph .gx.gx-full {
+  max-width: none;
+}
+#panel-graph .gx-src,
+#panel-graph #gx-load,
+#panel-graph .gx-check,
+#panel-graph .gx-help,
+#panel-graph .gx-seg[aria-label='Dimensions'],
+#panel-graph #gx-rotate {
+  display: none !important;
+}
+#panel-graph .gx-body {
+  height: calc(100vh - var(--gx-chrome, 4rem) - 10rem);
+  height: calc(100dvh - var(--gx-chrome, 4rem) - 10rem);
+}

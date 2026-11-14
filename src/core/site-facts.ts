@@ -3,6 +3,7 @@
 // AgenticSystemCore node check and the "no AI input" decision. Everything here came from the
 // site and is untrusted; nothing in it adds a tool, changes a setting or names an address to
 // fetch. The text for the model is built in site-context.ts.
+import { graphItemCount } from './graph-files';
 import { isAgscNode } from './node-mode';
 import { checkDigests, type DigestCheck } from './site-digest';
 import {
@@ -56,6 +57,8 @@ export interface SiteFacts {
   /** A valid knowledge link set of this origin with the node profile. */
   readonly node?: Linkset;
   readonly catalog?: Linkset;
+  /** The items the node says its graph holds (the sum of its counts); the card offers the explorer. */
+  readonly graphItems?: number;
   readonly agentCard?: AgentCard;
   readonly security?: SecurityTxt;
   readonly page?: PageFact;
@@ -181,6 +184,7 @@ export function buildSiteFacts(input: FactsInput): SiteFacts {
     ? checkDigests(all.node, input.outcomes, input.origin)
     : { matched: [], mismatched: [] };
   const groups = robots ? nonEmpty(parseRobotsGroups(robots.text)) : undefined;
+  const graphItems = graphItemCount(all.node?.counts);
   const base = {
     origin: input.origin,
     aiInput: decideAiInput(input.outcomes.robots),
@@ -188,6 +192,7 @@ export function buildSiteFacts(input: FactsInput): SiteFacts {
     ...withoutMismatched(all, digests.mismatched),
     digests,
     ...(groups ? { robotsGroups: groups } : {}),
+    ...(graphItems === undefined || graphItems === 0 ? {} : { graphItems }),
   };
   const stated = signal.aiInput !== undefined || signal.aiTrain !== undefined || trainingReserved;
   return { ...base, chips: chips(base, stated) };

@@ -11,6 +11,7 @@ export default tseslint.config(
       'dist-smoke/',
       'dist-eval/',
       'vendor/',
+      'third_party/',
       'test-results/',
       '.features-gen/',
       'playwright-report/',

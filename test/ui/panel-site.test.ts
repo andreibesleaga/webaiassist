@@ -39,6 +39,7 @@ describe('the card shows what the site publishes', () => {
       'security.txt',
       'AI policy',
       'peer: patterns.agenticsystemcore.com',
+      'Graph: 17 items',
     ]);
     const llms = byId('site-chips').querySelector('[data-chip="llms"]');
     expect(llms?.getAttribute('title')).toContain('Published by the site');

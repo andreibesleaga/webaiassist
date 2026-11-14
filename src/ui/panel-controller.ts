@@ -58,6 +58,8 @@ export interface PanelDeps {
   ): Promise<{ runtime: ModelRuntime; host?: HostName }>;
   download(fileName: string, text: string): void;
   openOptions(): void;
+  /** Opens the graph explorer tab for a tab and its site (the "Graph: N items" chip); absent in tests that skip it. */
+  openGraph?(tabId: number, origin: string): void;
   /** The model files stored in this browser (for the question before a download). */
   readonly store: StoreLike;
   /** What the panel remembers besides the Options (welcome screen, measured first answer). */

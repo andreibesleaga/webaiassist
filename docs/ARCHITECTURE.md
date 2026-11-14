@@ -332,8 +332,38 @@ When the site changes, `panel-switch.ts` stops a running answer with one plain l
 question waiting in the dialog, and shows the chat of the new site (saved with Memory on, empty
 with Memory off). The "site facts" go to the model as one fenced block before the question
 (`AgentInput.siteContext`), are marked transient in the loop, and are left out of the saved chat.
-The message hop `site` carries `site/file` and `site/page` from the injected script to the panel
+The message hop `site` carries `site/file`, `site/page` and `site/graph-file` from the injected script to the panel
 (`src/protocol/messages.ts`).
+
+## The graph explorer tab
+
+The card's "Graph: N items" button (built in code, `src/ui/page-card.ts`; N is the sum of the node's
+`agsc-counts`, `src/core/graph-files.ts`) makes the panel open `explorer.html?tabid=...&origin=...&src=...`
+in a new tab (`src/ui/explorer-url.ts`, `chrome.tabs.create`, no permission). The page is one extension page
+with a tab list (`src/ui/explorer/tabs.ts`, `shell.ts`); this release has the Graph tab, and the Query,
+Vocabulary and Page data tabs are added to that list by their own package (empty placeholder files exist).
+
+```text
+core (pure)                              adapters                           ui / entry
+graph-files.ts  list, caps, counts       graph-files.ts  one file through   explorer.html (site markup, pinned)
+site-linkset.ts counts, graph address      the tab, schema check            entries/explorer.ts  boot
+                                         graph-fetch-guard.ts  decide(url)  ui/explorer/graph-tab.ts, peers-block.ts
+                                         peers.ts  peer origin rules        ui/explorer/shell.ts, link-opener.ts
+                                         linkset-digests.ts  declared       ui/explorer-url.ts  page address
+                                           SHA-256 per file                 third_party/agsc-explorer/*  (unchanged)
+                                         explorer-tab-reader.ts  "left      explorer-vendor/ (build output)
+                                           the site" rule
+                                         graph-fetch-shim.ts  window.fetch
+                                           for the site's code: tab, peer,
+                                           digest, caps
+```
+
+The explorer's own code (the site's, copied unchanged and pinned by hash, `third_party/agsc-explorer/PINS.json`)
+calls `window.fetch`; the page installs `createGuardedFetch` first. Own files come through the tab (the same isolated-world
+script as the site files, with the `site/graph-file` message); a ticked peer is read with one plain request; everything else is
+refused. force-graph 1.52.0 is copied from `node_modules` by the build after its hash is checked
+(`scripts/explorer-pins.mjs`), in the folder layout of the site (`explorer-vendor/assets/...`). Threats and controls:
+[THREAT-MODEL.md](THREAT-MODEL.md), "Graph explorer tab".
 
 ## Look and feel
 
@@ -437,11 +467,12 @@ is therefore untrusted:
 src/core/       agent loop, gate, parser, prompt, fence, node mode, consent, export, ports
 src/adapters/   model runtimes, page bridge, router, memory, settings, grants, validators, probes
 src/protocol/   message types, JSON schemas, generated validators, parseMessage
-src/ui/         side panel and Options page logic, strings (messages-en.ts)
+src/ui/         side panel and Options page logic, strings (messages-en.ts), the explorer tab (src/ui/explorer/)
 src/fakes/      in-memory fakes of the ports, the scripted test model
 src/spike/      browser check logic (report, stub node tools, WebMCP check)
 src/entries/    service worker, offscreen, side panel, Options, page scripts, polyfill, spike page
-static/         manifest template, extension HTML pages, ui.css, icons (SVG source and PNGs)
+static/         manifest template, extension HTML pages (including explorer.html), ui.css, explorer.css, icons (SVG source and PNGs)
+third_party/    unchanged copies of other repositories' files with their pins (agsc-explorer: the site's graph explorer)
 spike/          spike page HTML
 fixtures/       the ten tools of an AgenticSystemCore node page
 scripts/        build, dist and zip checks, model-library pins, validator generator, spike server

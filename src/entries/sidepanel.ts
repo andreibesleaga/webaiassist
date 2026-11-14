@@ -25,6 +25,7 @@ import { startPanel, type PanelDeps } from '../ui/panel-controller';
 import { cpuTestModels } from './shared/cpu-engine';
 import { createModelStore } from './shared/model-store';
 import { createRuntime } from './shared/panel-runtimes';
+import { explorerQuery } from '../ui/explorer-url';
 import { siteDeps } from './shared/site-deps';
 import { fromExtensionPage } from './shared/sender';
 
@@ -158,6 +159,10 @@ async function buildDeps(bridge: MessagingToolBridge): Promise<PanelDeps> {
     version: chrome.runtime.getManifest().version,
     download,
     openOptions: () => void chrome.runtime.openOptionsPage(),
+    openGraph: (tabId, origin) =>
+      void chrome.tabs.create({
+        url: chrome.runtime.getURL(`explorer.html?${explorerQuery({ tabId, origin })}`),
+      }),
     builtInState: () =>
       builtInState((globalThis as { LanguageModel?: AvailabilityLike }).LanguageModel),
   };

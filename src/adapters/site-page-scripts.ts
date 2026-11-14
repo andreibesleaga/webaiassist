@@ -18,6 +18,8 @@ export interface PageFileRequest {
   readonly accept: string;
   readonly maxBytes: number;
   readonly timeoutMs: number;
+  /** The message type of the answer: `site/file` unless the graph list asks for its own. */
+  readonly type?: 'site/graph-file';
 }
 
 /* eslint-disable max-lines-per-function -- an injected function cannot call code outside itself */
@@ -25,7 +27,7 @@ export interface PageFileRequest {
 /** One GET of one site file. Always resolves with a `site/file` message. */
 export async function fetchSiteFile(request: PageFileRequest): Promise<unknown> {
   const answer = (change: Record<string, unknown>): Record<string, unknown> => ({
-    type: 'site/file',
+    type: request.type ?? 'site/file',
     id: request.id,
     origin: location.origin,
     status: 0,

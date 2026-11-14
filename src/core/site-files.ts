@@ -148,7 +148,10 @@ function missing(reply: SiteFileReply): FileOutcome | undefined {
  * a data file, so a site that answers 200 with a page for every path is not believed), and a
  * JSON file that was cut is dropped. A text file that was cut keeps its first part.
  */
-export function checkReply(spec: SiteFileSpec, reply: SiteFileReply): FileOutcome {
+export function checkReply(
+  spec: Pick<SiteFileSpec, 'accept' | 'json' | 'maxBytes'>,
+  reply: SiteFileReply,
+): FileOutcome {
   const problem = missing(reply);
   if (problem) return problem;
   if (!spec.accept.includes(mediaType(reply.contentType)))

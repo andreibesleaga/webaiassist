@@ -25,6 +25,7 @@ const VALIDATORS: Record<MessageType, StandaloneValidator> = {
   'probe/gpu-result': generated.validate_probe_gpu_result,
   'site/file': generated.validate_site_file,
   'site/page': generated.validate_site_page,
+  'site/graph-file': generated.validate_site_graph_file,
 };
 
 function typeOf(raw: unknown): string | undefined {
