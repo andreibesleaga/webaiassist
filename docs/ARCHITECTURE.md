@@ -510,3 +510,12 @@ test/           unit tests (Vitest), fixture replay, adversarial tests (test/sec
 `test/smoke/conformance.spec.ts`) and the real-Chrome runs (`scripts/eval/conformance.ts`, with
 `conformance-run.ts` for the panel steps, `demos.ts` for Google's demo pages and `chrome-launch.ts`
 for starting Google Chrome). Nothing in `src/` depends on it.
+
+## Package P7d additions (14 Nov 2026)
+
+- Node card and help screens: `src/ui/node-card.ts` (drawing, the demo address constant, the start
+  command, the switch address), `src/ui/panel-node-card.ts` (panel hook called from `drawPage`,
+  and the "Copy report" button), texts in `src/ui/messages-node-card-en.ts`.
+- Developer report: `src/core/tool-report.ts` (Markdown text, schema and annotation checks);
+  `src/core/review-flags.ts` is the hook for the "Security review flags" rows: replace the body of
+  `reviewFlags` (same signature) and the report needs no change.

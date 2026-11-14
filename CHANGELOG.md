@@ -10,6 +10,12 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Added
 
+- **Node card, help screens and Copy report**: node card heading from the node's own link set
+  and a "Start your own node" command to copy; a fourth starter ("Compose a harness for my task")
+  and an `explain` starter that asks why two items are linked; help screens for "This site has no
+  tools" and "Chrome needs the WebMCP switch"; a developer "Copy report" of the open page's tools
+  with a "Security review flags" hook (`reviewFlags`, empty for now).
+
 - **Side panel**: a chat with a local AI model that uses the WebMCP tools of the open page.
   Streaming answers, Stop, a step limit (1 to 12, default 6), Export as Markdown (it says it was
   written by an AI model and names the model and where it ran), Help and a welcome screen,

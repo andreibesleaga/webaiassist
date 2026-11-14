@@ -60,12 +60,12 @@ Scenarios whose wording changed when they stopped being pending:
 | Tag | Scenarios |
 |---|---|
 | @smoke | 119 |
-| @unit | 151 |
+| @unit | 160 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 9 |
-| all | 284 |
+| all | 293 |
 | run by `npm run test:bdd` now | 119 |
 
 ### Every scenario
@@ -356,6 +356,15 @@ Scenarios whose wording changed when they stopped being pending:
 | F26.4 | A chat endpoint, on this computer or remote | An endpoint on this computer never shows the question | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
 | F26.5 | A chat endpoint, on this computer or remote | The endpoint's token counts and price are read, streamed or not | @unit | `test/adapters/endpoint-usage.test.ts` | unit test |
 | F26.6 | A chat endpoint, on this computer or remote | A service that echoes the API key in an error cannot show it | @unit | `test/security/endpoint-key-leaks.test.ts`, `test/adapters/endpoint-usage.test.ts` | unit test |
+| F30.1 | Node card, first-run help screens and the developer report | The node card is headed with the node's own spec version | @unit | `test/ui/node-card.test.ts` | unit test |
+| F30.2 | Node card, first-run help screens and the developer report | Start your own node shows the command as text to copy | @unit | `test/ui/node-card.test.ts` | unit test |
+| F30.3 | Node card, first-run help screens and the developer report | Compose is offered as a starter only when the page has the compose tool | @unit | `test/ui/node-card.test.ts` | unit test |
+| F30.4 | Node card, first-run help screens and the developer report | The explain starter asks why two items are linked | @unit | `test/ui/node-card.test.ts` | unit test |
+| F30.5 | Node card, first-run help screens and the developer report | A page with no tools gets the help screen "This site has no tools" | @unit | `test/ui/node-card.test.ts` | unit test |
+| F30.6 | Node card, first-run help screens and the developer report | Chrome without the WebMCP switch gets the help screen with the address to copy | @unit | `test/ui/node-card.test.ts` | unit test |
+| F30.7 | Node card, first-run help screens and the developer report | Copy report shows a preview first and copies on the second click | @unit | `test/ui/node-card.test.ts`, `test/core/tool-report.test.ts` | unit test |
+| F30.8 | Node card, first-run help screens and the developer report | The report lists tools, problems and the review hook, and is informational | @unit | `test/core/tool-report.test.ts` | unit test |
+| F30.9 | Node card, first-run help screens and the developer report | The report holds no page text beyond tool names, titles and descriptions | @unit | `test/core/tool-report.test.ts` | unit test |
 
 ### Requirement rows
 
