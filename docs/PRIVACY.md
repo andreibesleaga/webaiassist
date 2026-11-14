@@ -75,3 +75,10 @@ press it. It starts with a short block that marks the text as AI-generated (`ai-
 untrusted page content). Argument values whose names look like secrets (password, token, API key,
 auth, bearer, private key, session, cookie, credential) are replaced with `[redacted]`, and so is
 the endpoint API key wherever it appears, even in text you typed.
+
+## Conformance page and demo pages
+
+The conformance page (`conformance/`) is not part of the extension and sends nothing. The one host
+`googlechromelabs.github.io` is an install-time host permission of the evaluation build made with
+`--demos` only; the released extension has no install-time host and contacts a site only after you
+allow it.

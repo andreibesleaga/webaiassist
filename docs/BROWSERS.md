@@ -108,3 +108,14 @@ WebGPU it shows a plain error and **Use the processor instead**.
 | Brave   | Not documented          | Not documented                | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                    |
 | Opera   | Add-on not verified     | `opera:extensions`            | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                    |
 | Vivaldi | Yes, Add to Vivaldi     | `vivaldi://extensions`        | Not documented | Not documented                     | Not documented                              | Not documented                      | Not tested                                                                                    |
+
+## WebMCP conformance
+
+`conformance/` tests the WebMCP interface of a browser; `npm run eval:conformance` runs it in
+Google Chrome (see [EVAL.md](EVAL.md)). Measured in Playwright's Chromium 156.0.8078.4 with
+`--enable-features=WebMCPTesting` on 14 Nov 2026: `document.modelContext` has `registerTool`,
+`getTools`, `executeTool` and the three event handlers, and no `unregisterTool`; tool names other
+than letters, digits, underscore, hyphen and dot are refused with `InvalidStateError`; input is
+not checked against `inputSchema`; an empty result comes back as "Operation succeeded"; declarative
+form tools work (`toolname`, `tooldescription`, `toolautosubmit`, `SubmitEvent.agentInvoked`).
+Chrome 157 results: not recorded yet.

@@ -179,3 +179,26 @@ DevTools on the first Start and look. Differences between browsers go in `docs/B
    untrusted with the markers broken.
 3. **Other Chromium browsers** (Edge, Brave, Opera, Vivaldi), a screen reader, and Chrome's own
    site-access request from the toolbar: see step 6 of Run.
+
+## WebMCP conformance in real Chrome
+
+`npm run eval:conformance` opens the conformance page (`conformance/`, see its README) in Google
+Chrome with `--enable-features=WebMCP` (Chrome 157 and later; `scripts/eval/nano-plan.ts`). Stages:
+
+1. Default: Chrome alone; the page runs its own checks on every case.
+2. `-- --extension`: the eval build is loaded and every case of `conformance/expect.json` runs through
+   the real side panel with the scripted model (list, question before each call, result text).
+3. `-- --demos`: builds the eval build with the demo host (`node scripts/build.mjs --demos`) and
+   opens each of Google's 18 official demo pages (`scripts/eval/demo-pages.json`). Per page it
+   records the tools found and whether the panel lists them, and, when a tool is marked read-only
+   and needs no argument, runs it once through the confirmation. It never submits a form and
+   never calls a tool that is not marked read-only. `--no-browser` skips stage 1
+   (`npm run eval:demos`).
+
+From WSL, `npm run eval:conformance:win -- --extension --demos` copies the project to Windows and
+runs it there (the same mechanism as `eval:nano:win`); the report comes back under `docs/eval/`.
+The report is `docs/eval/EVAL-CONFORMANCE-<date>-<chrome version>.json`. The suite also runs in
+Playwright's Chromium: `npx playwright test test/smoke/conformance-browser.spec.ts
+test/smoke/conformance.spec.ts`. The Chromium and Chrome results are compared by hand.
+
+No real-Chrome run is recorded yet: it needs the maintainer's Windows computer.

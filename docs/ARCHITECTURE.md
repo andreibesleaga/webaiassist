@@ -441,3 +441,11 @@ vendor/         model libraries fetched once by the build (not in git)
 test/           unit tests (Vitest), fixture replay, adversarial tests (test/security),
                 browser smoke and accessibility tests (Playwright, test/smoke)
 ```
+
+## Conformance page and its runs
+
+`conformance/` is a static page, outside the extension, that exercises the WebMCP interface; its
+`expect.json` drives the browser tests (`test/smoke/conformance-browser.spec.ts`,
+`test/smoke/conformance.spec.ts`) and the real-Chrome runs (`scripts/eval/conformance.ts`, with
+`conformance-run.ts` for the panel steps, `demos.ts` for Google's demo pages and `chrome-launch.ts`
+for starting Google Chrome). Nothing in `src/` depends on it.

@@ -17,7 +17,7 @@ Note the Chrome version, the operating system and the result of each check in th
 | `@gpu`    | A computer with WebGPU                                                         | F02.7, F02.33                                        |
 | `@cpu`    | The real processor model (a 397 MB download); the browser tests use a stand-in | F02.6 (real part), F02.28, F02.34, F18.2 (real part) |
 | `@nano`   | Official Google Chrome with its built-in model                                 | F02.8                                                |
-| `@manual` | A person, a store listing, a live site, a screen reader or a network log       | F01.8, F10.17, F11.8, F16.10, F17.6, F19.5           |
+| `@manual` | A person, a store listing, a live site, a screen reader or a network log       | F01.8, F10.17, F11.8, F16.10, F17.6, F19.5, F23.7    |
 
 ## `@gpu`: the graphics card model answers (F02.7)
 
@@ -140,6 +140,16 @@ with WebMCP off), and serve this page from `localhost` or `https`:
 2. Press **Add WebMCP to this site**, accept Chrome's site-access question, reload the page.
 3. Expected: the card says one WebMCP tool; **Tools** lists `ping`. Ask the model to call it.
 4. Press **Forget this site**. Expected: after a reload the page has no tools again.
+
+### F23.7: the conformance page and the extension in real Google Chrome
+
+Needs Google Chrome 157 or later (the maintainer's Windows computer, from WSL).
+
+1. `npm run eval:conformance:win -- --extension --demos`.
+2. Expected: exit code 0 and the report `docs/eval/EVAL-CONFORMANCE-<date>-<chrome>.json` with
+   no `fail` in the browser stage, every step of the extension stage as expected, and one row per
+   demo page (tools found, listed by the panel, one read-only call asked first).
+3. Record the Chrome version and file the report next to the Chromium 156 results.
 
 ## When a check fails
 

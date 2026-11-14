@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   checkBundles,
   checkDevOnly,
   checkManifest,
+  DEMO_HOSTS,
   EXPECTED_CSP,
   EXPECTED_OPTIONAL_HOSTS,
   EXPECTED_PERMISSIONS,
@@ -232,5 +234,48 @@ describe('checkBundles', () => {
     expect(
       checkBundles({ 'x.html': '<script src="https://cdn.example/x.js">' }, 'release'),
     ).toEqual(['x.html loads a remote script']);
+  });
+});
+
+describe('the demo host (eval build made with --demos)', () => {
+  const demo = { ...good, host_permissions: [...DEMO_HOSTS] };
+  const devExists = (path: string): boolean => exists(path) || path.startsWith('spike/');
+
+  it('is exactly the eval hosts plus googlechromelabs.github.io', () => {
+    expect(DEMO_HOSTS).toEqual([
+      'http://127.0.0.1/*',
+      'http://localhost/*',
+      'https://agenticsystemcore.com/*',
+      'https://googlechromelabs.github.io/*',
+    ]);
+  });
+  it('passes in the demos variant only', () => {
+    expect(checkManifest(demo, devExists, 'demos')).toEqual([]);
+    expect(checkManifest(demo, devExists, 'eval')).toEqual([
+      'eval build host_permissions must be http://127.0.0.1/*, http://localhost/*, https://agenticsystemcore.com/*',
+    ]);
+  });
+  it('is refused in the release build, which keeps zero install-time hosts', () => {
+    expect(checkManifest(demo, exists, 'release')).toEqual(['host_permissions must be empty']);
+    expect(
+      checkManifest(
+        { ...good, host_permissions: ['https://googlechromelabs.github.io/*'] },
+        exists,
+      ),
+    ).toEqual(['host_permissions must be empty']);
+  });
+  it('is refused in the smoke build', () => {
+    expect(checkManifest(demo, devExists, 'smoke')).toHaveLength(1);
+  });
+  it('is not in the source manifest, and build.mjs adds it only under --demos', () => {
+    const manifest = JSON.parse(readFileSync('static/manifest.json', 'utf8')) as Record<
+      string,
+      unknown
+    >;
+    expect(manifest.host_permissions).toBeUndefined();
+    const build = readFileSync('scripts/build.mjs', 'utf8');
+    expect(build).toContain("const demos = process.argv.includes('--demos');");
+    expect(build).toContain("...(demos ? ['https://googlechromelabs.github.io/*'] : [])");
+    expect(build).toContain('const evalBuild = demos ||');
   });
 });

@@ -19,7 +19,10 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 // `--eval` writes dist-eval/: the smoke-test build plus install-time access to the eval's
 // targets (http://localhost for the stub node, https://agenticsystemcore.com for the live
 // page), so `npm run eval:gpu` needs no click in Chrome's toolbar (scripts/eval/run.ts).
-const evalBuild = process.argv.includes('--eval');
+// `--demos` (implies `--eval`) adds one more install-time host, googlechromelabs.github.io, where
+// Google's official WebMCP demo pages live, for the demo-page stage of the Chrome evaluation (scripts/eval/demos.ts). Never in dist/.
+const demos = process.argv.includes('--demos');
+const evalBuild = demos || process.argv.includes('--eval');
 const smoke = evalBuild || process.argv.includes('--smoke');
 const root = new URL('../', import.meta.url);
 const outName = evalBuild ? 'dist-eval' : smoke ? 'dist-smoke' : 'dist';
@@ -96,9 +99,10 @@ if (evalBuild) {
     'http://127.0.0.1/*',
     'http://localhost/*',
     'https://agenticsystemcore.com/*',
+    ...(demos ? ['https://googlechromelabs.github.io/*'] : []),
   ];
 }
 writeFileSync(new URL('manifest.json', out), `${JSON.stringify(manifest, null, 2)}\n`);
 console.log(
-  `${outName}/ written (version ${pkg.version}${evalBuild ? ', eval build' : smoke ? ', smoke-test build' : ''})`,
+  `${outName}/ written (version ${pkg.version}${demos ? ', eval build with the demo host' : evalBuild ? ', eval build' : smoke ? ', smoke-test build' : ''})`,
 );

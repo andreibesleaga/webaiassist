@@ -59,14 +59,14 @@ Scenarios whose wording changed when they stopped being pending:
 
 | Tag | Scenarios |
 |---|---|
-| @smoke | 108 |
-| @unit | 114 |
+| @smoke | 111 |
+| @unit | 115 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
-| @manual | 6 |
-| all | 233 |
-| run by `npm run test:bdd` now | 108 |
+| @manual | 7 |
+| all | 238 |
+| run by `npm run test:bdd` now | 111 |
 
 ### Every scenario
 
@@ -305,6 +305,11 @@ Scenarios whose wording changed when they stopped being pending:
 | F20.17 | Security and governance requirements that can be observed | For a site that asks for no AI input the panel says which parts are held back | @unit | `test/ui/panel-policy.test.ts`, `test/security-review/docs-review.test.ts` | unit test |
 | F20.18 | Security and governance requirements that can be observed | The export is marked as AI-generated in a front-matter block and names the endpoint host when one wrote it | @unit | `test/core/export.test.ts`, `test/ui/panel-export.test.ts` | unit test |
 | F20.19 | Security and governance requirements that can be observed | The privacy and governance texts state the saved tool results, the toolbar reads and the per-site exception | @unit | `test/security-review/docs-review.test.ts` | unit test |
+| F23.1 | The WebMCP conformance page and suite | A conformance case registers exactly its tools and its own check ends as expected | @smoke | `features/23-webmcp-conformance.feature`, `test/ui/conformance-files.test.ts` | npm run test:bdd |
+| F23.2 | The WebMCP conformance page and suite | The side panel lists, asks and shows results for the conformance cases of errors, large and slow tools | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
+| F23.3 | The WebMCP conformance page and suite | A page that swaps a tool's description while the question to run it is open gets its call refused | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
+| F23.4 | The WebMCP conformance page and suite | Only the evaluation build made with the demos flag may script Google's demo pages | @unit | `test/scripts/check-dist.test.ts` | unit test |
+| F23.5 | The WebMCP conformance page and suite | The conformance page and the extension are run in real Google Chrome | @manual | `features/23-webmcp-conformance.feature` | manual check |
 
 ### Requirement rows
 

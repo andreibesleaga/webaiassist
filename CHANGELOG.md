@@ -85,6 +85,13 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 - **Documents**: README, architecture, engineering, threat model, privacy, governance, accessibility,
   scenarios, manual checks, evaluation, browsers, sources, store listing and runbook, pitch and
   video script.
+- **WebMCP conformance page and suite** (`conformance/`): a plain static page with sixteen cases
+  that exercise every part of the WebMCP interface (registering, listing, running, annotations,
+  schemas, errors, cancelling, slow and large results, form tools, late and removed tools, frames,
+  hostile definitions), one `expect.json` as their single source, browser-only and extension
+  tests, and `npm run eval:conformance` (and `:win`) for real Google Chrome, with an optional
+  stage on Google's official demo pages. The evaluation build made with `--demos` adds the one
+  host `googlechromelabs.github.io`; the release build keeps no install-time host.
 
 ### Security
 
