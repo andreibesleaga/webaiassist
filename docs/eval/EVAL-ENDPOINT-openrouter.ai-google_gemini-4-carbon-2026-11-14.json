@@ -1,0 +1,92 @@
+{
+  "date": "2026-11-14",
+  "host": "openrouter.ai",
+  "model": "google/gemini-4-carbon",
+  "local": false,
+  "rows": [
+    {
+      "n": 1,
+      "text": "What does this site say about handoffs?",
+      "tools": [
+        "search",
+        "read"
+      ],
+      "toolRight": false,
+      "taskDone": true,
+      "seconds": 16.4,
+      "modelCalls": 3,
+      "promptTokens": 2250,
+      "completionTokens": 341,
+      "costUsd": 0.00791,
+      "answer": "According to the site, a **handoff** describes how work passes between agents along with its **context**. It is also associated with **review** (where a reviewer checks the result) and involves requirements around release and review."
+    },
+    {
+      "n": 2,
+      "text": "Which items best answer: how do agents share work?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 18.4,
+      "modelCalls": 2,
+      "promptTokens": 1146,
+      "completionTokens": 117,
+      "costUsd": 0.003462,
+      "answer": "The items that best answer how agents share work are **handoff** (how work passes between agents, with context) and **review** (where a reviewer checks the result), referencing the facts **context** and **handoff**."
+    },
+    {
+      "n": 3,
+      "text": "Find items about review.",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 9.3,
+      "modelCalls": 2,
+      "promptTokens": 2151,
+      "completionTokens": 84,
+      "costUsd": 0.005142,
+      "answer": "Found two matching items:\n- **review**: a reviewer checks the result\n- **handoff**: how work passes between agents, with context"
+    },
+    {
+      "n": 4,
+      "text": "Search for \"memory\".",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 25,
+      "modelCalls": 2,
+      "promptTokens": 2147,
+      "completionTokens": 154,
+      "costUsd": 0.005834000000000001,
+      "answer": "Searching for \"memory\" returned the following items:\n\n- **handoff**: how work passes between agents, with context\n- **review**: a reviewer checks the result\n\nRelated facts: context, handoff, release, requires, review, reviewer."
+    },
+    {
+      "n": 5,
+      "text": "Is there anything on guardrails here?",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 10.9,
+      "modelCalls": 2,
+      "promptTokens": 2159,
+      "completionTokens": 352,
+      "costUsd": 0.007838,
+      "answer": "There isn't an item specifically titled \"guardrails,\" though a search returns two related items: **handoff** (how work passes between agents, with context) and **review** (where a reviewer checks the result)."
+    }
+  ],
+  "totals": {
+    "toolRight": 4,
+    "taskDone": 5,
+    "promptTokens": 9853,
+    "completionTokens": 1048,
+    "costUsd": 0.030185999999999998,
+    "medianSeconds": 16.4
+  }
+}

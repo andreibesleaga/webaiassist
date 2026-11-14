@@ -54,6 +54,7 @@ describe('eval:endpoint report', () => {
     text: 'q',
     tools: ['ask'],
     toolRight: ok,
+    taskDone: ok,
     seconds: n,
     modelCalls: 2,
     promptTokens: 100,

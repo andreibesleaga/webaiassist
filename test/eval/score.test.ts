@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it } from 'vitest';
 import type { EvalPrompt } from '../../scripts/eval/prompts.ts';
-import { scorePrompt, summarize, type Observation } from '../../scripts/eval/score.ts';
+import { scorePrompt, summarize, taskDone, type Observation } from '../../scripts/eval/score.ts';
 
 const PAGE = ['ask', 'search', 'read', 'links', 'propose', 'remember'];
 const p = (tools: string[], facts: string[] = ['reviewer']): EvalPrompt => ({
@@ -34,6 +34,7 @@ describe('scoring one prompt by the rules of docs/EVAL.md', () => {
       toolRight: 1,
       firstToolRight: 1,
       toolUsed: 1,
+      taskDone: 1,
       gateShown: 1,
       factInAnswer: 1,
       hallucinated: [],
@@ -116,6 +117,7 @@ describe('summary per model and target', () => {
         toolRight: 2,
         firstToolRight: 2,
         toolUsed: '1 of 2',
+        taskDone: 2,
         gateShown: '1 of 1',
         factInAnswer: '1 of 2',
         hallucinated: 0,
@@ -124,5 +126,42 @@ describe('summary per model and target', () => {
         medianFirstTokenS: 1.5,
       },
     ]);
+  });
+});
+
+describe('task done: the answer a user would accept, by any valid tool path', () => {
+  const ask = { ...p(['ask'], ['context']), accept: ['search'] };
+  const answer = 'Handoffs pass context between agents.';
+  const done = (prompt: EvalPrompt, extra: Partial<Observation>) =>
+    taskDone(prompt, seen({ answer, ...extra }), 'stub');
+
+  it('accepts the expected tool, an accepted other first tool, and extra read-only calls', () => {
+    expect(done(ask, { tools: ['ask'] })).toBe(1);
+    expect(done(ask, { tools: ['search', 'read'] })).toBe(1);
+    expect(done(ask, { tools: ['links'] })).toBe(0);
+  });
+
+  it('wants every expected tool to have been called', () => {
+    expect(done(p(['search', 'read'], ['context']), { tools: ['search'] })).toBe(0);
+    expect(done(p(['search', 'read'], ['context']), { tools: ['search', 'ask', 'read'] })).toBe(1);
+  });
+
+  it('fails on a missing fact, an error, a timeout, or a changing tool nobody asked for', () => {
+    expect(done(ask, { tools: ['ask'], answer: 'I do not know.' })).toBe(0);
+    expect(done(ask, { tools: ['ask'], errors: ['stopped after 6 tool steps'] })).toBe(0);
+    expect(done(ask, { tools: ['ask'], timedOut: true })).toBe(0);
+    expect(done(ask, { tools: ['ask', 'propose'] })).toBe(0);
+    expect(done(p(['propose'], ['context']), { tools: ['propose'] })).toBe(1);
+  });
+
+  it('for a prompt that expects no tool, wants an answer and no tool', () => {
+    expect(done(p([], []), { tools: [] })).toBe(1);
+    expect(done(p([], []), { tools: ['search'] })).toBe(0);
+  });
+
+  it('is counted in the summary', () => {
+    const rows = [scorePrompt(ask, seen({ tools: ['search', 'read'], answer }), ctx)];
+    expect(rows[0]).toMatchObject({ toolRight: 0, taskDone: 1 });
+    expect(summarize(rows)[0]).toMatchObject({ taskDone: 1 });
   });
 });

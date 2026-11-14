@@ -17,6 +17,7 @@ import { FixedClock } from '../../src/fakes/fixed-clock.ts';
 import { InMemoryMemory } from '../../src/fakes/in-memory-memory.ts';
 import { buildReport, endpointFromEnv, reportText, type EndpointRow } from './endpoint-plan.ts';
 import { loadPrompts, promptsFor, type EvalPrompt } from './prompts.ts';
+import { taskDone, type Observation } from './score.ts';
 
 const ORIGIN = 'https://stub.node.example';
 const TAB = 1;
@@ -48,6 +49,20 @@ function stubNode(): FakeToolBridge {
   return bridge;
 }
 
+/** The run in the shape the scorer reads (scripts/eval/score.ts). */
+function seenBy(used: readonly string[], result: { answer?: string; error?: string }): Observation {
+  return {
+    tools: used,
+    gates: used,
+    answer: result.answer ?? '',
+    errors: result.error === undefined ? [] : [result.error],
+    repeated: 0,
+    firstTokenMs: null,
+    totalMs: 0,
+    timedOut: false,
+  };
+}
+
 async function askOne(runtime: ModelRuntime, prompt: EvalPrompt): Promise<EndpointRow> {
   const total = { usage: [] as ModelUsage[] };
   const bridge = stubNode();
@@ -68,6 +83,7 @@ async function askOne(runtime: ModelRuntime, prompt: EvalPrompt): Promise<Endpoi
     text: prompt.text,
     tools: used,
     toolRight: JSON.stringify(used) === JSON.stringify(prompt.tools),
+    taskDone: taskDone(prompt, seenBy(used, result), 'stub') === 1,
     seconds: Math.round((performance.now() - started) / 100) / 10,
     modelCalls: total.usage.length,
     promptTokens: total.usage.reduce((a, u) => a + (u.promptTokens ?? 0), 0),

@@ -8,6 +8,8 @@ export interface EvalPrompt {
   readonly text: string;
   /** Expected tool calls in order; empty means an answer without a tool. */
   readonly tools: readonly string[];
+  /** Other tools that also serve as the first step (for "task done"); empty when absent. */
+  readonly accept?: readonly string[];
   /** The answer must contain one of these on the stub node. */
   readonly facts: readonly string[];
   /** What the scripted test model is told. */
@@ -35,7 +37,16 @@ function checkPrompt(raw: unknown, index: number): EvalPrompt {
   }
   if (!strings(p.tools) || !strings(p.facts))
     throw new Error(`${where}: tools and facts must be string lists`);
-  return { n: Number(p.n), text: p.text, tools: p.tools, facts: p.facts, scripted: p.scripted };
+  if (p.accept !== undefined && !strings(p.accept))
+    throw new Error(`${where}: accept must be a string list`);
+  return {
+    n: Number(p.n),
+    text: p.text,
+    tools: p.tools,
+    facts: p.facts,
+    scripted: p.scripted,
+    ...(p.accept === undefined ? {} : { accept: p.accept }),
+  };
 }
 
 export function parsePrompts(raw: unknown): PromptFile {

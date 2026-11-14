@@ -1,10 +1,18 @@
 {
-  "about": "The 20 prompts of docs/EVAL.md, read by npm run eval:gpu (scripts/eval/run.ts). {a} and {b} are item slugs of the target. tools: the expected tool calls in order ([] = answer without a tool). facts: the answer must contain one of them on the stub node (fixtures/agsc-answers.json); the live site has no fixed answers, so facts are not scored there. scripted: what the scripted test model is told, for the flow check without a GPU.",
+  "about": "The 20 prompts of docs/EVAL.md, read by npm run eval:gpu (scripts/eval/run.ts). {a} and {b} are item slugs of the target. tools: the expected tool calls in order ([] = answer without a tool). facts: the answer must contain one of them on the stub node (fixtures/agsc-answers.json); the live site has no fixed answers, so facts are not scored there. scripted: what the scripted test model is told, for the flow check without a GPU. accept: other tools that also serve as the first step; used only by the \"Task done\" score.",
   "targets": {
-    "stub": { "slugs": { "a": "handoff", "b": "review" } },
+    "stub": {
+      "slugs": {
+        "a": "handoff",
+        "b": "review"
+      }
+    },
     "live": {
       "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
-      "slugs": { "a": "agentic-knowledge", "b": "compliance" }
+      "slugs": {
+        "a": "agentic-knowledge",
+        "b": "compliance"
+      }
     }
   },
   "prompts": [
@@ -13,21 +21,24 @@
       "text": "What does this site say about handoffs?",
       "tools": ["ask"],
       "facts": ["context"],
-      "scripted": "/tool ask {\"question\": \"handoffs\"}"
+      "scripted": "/tool ask {\"question\": \"handoffs\"}",
+      "accept": ["search"]
     },
     {
       "n": 2,
       "text": "Which items best answer: how do agents share work?",
       "tools": ["ask"],
       "facts": ["handoff"],
-      "scripted": "/tool ask {\"question\": \"how do agents share work?\"}"
+      "scripted": "/tool ask {\"question\": \"how do agents share work?\"}",
+      "accept": ["search"]
     },
     {
       "n": 3,
       "text": "Find items about review.",
       "tools": ["search"],
       "facts": ["reviewer"],
-      "scripted": "/tool search {\"query\": \"review\"}"
+      "scripted": "/tool search {\"query\": \"review\"}",
+      "accept": ["ask"]
     },
     {
       "n": 4,
@@ -41,7 +52,8 @@
       "text": "Is there anything on guardrails here?",
       "tools": ["search"],
       "facts": ["review", "handoff"],
-      "scripted": "/tool search {\"query\": \"guardrails\"}"
+      "scripted": "/tool search {\"query\": \"guardrails\"}",
+      "accept": ["ask"]
     },
     {
       "n": 6,

@@ -152,7 +152,7 @@ page does not offer, repeated calls (how many times the loop declined to run a c
 already made in that question; the summary counts the prompts with at least one), and the seconds
 to the first token and in total. Argument quality is read from the report's rows by hand.
 
-Three tool columns, from strict to loose: "Tool right" (the whole tool sequence equals the expected one), "First tool right" (the first tool equals the first expected one; for a prompt that expects no tool, none was called) and "Tool used" (any tool was called; counted only over prompts that expect a tool). A model that calls `ask` and then `read` for a question that expects `ask` is not "Tool right" but is "First tool right".
+Three tool columns, from strict to loose: "Tool right" (the whole tool sequence equals the expected one), "First tool right" (the first tool equals the first expected one; for a prompt that expects no tool, none was called) and "Tool used" (any tool was called; counted only over prompts that expect a tool). A model that calls `ask` and then `read` for a question that expects `ask` is not "Tool right" but is "First tool right". A fourth column, "Task done", is the one a user cares about: a valid tool path (the expected first tool or another one that `prompts.json` lists under `accept`, every further expected tool, no changing tool that was not asked for), an answer with no error, and, on the test node, the expected fact in the answer. Extra read-only calls do not fail it.
 
 ### Tool use before and after the tool-use change (14 Nov 2026, processor, stub node, 5 prompts)
 

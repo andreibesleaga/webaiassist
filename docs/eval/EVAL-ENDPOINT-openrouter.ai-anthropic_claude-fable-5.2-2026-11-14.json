@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-14",
+  "host": "openrouter.ai",
+  "model": "anthropic/claude-fable-5.2",
+  "local": false,
+  "rows": [
+    {
+      "n": 1,
+      "text": "What does this site say about handoffs?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 6.8,
+      "modelCalls": 2,
+      "promptTokens": 3360,
+      "completionTokens": 85,
+      "costUsd": 0.03028,
+      "answer": "The site describes a handoff as how work passes between agents, with context carried along. It's related to the review item, where a reviewer checks the result."
+    },
+    {
+      "n": 2,
+      "text": "Which items best answer: how do agents share work?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 6.5,
+      "modelCalls": 2,
+      "promptTokens": 3358,
+      "completionTokens": 112,
+      "costUsd": 0.031344,
+      "answer": "The best-matching items for how agents share work are:\n\n1. handoff — describes how work passes between agents, together with its context.\n2. review — a reviewer checks the result.\n\nRelated facts cited: context, handoff."
+    },
+    {
+      "n": 3,
+      "text": "Find items about review.",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 5.1,
+      "modelCalls": 2,
+      "promptTokens": 3339,
+      "completionTokens": 112,
+      "costUsd": 0.031192,
+      "answer": "The search for \"review\" returned two items:\n\n- review — a reviewer checks the result.\n- handoff — how work passes between agents, with context.\n\nRelated facts mentioned: context, handoff, release, requires, review, reviewer."
+    },
+    {
+      "n": 4,
+      "text": "Search for \"memory\".",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 5,
+      "modelCalls": 2,
+      "promptTokens": 3343,
+      "completionTokens": 116,
+      "costUsd": 0.031384,
+      "answer": "The search for \"memory\" returned two items:\n\n- **handoff** — how work passes between agents, with context\n- **review** — a reviewer checks the result\n\nRelated facts mentioned: context, handoff, release, requires, review, reviewer."
+    },
+    {
+      "n": 5,
+      "text": "Is there anything on guardrails here?",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 6.6,
+      "modelCalls": 2,
+      "promptTokens": 3357,
+      "completionTokens": 201,
+      "costUsd": 0.034895999999999996,
+      "answer": "A search for \"guardrails\" found no item dedicated to guardrails. It returned two related items: \"handoff\" (how work passes between agents, with context) and \"review\" (a reviewer checks the result). The review item is probably the closest to a guardrail. I can open either one if you want the details."
+    }
+  ],
+  "totals": {
+    "toolRight": 5,
+    "taskDone": 5,
+    "promptTokens": 16757,
+    "completionTokens": 626,
+    "costUsd": 0.15909600000000002,
+    "medianSeconds": 6.5
+  }
+}

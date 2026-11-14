@@ -28,6 +28,8 @@ export interface Row {
   readonly firstToolRight: 0 | 1;
   /** A tool was used; null when the prompt expects no tool. */
   readonly toolUsed: 0 | 1 | null;
+  /** The task was done by any valid tool path (see taskDone). */
+  readonly taskDone: 0 | 1;
   /** null when no tool ran. */
   readonly gateShown: 0 | 1 | null;
   /** null when the prompt or the target has no fact to check. */
@@ -73,6 +75,28 @@ function factInAnswer(prompt: EvalPrompt, seen: Observation, target: string): 0 
   return bit(prompt.facts.some((fact) => answer.includes(fact.toLowerCase())));
 }
 
+/** Tools of the test node that change something; calling one unasked is a failed task. */
+const CHANGING_TOOLS = ['propose', 'remember'];
+
+function toolsServe(prompt: EvalPrompt, used: readonly string[]): boolean {
+  if (prompt.tools.length === 0) return used.length === 0;
+  const first = [...prompt.tools.slice(0, 1), ...(prompt.accept ?? [])];
+  const unasked = used.some((t) => CHANGING_TOOLS.includes(t) && !prompt.tools.includes(t));
+  const rest = prompt.tools.slice(1).every((tool) => used.includes(tool));
+  return first.some((tool) => used.includes(tool)) && rest && !unasked;
+}
+
+/**
+ * The task was done: a valid tool path (the expected first tool or an accepted other one, every
+ * further expected tool, no changing tool nobody asked for), an answer, no error, and the
+ * expected fact in the answer where facts are scored. Extra read-only calls do not fail it.
+ */
+export function taskDone(prompt: EvalPrompt, seen: Observation, target: string): 0 | 1 {
+  const clean = !seen.timedOut && seen.errors.length === 0 && seen.answer.trim() !== '';
+  const fact = factInAnswer(prompt, seen, target) !== 0;
+  return bit(clean && fact && toolsServe(prompt, seen.tools));
+}
+
 function hallucinated(seen: Observation, pageTools: readonly string[]): string[] {
   const called = seen.tools.filter((tool) => !pageTools.includes(tool));
   const named = seen.errors.flatMap((e) =>
@@ -91,6 +115,7 @@ export function scorePrompt(prompt: EvalPrompt, seen: Observation, ctx: ScoreCon
     toolRight: toolRight(prompt, seen),
     firstToolRight: firstToolRight(prompt, seen),
     toolUsed: toolUsed(prompt, seen),
+    taskDone: taskDone(prompt, seen, ctx.target),
     gateShown: gateShown(seen),
     factInAnswer: factInAnswer(prompt, seen, ctx.target),
     hallucinated: hallucinated(seen, ctx.pageTools),
@@ -108,6 +133,7 @@ export interface SummaryRow {
   readonly toolRight: number;
   readonly firstToolRight: number;
   readonly toolUsed: string;
+  readonly taskDone: number;
   readonly gateShown: string;
   readonly factInAnswer: string;
   readonly hallucinated: number;
@@ -140,6 +166,7 @@ function summaryOf(rows: readonly Row[]): SummaryRow {
     toolRight: rows.filter((r) => r.toolRight === 1).length,
     firstToolRight: rows.filter((r) => r.firstToolRight === 1).length,
     toolUsed: ofScored(rows.map((r) => r.toolUsed)),
+    taskDone: rows.filter((r) => r.taskDone === 1).length,
     gateShown: ofScored(rows.map((r) => r.gateShown)),
     factInAnswer: ofScored(rows.map((r) => r.factInAnswer)),
     hallucinated: rows.filter((r) => r.hallucinated.length > 0).length,

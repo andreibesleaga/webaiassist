@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-14",
+  "host": "openrouter.ai",
+  "model": "openai/gpt-6.1-terra",
+  "local": false,
+  "rows": [
+    {
+      "n": 1,
+      "text": "What does this site say about handoffs?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 6.3,
+      "modelCalls": 3,
+      "promptTokens": 3362,
+      "completionTokens": 153,
+      "costUsd": 0.0033838,
+      "answer": "The site describes a handoff as how work passes between agents, along with context. It also mentions review, where a reviewer checks the result."
+    },
+    {
+      "n": 2,
+      "text": "Which items best answer: how do agents share work?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 7.4,
+      "modelCalls": 3,
+      "promptTokens": 3350,
+      "completionTokens": 201,
+      "costUsd": 0.0036131,
+      "answer": "The best-matching items are **handoff**, which explains how work passes between agents with context, and **review**, which covers a reviewer checking the result."
+    },
+    {
+      "n": 3,
+      "text": "Find items about review.",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 3.8,
+      "modelCalls": 2,
+      "promptTokens": 2148,
+      "completionTokens": 66,
+      "costUsd": 0.00276025,
+      "answer": "Found two related items:\n- **review** — a reviewer checks the result.\n- **handoff** — how work passes between agents, with context."
+    },
+    {
+      "n": 4,
+      "text": "Search for \"memory\".",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 4.2,
+      "modelCalls": 2,
+      "promptTokens": 2148,
+      "completionTokens": 68,
+      "costUsd": 0.00277025,
+      "answer": "Search results for “memory”:\n- **handoff** — How work passes between agents, with context.\n- **review** — A reviewer checks the result."
+    },
+    {
+      "n": 5,
+      "text": "Is there anything on guardrails here?",
+      "tools": [
+        "search",
+        "ask",
+        "read"
+      ],
+      "toolRight": false,
+      "taskDone": true,
+      "seconds": 7.7,
+      "modelCalls": 4,
+      "promptTokens": 4713,
+      "completionTokens": 170,
+      "costUsd": 0.0064842499999999996,
+      "answer": "I didn’t find anything explicitly labeled “guardrails.” The closest items are **review**, where a reviewer checks the result, and **handoff**, which covers passing work and context between agents."
+    }
+  ],
+  "totals": {
+    "toolRight": 4,
+    "taskDone": 5,
+    "promptTokens": 15721,
+    "completionTokens": 658,
+    "costUsd": 0.01901165,
+    "medianSeconds": 6.3
+  }
+}

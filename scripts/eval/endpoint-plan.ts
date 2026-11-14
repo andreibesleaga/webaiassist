@@ -49,6 +49,8 @@ export interface EndpointRow {
   readonly text: string;
   readonly tools: readonly string[];
   readonly toolRight: boolean;
+  /** Done by any valid tool path, with the expected fact in the answer (scripts/eval/score.ts). */
+  readonly taskDone: boolean;
   readonly seconds: number;
   /** Model calls that reported usage in this question (the counts below are summed over them). */
   readonly modelCalls: number;
@@ -68,6 +70,7 @@ export interface EndpointReport {
   readonly rows: readonly EndpointRow[];
   readonly totals: {
     readonly toolRight: number;
+    readonly taskDone: number;
     readonly promptTokens: number;
     readonly completionTokens: number;
     readonly costUsd: number | null;
@@ -100,6 +103,7 @@ export function buildReport(
     rows,
     totals: {
       toolRight: rows.filter((r) => r.toolRight).length,
+      taskDone: rows.filter((r) => r.taskDone).length,
       promptTokens: sum(rows.map((r) => r.promptTokens)),
       completionTokens: sum(rows.map((r) => r.completionTokens)),
       costUsd: costs.length === 0 ? null : sum(costs),
