@@ -36,7 +36,7 @@ schemas, `webgpureport.org` is part of an error message, `www.w3.org` is in a co
 `w3id.org` and `www.rfc-editor.org` are names the extension compares a site's published files
 with (it never requests them), `purl.org`, `schema.org` and `www.w3.org` are identifiers of vocabularies inside the
 graph explorer's code and `github.com` is the address of force-graph's source in its header (none of them is
-contacted, they are names, not contact points), and WebLLM's own model list names `huggingface.co` repositories of models this extension does not
+contacted, they are names, not contact points), `agenticsystemcore.com` is the address of the links "Open the demo page, which offers tools" and "More at the AgenticSystemCore site" in the panel (the extension never requests it; your browser opens it only when you click the link), and WebLLM's own model list names `huggingface.co` repositories of models this extension does not
 offer.
 
 ## What is stored, and where

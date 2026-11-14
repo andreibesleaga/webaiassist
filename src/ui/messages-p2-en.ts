@@ -50,5 +50,4 @@ export const P2_EN = {
   startersLabel: 'Questions to start with',
   starterBrief: 'Give me a brief of the main items on this node.',
   starterSearch: 'Search this node for how to publish a node.',
-  starterExplain: 'Explain this rule code from the node: AGSC-06-08',
 } as const;

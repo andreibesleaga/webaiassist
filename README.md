@@ -98,6 +98,19 @@ local model on that tab; it is not offered with a chat endpoint.
 - **Copy diagnostics** (Options, and More in the panel): shows what it will copy, then copies it
   on a second click: versions, model, graphics adapter, built-in model state, WebMCP on the tab
   and the last error. No page text, no keys, nothing sent anywhere.
+- **Node card and help screens**: on an AgenticSystemCore node the card is headed "AgenticSystemCore
+  node, spec VERSION" (the version is the node's own), with the command to start your own node
+  as text to copy and one link to the AgenticSystemCore site. Four starter questions fill the
+  box and send nothing ("Compose a harness for my task" only when the page has `compose`). A page
+  with no tools, and a Chrome without the WebMCP switch, each get a plain help screen; the switch
+  address `chrome://flags/#enable-webmcp-testing` is shown as text to copy, because an extension
+  cannot open it.
+- **Copy report** (More in the panel, for developers): a Markdown note about the open page's
+  tools: name, title, read-only mark, schema and annotation problems, and a "Security review
+  flags" section that stays empty until its rules are connected (`src/core/review-flags.ts`). It
+  names the WebMCP draft date it was checked against (13 Nov 2026) and is informational, not a
+  score or a certification. Preview first, copy on the second click; tool names, titles and
+  descriptions only, nothing sent anywhere.
 - **Downloaded models**: after the first successful download the panel asks Chrome once to keep
   them (`navigator.storage.persist()`; Chrome decides). Options shows their total size. What an
   update does to them is in [docs/PRIVACY.md](docs/PRIVACY.md).

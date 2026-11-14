@@ -56,6 +56,12 @@
         <p id="site-ai" class="hint" hidden></p>
         <button id="use-anyway" type="button" data-i18n="useAnyway" hidden></button>
         <p id="site-looking" class="hint" data-i18n="siteLooking" hidden></p>
+        <section
+          id="node-card"
+          class="node-card"
+          aria-labelledby="node-card-title"
+          hidden
+        ></section>
         <ul id="site-chips" class="chips" data-i18n-label="siteChipsLabel"></ul>
         <ul id="site-facts-list" class="facts"></ul>
         <p id="page-note" class="status" role="status"></p>
@@ -69,6 +75,11 @@
               <button id="forget" type="button" data-i18n="forget"></button>
               <button id="export" type="button" data-i18n="exportChat"></button>
               <button id="diagnostics" type="button" data-i18n="diagnostics"></button>
+              <button id="copy-report" type="button" data-i18n="reportButton"></button>
+            </div>
+            <div id="report-box" hidden>
+              <p class="hint" data-i18n="reportPreview"></p>
+              <pre id="report-preview" class="diag"></pre>
             </div>
             <div id="diag-box" hidden>
               <p class="hint" data-i18n="diagnosticsPreview"></p>
@@ -136,6 +147,7 @@
             <button id="first-run-other" type="button" data-i18n="chooseOther"></button>
           </div>
         </section>
+        <section id="help-screen" class="first-run" hidden></section>
         <p id="chat-empty" class="hint" data-i18n="chatEmpty"></p>
         <ul id="starter-prompts" class="chips starters" data-i18n-label="startersLabel" hidden></ul>
         <div role="log" aria-live="polite" aria-labelledby="conversation-title">
