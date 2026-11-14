@@ -10,6 +10,8 @@ export const PANEL_STATE_KEY = 'panelState';
 export interface StoredPanelState {
   readonly firstRunDone: boolean;
   readonly gpu?: GpuMeasure;
+  /** The last error the panel showed, already cleaned and cut (src/core/diagnostics.ts). */
+  readonly lastError?: string;
 }
 
 type Raw = Record<string, unknown>;
@@ -27,9 +29,11 @@ function gpu(value: unknown): GpuMeasure | undefined {
 export function normalizePanelState(value: unknown): StoredPanelState {
   const raw = asRecord(value);
   const measure = gpu(raw.gpu);
+  const lastError = typeof raw.lastError === 'string' ? raw.lastError.slice(0, 300) : undefined;
   return {
     firstRunDone: raw.firstRunDone === true,
     ...(measure ? { gpu: measure } : {}),
+    ...(lastError ? { lastError } : {}),
   };
 }
 

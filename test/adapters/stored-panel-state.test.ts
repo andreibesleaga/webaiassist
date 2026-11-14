@@ -52,4 +52,10 @@ describe('stored panel state', () => {
       firstAnswerMs: 12,
     });
   });
+
+  it('keeps the last error text as text, cut to 300 characters, and drops anything else', () => {
+    expect(normalizePanelState({ lastError: 'x'.repeat(500) }).lastError).toHaveLength(300);
+    expect(normalizePanelState({ lastError: 5 })).toEqual({ firstRunDone: false });
+    expect(normalizePanelState({ lastError: '' })).toEqual({ firstRunDone: false });
+  });
 });

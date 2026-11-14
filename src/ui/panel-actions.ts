@@ -11,6 +11,7 @@ import { endpointHost } from './endpoint-host';
 import { t } from './i18n';
 import type { PanelController } from './panel-controller';
 import { bindToolsToggle } from './page-card';
+import { bindPanelDiagnostics } from './panel-diagnostics';
 import { note } from './panel-note';
 import { hideWelcomeAfterHelp, showWelcome } from './panel-notices';
 import { aiBlocked, overrideAiPolicy, refreshPage } from './panel-page';
@@ -137,4 +138,5 @@ export function bindActions(ctx: PanelController): void {
   byId(doc, 'export').addEventListener('click', () => exportChat(ctx));
   byId(doc, 'open-options').addEventListener('click', () => ctx.deps.openOptions());
   bindHelp(ctx);
+  bindPanelDiagnostics(ctx);
 }

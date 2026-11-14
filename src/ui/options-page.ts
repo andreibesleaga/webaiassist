@@ -3,6 +3,8 @@
 // Saving an endpoint asks the browser for access to that one site, from the Save click.
 import type { StoreLike } from '../adapters/model-store';
 import type { Settings } from '../adapters/settings';
+import type { DiagnosticsFacts } from '../core/diagnostics';
+import { bindDiagnostics } from './diagnostics-ui';
 import { byId } from './dom';
 import { t } from './i18n';
 import {
@@ -27,6 +29,9 @@ export interface OptionsDeps {
   clearMemory(): Promise<void>;
   /** The model files stored in this browser. */
   readonly store: StoreLike;
+  /** The facts of "Copy diagnostics" (no host box on this page). */
+  diagnostics(includeHost: boolean): Promise<DiagnosticsFacts>;
+  copyText(text: string): Promise<void>;
   /** "Forget all sites": chats, tool permissions, compat scripts and site access. */
   forgetAll(): Promise<void>;
 }
@@ -78,6 +83,13 @@ export async function startOptions(deps: OptionsDeps): Promise<void> {
   const preset = byId<HTMLSelectElement>(doc, 'endpoint-preset');
   preset.addEventListener('change', () => {
     if (preset.value !== '') byId<HTMLInputElement>(doc, 'endpoint-url').value = preset.value;
+  });
+  bindDiagnostics({
+    doc,
+    gather: (host) => deps.diagnostics(host),
+    secrets: () => [readForm(doc).endpoint.apiKey],
+    copy: (text) => deps.copyText(text),
+    say: (text) => status(deps, text),
   });
   // Last: the form works whether or not the model list answers.
   await bindStorage({ doc, store: deps.store, forgetAll: () => deps.forgetAll() });

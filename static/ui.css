@@ -695,3 +695,14 @@ dialog .warning {
   text-align: left;
   white-space: normal;
 }
+
+/* The diagnostics preview: plain text, wrapped, never wider than the panel. */
+.diag {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: var(--space-1) 0;
+  padding: var(--space-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-s);
+  font-size: var(--text-s);
+}

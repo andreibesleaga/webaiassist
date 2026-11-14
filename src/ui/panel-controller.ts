@@ -114,6 +114,8 @@ export interface PanelState {
   status?: PageStatus;
   /** Text from "Read this page", bound to the tab and site it was read on. */
   pageText?: PageText;
+  /** The last error text the panel showed, cleaned (src/core/diagnostics.ts); for diagnostics. */
+  lastError?: string;
   running?: AbortController;
   /** The model download in progress; Cancel aborts it. */
   loading?: AbortController;

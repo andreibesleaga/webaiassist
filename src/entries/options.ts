@@ -4,10 +4,16 @@
 import { openIndexedDbMemory } from '../adapters/indexeddb-memory';
 import { probeWebGpu } from '../adapters/webgpu-probe';
 import { loadSettings, resetSettings, saveSettings } from '../adapters/settings';
-import { applyI18n, setLanguage } from '../ui/i18n';
+import { loadPanelState } from '../adapters/stored-panel-state';
+import { builtInState, type AvailabilityLike } from '../adapters/prompt-api-state';
+import { browserOf } from '../ui/panel-diagnostics';
+import { applyI18n, setLanguage, t } from '../ui/i18n';
 import { forgetAll } from './shared/forget-all';
 import { createModelStore } from './shared/model-store';
 import { startOptions } from '../ui/options-page';
+
+const lastError = (state: { lastError?: string }) =>
+  state.lastError === undefined ? {} : { lastError: state.lastError };
 
 async function main(): Promise<void> {
   const local = chrome.storage.local;
@@ -24,6 +30,25 @@ async function main(): Promise<void> {
     clearMemory: async () => (await openIndexedDbMemory()).clear(),
     store: createModelStore(),
     forgetAll,
+    copyText: (text) => navigator.clipboard.writeText(text),
+    diagnostics: async () => ({
+      version: chrome.runtime.getManifest().version,
+      browser: browserOf(navigator.userAgent),
+      webmcp: t('diagWebmcpNotHere'),
+      builtIn: await builtInState(
+        (globalThis as { LanguageModel?: AvailabilityLike }).LanguageModel,
+      ),
+      ...((gpu.vendor ?? gpu.architecture) === undefined && !gpu.adapter
+        ? {}
+        : {
+            gpu: {
+              ...(gpu.vendor === undefined ? {} : { vendor: gpu.vendor }),
+              ...(gpu.architecture === undefined ? {} : { architecture: gpu.architecture }),
+              shaderF16: gpu.features.includes('shader-f16'),
+            },
+          }),
+      ...lastError(await loadPanelState(local)),
+    }),
   });
 }
 

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Turns a failure into the banner above the question box: one plain sentence and the buttons that
 // say what to do next. The conversation is never touched, so the chat is kept.
+import { cleanError } from '../core/diagnostics';
 import { endpointHost } from './endpoint-host';
 import { showBanner, type BannerAction } from './error-banner';
 import { downloadBytes } from './download-size';
@@ -98,8 +99,17 @@ function dropRuntime(ctx: PanelController): void {
   ctx.ui.showProgress({ fraction: 0, text: t('modelStopped') });
 }
 
+/** Keeps the cleaned text of the last error for "Copy diagnostics", in memory and in storage
+ *  (the Options page shows it too). */
+function rememberError(ctx: PanelController, error: unknown): void {
+  const text = cleanError(problemText(error), [ctx.state.settings.endpoint.apiKey]);
+  ctx.state.lastError = text;
+  void ctx.deps.saveState({ lastError: text }).catch(() => undefined);
+}
+
 export function reportProblem(ctx: PanelController, error: unknown, options: ReportOptions): void {
   const kind = classifyProblem(error);
+  rememberError(ctx, error);
   if (kind === 'unexpected' && options.quiet === true) return;
   const { text, actions } = banner(ctx, kind, error, options);
   showBanner(ctx.deps.doc, text, actions);
