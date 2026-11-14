@@ -31,6 +31,7 @@
     "eval:gpu": "npm run build:eval && node scripts/eval/run.ts",
     "eval:gpu:win": "node scripts/eval/win.ts",
     "eval:cpu": "npm run build:eval && node scripts/eval/cpu.ts",
+    "eval:endpoint": "node scripts/eval/endpoint.mjs",
     "eval:nano": "npm run build:eval && node scripts/eval/nano.ts",
     "eval:nano:win": "node scripts/eval/win.ts --script eval:nano",
     "zip": "node scripts/zip.mjs",

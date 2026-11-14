@@ -2,7 +2,8 @@
 // The model list of the side panel: the four graphics-card models (Gemma 4 E2B only when the
 // graphics card has shader-f16), the processor models when
 // this browser can run them, Chrome's built-in model when present, the endpoint when one is set, the scripted model in the smoke-test build, and,
-// on a computer without WebGPU and nothing else to run, "Set up a chat endpoint".
+// on a computer without WebGPU and nothing else to run, "Set up a chat endpoint"; with no endpoint
+// set otherwise, "Use your own server or a remote service…" (the same value, it opens Options).
 // Values: "webllm:<id>", "cpu:<id>", "prompt-api", "endpoint", "scripted", "setup-endpoint".
 // What is selected: the model the user chose (kept in the Options), else the default that
 // src/ui/default-model.ts picks and explains.
@@ -115,8 +116,8 @@ function serverChoices(settings: Settings, env: PickerEnv): PickerChoice[] {
     const label = endpointLabel(url, model);
     out.push({ value: 'endpoint', label, runtime: 'endpoint', modelId: model, group });
   }
-  if (needsSetup(settings, env)) {
-    const label = t('setupEndpoint');
+  if (model === '') {
+    const label = t(needsSetup(settings, env) ? 'setupEndpoint' : 'setupEndpointOwn');
     out.push({ value: SETUP_VALUE, label, runtime: 'setup', modelId: '', group });
   }
   return out;

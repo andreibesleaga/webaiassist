@@ -20,12 +20,24 @@ export interface LoadProgress {
   readonly text: string;
 }
 
+/** What a service reports for one chat call. Every field is optional: a local server may send
+ *  only the counts, and a service sends a price only when it charges. */
+export interface ModelUsage {
+  readonly promptTokens?: number;
+  readonly completionTokens?: number;
+  /** The price of the call in US dollars (OpenRouter: `usage.cost`, in credits). */
+  readonly costUsd?: number;
+}
+
 export interface ChatRequest {
   readonly messages: readonly ChatMessage[];
   /** When set, the runtime should constrain its reply to this schema. */
   readonly jsonSchema?: JsonSchema;
   readonly signal?: CancelSignal;
   readonly onToken?: (token: string) => void;
+  /** Called once per chat call, after the last token, when the runtime knows the usage. Only
+   *  the endpoint runtime reports it; the others never call it. */
+  readonly onUsage?: (usage: ModelUsage) => void;
 }
 
 /** Port: a language model that runs on the user's machine. */

@@ -96,6 +96,50 @@ context to its cap (about 8,900 characters, 2,966 estimated tokens) would bring 
 to 4,357 estimated tokens, 770 above what fits; the estimate errs high, but the panel does not
 shrink the site facts for a 4,096 window (it does for Chrome's built-in model).
 
+## A chat endpoint, local or remote
+
+`npm run eval:endpoint` asks five questions of `docs/eval/prompts.json` through the real
+`EndpointRuntime` (streaming on) with the agent loop and the ten tools of the stub node, in Node
+(no browser). It reads only these environment variables:
+
+| Variable                       | Meaning                                                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `WEBAIASSIST_ENDPOINT_URL`     | The address before `/chat/completions`, for example `https://openrouter.ai/api/v1`                                              |
+| `WEBAIASSIST_ENDPOINT_MODEL`   | The model name at that service, for example `meta-llama/llama-3.1-8b-instruct`                                                  |
+| `WEBAIASSIST_ENDPOINT_KEY`     | The API key. Required for a remote address (the script stops, with no network call, when it is empty); optional for `localhost` |
+| `WEBAIASSIST_ENDPOINT_CONTEXT` | Optional context window in tokens (default 8192)                                                                                |
+
+Example with the key kept in a file outside the repository (the key is read into the one command and
+never printed; the script removes it from anything it prints):
+
+```bash
+WEBAIASSIST_ENDPOINT_KEY=$(grep '^OPENROUTER_API_KEY=' ~/work/.env | cut -d= -f2-) \
+WEBAIASSIST_ENDPOINT_URL=https://openrouter.ai/api/v1 \
+WEBAIASSIST_ENDPOINT_MODEL=meta-llama/llama-3.1-8b-instruct \
+npm run eval:endpoint
+```
+
+For each question the report (`docs/eval/EVAL-ENDPOINT-<host>-<date>.json`) holds the tools used (and
+whether they are the expected ones), the seconds, the number of model calls and the prompt and
+completion tokens and the price the service returned, added up over the question. A paid service
+charges for the run: five questions of about 2,000 tokens each cost well under 0.01 USD on a small
+model. It is not part of the gate; unit and browser tests use a fake server only.
+
+Ollama needs `OLLAMA_ORIGINS=chrome-extension://*` for the extension; this script runs in Node and
+needs no setting.
+
+### Run of 14 Nov 2026
+
+| Endpoint                                       | Tool right | Median answer (s) | Prompt tokens | Completion tokens | Price returned   |
+| ---------------------------------------------- | ---------- | ----------------- | ------------- | ----------------- | ---------------- |
+| Ollama `localhost:11434`, `gemma3:4b`          | 4 of 5     | 7.8               | 9,492         | 250               | none (local)     |
+| OpenRouter, `meta-llama/llama-3.1-8b-instruct` | 3 of 5     | 3.6               | 14,188        | 394               | 0.0003 USD total |
+
+One question per run is a model's choice of tools, not a fault of the endpoint: the small models
+picked a different tool than expected on one or two questions, and the OpenRouter model hit the step
+limit on question 3 (six tool steps). The reports are `docs/eval/EVAL-ENDPOINT-localhost-2026-11-14.json` and
+`docs/eval/EVAL-ENDPOINT-openrouter.ai-2026-11-14.json`.
+
 ## Questions
 
 The 20 prompts, their expected tools and facts are in `docs/eval/prompts.json`.

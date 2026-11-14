@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 // The question before a first download of weights: what it costs (size, source, where it is
 // stored), "Download" or "Not now". Nothing downloads before the first. A model that is already
-// stored, an endpoint and Chrome's model that is ready ask nothing.
+// stored and Chrome's model that is ready ask nothing. A remote chat endpoint gets the same kind
+// of question once per host: where the model runs, what is sent there, that it may cost money.
+// An endpoint on this computer asks nothing.
+import { isLocalEndpoint } from '../adapters/endpoint-runtime';
 import { isStored, type StoredRuntime } from '../adapters/model-store';
 import { byId } from './dom';
 import { downloadBytes } from './download-size';
+import { endpointHost } from './endpoint-host';
 import { t } from './i18n';
 import type { PickerChoice } from './model-picker';
 import type { PanelController } from './panel-controller';
@@ -17,7 +21,7 @@ interface DownloadNeed {
   readonly megabytes: number;
   readonly host: string;
   /** "checked": the file's SHA-256 is verified; "pinned": a fixed version; "chrome": Chrome's own. */
-  readonly kind: 'checked' | 'pinned' | 'chrome';
+  readonly kind: 'checked' | 'pinned' | 'chrome' | 'remote';
 }
 
 async function storedList(ctx: PanelController) {
@@ -49,9 +53,27 @@ export async function downloadNeed(
   if (choice.runtime === 'webllm' || choice.runtime === 'cpu') {
     return needOfStored(ctx, choice.runtime, choice);
   }
+  if (choice.runtime === 'endpoint') return remoteNeed(ctx);
   if (choice.runtime !== 'prompt-api') return undefined;
   if ((await ctx.deps.builtInState?.()) !== 'downloadable') return undefined;
   return { name: shortName(choice.label), megabytes: 0, host: 'Chrome', kind: 'chrome' };
+}
+
+/** The question for a remote endpoint whose host the user has not agreed to yet. */
+function remoteNeed(ctx: PanelController): DownloadNeed | undefined {
+  const { url } = ctx.state.settings.endpoint;
+  if (isLocalEndpoint(url)) return undefined;
+  const host = endpointHost(url);
+  if (ctx.state.persisted.endpointHosts?.includes(host) === true) return undefined;
+  return { name: host, megabytes: 0, host, kind: 'remote' };
+}
+
+/** Keeps the host the user agreed to, so the question is not asked again for it. */
+function rememberHost(ctx: PanelController): void {
+  const host = endpointHost(ctx.state.settings.endpoint.url);
+  const hosts = [...(ctx.state.persisted.endpointHosts ?? []), host];
+  ctx.state.persisted = { ...ctx.state.persisted, endpointHosts: hosts };
+  void ctx.deps.saveState({ endpointHosts: hosts }).catch(() => undefined);
 }
 
 function consentTexts(need: DownloadNeed): {
@@ -61,6 +83,14 @@ function consentTexts(need: DownloadNeed): {
   status: string;
 } {
   const values = { name: need.name, size: need.megabytes, host: need.host };
+  if (need.kind === 'remote') {
+    return {
+      title: t('remoteTitle', values),
+      body: t('remoteBody', values),
+      ok: t('remoteOk'),
+      status: t('remoteStatus', values),
+    };
+  }
   if (need.kind === 'chrome') {
     return {
       title: t('consentChromeTitle'),
@@ -113,6 +143,7 @@ export function bindConsent(ctx: PanelController, load: (choice: PickerChoice) =
   byId(doc, 'consent-ok').addEventListener('click', () => {
     const choice = ctx.state.consent?.choice;
     closeConsent(ctx, false);
+    if (choice?.runtime === 'endpoint') rememberHost(ctx);
     if (choice) load(choice);
   });
   byId(doc, 'consent-no').addEventListener('click', () => closeConsent(ctx, true));

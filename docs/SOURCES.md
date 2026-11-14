@@ -282,6 +282,15 @@ above the scenarios of `features/` that prove it ([SCENARIOS.md](SCENARIOS.md));
 read by a lawyer: whether the product is a "provider" in the sense of the Act is for its publisher to
 decide.
 
+## 19. OpenRouter API (14 Nov 2026)
+
+- URLs: <https://openrouter.ai/docs/api-reference/overview.md>, <https://openrouter.ai/docs/api-reference/streaming.md>, <https://openrouter.ai/docs/cookbook/administration/usage-accounting.md>, <https://openrouter.ai/api/v1/models> (prices). Read 14 Nov 2026.
+- Base address `https://openrouter.ai/api/v1`; chat completions are `POST /api/v1/chat/completions`, OpenAI-compatible, `Authorization: Bearer <key>`; the connection check uses `GET /api/v1/models`.
+- Streaming: server-sent events, `data: {json}` lines ended by `data: [DONE]`; keep-alive comments such as `: OPENROUTER PROCESSING` must be skipped (the parser ignores lines that do not start with `data:`). An error during a stream arrives as a data event with an `error` object and `finish_reason: "error"`.
+- Usage: every Chat Completions stream ends with a chunk, just before `[DONE]`, that has one content-free choice and a `usage` object (`prompt_tokens`, `completion_tokens`, `total_tokens`, and `cost` in credits, which are US dollars, plus `cost_details`). The page says `stream_options.include_usage` and `usage: {include: true}` are deprecated and have no effect: usage is always sent. WebAIAssist still sends `stream_options.include_usage` for the other OpenAI-compatible servers (Ollama 0.40.7 and LM Studio report usage only when asked).
+- Optional headers `HTTP-Referer` and `X-OpenRouter-Title` (`X-Title` also accepted) only identify the app on openrouter.ai rankings. They are optional and are not sent.
+- Price check for the evaluation: `meta-llama/llama-3.1-8b-instruct` at 0.02 USD per million prompt tokens and 0.04 per million completion tokens (`/api/v1/models`, 14 Nov 2026).
+
 ## Not verified
 
 - MCP `ToolAnnotations` property names: neither tools page lists them and the schema page was truncated before that section.

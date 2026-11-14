@@ -80,7 +80,7 @@ local model on that tab; it is not offered with a chat endpoint.
 - **Where the model runs**: Automatic (default), processor and memory, graphics card, Chrome's
   built-in model, or a chat endpoint.
 - **Model on the processor / in the browser**: which Qwen, Llama or Gemma model that path uses.
-- **Endpoint**: Ollama or LM Studio preset, or any address; model name; optional API key.
+- **Endpoint**: Ollama, LM Studio or OpenRouter preset, or any other address; model name; optional API key.
 - **When to ask before a tool**: before every call (default), or once per site per session for
   tools the page marks read-only.
 - **Tool steps per question**: 1 to 12 (default 6).
@@ -145,6 +145,20 @@ processor path and without Chrome's model, the model list offers
 1. Load a model in LM Studio and start its local server (port 1234).
 2. In Options choose **A chat endpoint**, preset **LM Studio**, and the model's name.
 3. Save. Chrome asks once for access to `localhost`.
+
+**OpenRouter (or another remote service).**
+
+1. Create an API key at the service and note a model name (OpenRouter: `vendor/model`, for example
+   `meta-llama/llama-3.1-8b-instruct`).
+2. In Options choose **A chat endpoint**, preset **OpenRouter** (or **Other address** with the
+   service's `https` address), the model name and the key. The model list also offers
+   **Use your own server or a remote service…** while no endpoint is set; it opens Options.
+3. Save. Chrome asks for access to that one host, from the Save click.
+4. Press Start. Before the first use of a remote host the panel says where the model runs, that your
+   questions, the page's tool list, tool results and any page text you read go to that host, and that
+   the service may charge for it, and waits for **Use this service**. A different host asks again; an
+   address on this computer never asks. A site that asks for no AI input is never sent to a remote
+   endpoint. The key stays in this browser; no app name or referrer is sent.
 
 An endpoint address must use `https`, or plain `http` on `localhost` or `127.0.0.1` only.
 

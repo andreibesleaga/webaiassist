@@ -10,6 +10,8 @@ export const PANEL_STATE_KEY = 'panelState';
 export interface StoredPanelState {
   readonly firstRunDone: boolean;
   readonly gpu?: GpuMeasure;
+  /** Hosts of remote chat endpoints the user agreed to use (src/ui/panel-consent.ts). */
+  readonly endpointHosts?: readonly string[];
 }
 
 type Raw = Record<string, unknown>;
@@ -24,12 +26,21 @@ function gpu(value: unknown): GpuMeasure | undefined {
   return { key: raw.key, firstAnswerMs: Math.round(ms) };
 }
 
+const MAX_HOSTS = 50;
+
+function hosts(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const names = value.filter((v): v is string => typeof v === 'string' && v.length <= 255);
+  return [...new Set(names)].slice(-MAX_HOSTS);
+}
+
 export function normalizePanelState(value: unknown): StoredPanelState {
   const raw = asRecord(value);
   const measure = gpu(raw.gpu);
   return {
     firstRunDone: raw.firstRunDone === true,
     ...(measure ? { gpu: measure } : {}),
+    ...(hosts(raw.endpointHosts).length > 0 ? { endpointHosts: hosts(raw.endpointHosts) } : {}),
   };
 }
 

@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-14",
+  "host": "openrouter.ai",
+  "model": "meta-llama/llama-3.1-8b-instruct",
+  "local": false,
+  "rows": [
+    {
+      "n": 1,
+      "text": "What does this site say about handoffs?",
+      "tools": [
+        "search"
+      ],
+      "toolRight": false,
+      "seconds": 5,
+      "modelCalls": 3,
+      "promptTokens": 2720,
+      "completionTokens": 96,
+      "costUsd": 0.00005824,
+      "answer": "The site mentions handoffs as a way for work to pass between agents, with context. It also mentions reviews as a part of the process, where a reviewer checks the result."
+    },
+    {
+      "n": 2,
+      "text": "Which items best answer: how do agents share work?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "seconds": 3.6,
+      "modelCalls": 2,
+      "promptTokens": 1728,
+      "completionTokens": 40,
+      "costUsd": 0.000036160000000000006,
+      "answer": "The items that best answer the question are handoff and review."
+    },
+    {
+      "n": 3,
+      "text": "Find items about review.",
+      "tools": [
+        "search",
+        "read",
+        "links",
+        "explain",
+        "explain",
+        "explain"
+      ],
+      "toolRight": false,
+      "seconds": 8.3,
+      "modelCalls": 6,
+      "promptTokens": 6304,
+      "completionTokens": 158,
+      "costUsd": 0.0001324,
+      "answer": "",
+      "error": "The assistant stopped after 6 tool steps (the limit in Options)."
+    },
+    {
+      "n": 4,
+      "text": "Search for \"memory\".",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "seconds": 2.9,
+      "modelCalls": 2,
+      "promptTokens": 1714,
+      "completionTokens": 60,
+      "costUsd": 0.00003668,
+      "answer": "Items: handoff (how work passes between agents, with context) and review (a reviewer checks the result). Facts: context, handoff, release, requires, review, reviewer."
+    },
+    {
+      "n": 5,
+      "text": "Is there anything on guardrails here?",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "seconds": 2.5,
+      "modelCalls": 2,
+      "promptTokens": 1722,
+      "completionTokens": 40,
+      "costUsd": 0.00003604,
+      "answer": "There is a fact called 'guardrails' that is related to 'requires'."
+    }
+  ],
+  "totals": {
+    "toolRight": 3,
+    "promptTokens": 14188,
+    "completionTokens": 394,
+    "costUsd": 0.00029951999999999995,
+    "medianSeconds": 3.6
+  }
+}

@@ -60,12 +60,12 @@ Scenarios whose wording changed when they stopped being pending:
 | Tag | Scenarios |
 |---|---|
 | @smoke | 108 |
-| @unit | 114 |
+| @unit | 120 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 6 |
-| all | 233 |
+| all | 239 |
 | run by `npm run test:bdd` now | 108 |
 
 ### Every scenario
@@ -305,6 +305,12 @@ Scenarios whose wording changed when they stopped being pending:
 | F20.17 | Security and governance requirements that can be observed | For a site that asks for no AI input the panel says which parts are held back | @unit | `test/ui/panel-policy.test.ts`, `test/security-review/docs-review.test.ts` | unit test |
 | F20.18 | Security and governance requirements that can be observed | The export is marked as AI-generated in a front-matter block and names the endpoint host when one wrote it | @unit | `test/core/export.test.ts`, `test/ui/panel-export.test.ts` | unit test |
 | F20.19 | Security and governance requirements that can be observed | The privacy and governance texts state the saved tool results, the toolbar reads and the per-site exception | @unit | `test/security-review/docs-review.test.ts` | unit test |
+| F26.1 | A chat endpoint, on this computer or remote | The model list leads to the endpoint set-up while none is set | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.2 | A chat endpoint, on this computer or remote | Options offers Ollama, LM Studio, OpenRouter and Other address | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.3 | A chat endpoint, on this computer or remote | A remote endpoint asks once, per host, before anything is sent | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.4 | A chat endpoint, on this computer or remote | An endpoint on this computer never shows the question | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
+| F26.5 | A chat endpoint, on this computer or remote | The endpoint's token counts and price are read, streamed or not | @unit | `test/adapters/endpoint-usage.test.ts` | unit test |
+| F26.6 | A chat endpoint, on this computer or remote | A service that echoes the API key in an error cannot show it | @unit | `test/security/endpoint-key-leaks.test.ts`, `test/adapters/endpoint-usage.test.ts` | unit test |
 
 ### Requirement rows
 

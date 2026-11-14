@@ -31,8 +31,11 @@ describe('the model list as groups', () => {
     expect(groups[0]!.querySelectorAll('option').length).toBeGreaterThanOrEqual(4);
   });
 
-  it('draws no empty group when there is no endpoint', async () => {
+  it('shows the set-up entry in the second group while there is no endpoint', async () => {
     await startPanel(fakeDeps([answer('hi')]));
-    expect(groupLabels()).toEqual(['On this computer, in the browser']);
+    expect(groupLabels()).toEqual([
+      'On this computer, in the browser',
+      'Your own server or a remote service',
+    ]);
   });
 });

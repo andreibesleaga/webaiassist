@@ -94,6 +94,9 @@ describe('why the model is selected', () => {
 
   it('labels the test model and the set-up entry', () => {
     expect(whyFor(DEFAULT_SETTINGS, base, 'scripted').why).toBe('whyTest');
-    expect(whyFor(DEFAULT_SETTINGS, base, 'setup-endpoint').why).toBe('whySetup');
+    // The same entry with other models that can run here is the plain way into the set-up.
+    expect(whyFor(DEFAULT_SETTINGS, base, 'setup-endpoint').why).toBe('whySetupOwn');
+    const nothing = { promptApi: false, scripted: false, webgpu: false };
+    expect(whyFor(DEFAULT_SETTINGS, nothing, 'setup-endpoint').why).toBe('whySetup');
   });
 });

@@ -182,6 +182,11 @@ whose name no other entry uses.
 
 ## Where the model runs
 
+The chat request of the `ModelRuntime` port has an optional `onUsage` callback. Only the endpoint
+runtime calls it, once per chat, with the prompt and completion token counts and the price (US
+dollars) the service returned in the last chunk of the stream; an activity log reads them there
+(`src/core/ports/model-runtime.ts`).
+
 WebLLM needs WebGPU. The panel probes for it when the user presses Start and uses the first host
 that has an adapter: the offscreen document, then the extension service worker
 (`src/adapters/host-choice.ts`). The order was chosen from a measured run on 12 Nov 2026 (Windows
@@ -378,7 +383,10 @@ origin from the click. On an older Chrome the panel points to the toolbar button
 
 The manifest lists `optional_host_permissions` (`https://*/*`, `http://localhost/*`,
 `http://127.0.0.1/*`); nothing is granted at install, and each grant is one site, asked from the
-user's click. Besides Allow, two features need such a grant:
+user's click. A remote chat endpoint such as `openrouter.ai` uses the `https://*/*` entry: Options
+asks for that one host from the Save click, and the panel asks the user once per host before the
+first chat is sent (`src/ui/panel-consent.ts`; the agreed hosts are in the panel's stored state).
+Besides Allow, two features need such a grant:
 
 - Compat mode registers the WebMCP polyfill to run at document start on reload, so the page's own
   scripts find `document.modelContext` when they register their tools. A registered content

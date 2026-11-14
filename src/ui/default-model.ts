@@ -59,8 +59,10 @@ export function chooseDefault(settings: Settings, env: PickerEnv): DefaultChoice
 /** The reason line for `value`, which is the model the picker shows as selected. */
 export function whyFor(settings: Settings, env: PickerEnv, value: string): DefaultChoice {
   if (value === 'scripted') return { value, why: 'whyTest' };
-  if (value === SETUP_VALUE) return { value, why: 'whySetup' };
   const fallback = chooseDefault(settings, env);
+  if (value === SETUP_VALUE) {
+    return { value, why: fallback.value === SETUP_VALUE ? 'whySetup' : 'whySetupOwn' };
+  }
   if (settings.runtime === 'auto' && fallback.value === value) return fallback;
   return { value, why: 'whyChosen' };
 }
