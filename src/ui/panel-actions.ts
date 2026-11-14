@@ -12,6 +12,7 @@ import { t } from './i18n';
 import type { PanelController } from './panel-controller';
 import { bindToolsToggle } from './page-card';
 import { bindPanelDiagnostics } from './panel-diagnostics';
+import { bindReport } from './panel-node-card';
 import { note } from './panel-note';
 import { hideWelcomeAfterHelp, showWelcome } from './panel-notices';
 import { aiBlocked, overrideAiPolicy, refreshPage } from './panel-page';
@@ -150,4 +151,5 @@ export function bindActions(ctx: PanelController): void {
   });
   bindHelp(ctx);
   bindPanelDiagnostics(ctx);
+  bindReport(ctx);
 }

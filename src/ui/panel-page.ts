@@ -15,6 +15,7 @@ import { allowLabel, errorStatus, statusOf, statusText, type PageStatus } from '
 import type { PanelController, SiteState } from './panel-controller';
 import { note } from './panel-note';
 import { showSiteChat, stopForSwitch } from './panel-switch';
+import { drawNodeCard } from './panel-node-card';
 import { starterPrompts } from './starter-prompts';
 
 const hostOf = (origin: string): string => {
@@ -92,6 +93,7 @@ export function drawPage(ctx: PanelController, looking = stillLooking(ctx)): voi
   const blocked = aiBlocked(ctx);
   if (info) showStatus(ctx, statusOf(info, { node: isNode(ctx), blocked }));
   renderCard(ctx.deps.doc, cardView(ctx, looking));
+  drawNodeCard(ctx, isNode(ctx), blocked);
   ctx.ui.setEmptyText(emptyText(ctx, blocked));
   ctx.ui.setStarters(
     isNode(ctx) && !blocked ? starterPrompts(ctx.state.page?.info?.tools ?? []) : [],

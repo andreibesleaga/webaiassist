@@ -2,6 +2,7 @@
 // Every text the side panel and the Options page show, in English. Another language is
 // one more file with the same keys (see i18n.ts). {name} marks a value filled in at runtime.
 
+import { NODE_CARD_EN } from './messages-node-card-en';
 import { P2_EN } from './messages-p2-en';
 import { ENDPOINT_EN } from './messages-endpoint-en';
 import { EXPLORER_EN } from './messages-explorer-en';
@@ -11,6 +12,7 @@ import { SITE_EN } from './messages-site-en';
 export const EN = {
   ...SITE_EN,
   ...P2_EN,
+  ...NODE_CARD_EN,
   ...ENDPOINT_EN,
   ...EXPLORER_EN,
   ...QUERY_EN,

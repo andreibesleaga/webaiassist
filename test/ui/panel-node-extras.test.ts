@@ -153,12 +153,12 @@ describe('starter prompts and peer chips on a node', () => {
   const starters = (): string[] =>
     [...byId('starter-prompts').querySelectorAll('button')].map((b) => b.textContent ?? '');
 
-  it('shows three prompts in the empty chat; a click fills the box and sends nothing', async () => {
+  it('shows four prompts in the empty chat; a click fills the box and sends nothing', async () => {
     const site = new FakeSite();
     site.outcomes = nodeOutcomes();
     const bridge = new FakePanelBridge(AGSC_TOOLS);
     await open(fakeDeps([], { site, bridge }));
-    expect(starters()).toHaveLength(3);
+    expect(starters()).toHaveLength(4);
     expect(byId('starter-prompts').hidden).toBe(false);
     byId('starter-prompts').querySelector('button')?.click();
     expect(byId<HTMLTextAreaElement>('question').value).toBe(starters()[0]);
@@ -173,7 +173,7 @@ describe('starter prompts and peer chips on a node', () => {
       site,
       AGSC_TOOLS.filter((tool) => tool.name !== 'explain'),
     );
-    expect(starters()).toHaveLength(2);
+    expect(starters()).toHaveLength(3);
     loadPage('sidepanel.html');
     const plain = new FakeSite();
     await open(fakeDeps([], { site: plain, bridge: new FakePanelBridge([]) }));

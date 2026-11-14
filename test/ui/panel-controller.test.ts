@@ -8,7 +8,6 @@ import { startPanel, type PanelController } from '../../src/ui/panel-controller'
 import { answer, call } from '../helpers';
 import { byId, click, key, loadPage, tick } from './dom';
 import { fakeDeps, FakePanelBridge, ORIGIN, type FakeDeps } from './panel-fakes';
-
 async function settle(): Promise<void> {
   for (let i = 0; i < 10; i += 1) await tick();
 }
