@@ -12,6 +12,8 @@ export interface StoredPanelState {
   readonly gpu?: GpuMeasure;
   /** The last error the panel showed, already cleaned and cut (src/core/diagnostics.ts). */
   readonly lastError?: string;
+  /** Persistent storage was asked for once, after the first successful model download. */
+  readonly persistAsked?: boolean;
 }
 
 type Raw = Record<string, unknown>;
@@ -34,6 +36,7 @@ export function normalizePanelState(value: unknown): StoredPanelState {
     firstRunDone: raw.firstRunDone === true,
     ...(measure ? { gpu: measure } : {}),
     ...(lastError ? { lastError } : {}),
+    ...(raw.persistAsked === true ? { persistAsked: true } : {}),
   };
 }
 

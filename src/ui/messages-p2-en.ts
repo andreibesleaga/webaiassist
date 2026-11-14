@@ -46,6 +46,7 @@ export const P2_EN = {
   diagWebmcpNoPage: 'no page',
   diagWebmcpUnknown: 'unknown',
   diagWebmcpNotHere: 'not checked here (open the panel on a page)',
+  storeTotal: 'Total on this computer: {size} MB',
   startersLabel: 'Questions to start with',
   starterBrief: 'Give me a brief of the main items on this node.',
   starterSearch: 'Search this node for how to publish a node.',

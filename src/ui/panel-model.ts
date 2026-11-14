@@ -82,7 +82,7 @@ async function startModel(ctx: PanelController): Promise<void> {
   }
   if (!(await graphicsUsable(ctx, choice))) return;
   const need = await downloadNeed(ctx, choice);
-  if (!need) return loadModel(ctx, choice);
+  if (!need) return loadModel(ctx, choice, false);
   if (state.loading) return;
   showConsent(ctx, choice, need);
 }
@@ -102,7 +102,11 @@ async function graphicsUsable(ctx: PanelController, choice: PickerChoice): Promi
   }
 }
 
-async function loadModel(ctx: PanelController, choice: PickerChoice): Promise<void> {
+async function loadModel(
+  ctx: PanelController,
+  choice: PickerChoice,
+  downloaded: boolean,
+): Promise<void> {
   const { state, ui } = ctx;
   const loading = new AbortController();
   setLoading(ctx, loading);
@@ -117,6 +121,7 @@ async function loadModel(ctx: PanelController, choice: PickerChoice): Promise<vo
     };
     ui.showProgress({ fraction: 1, text: readyLine(ctx, choice, host, runtime) });
     drawPage(ctx);
+    if (downloaded) askPersistence(ctx, choice);
   } catch (error) {
     const aborted = loading.signal.aborted;
     const why = aborted ? t('loadCancelled') : problemText(error);
@@ -125,6 +130,17 @@ async function loadModel(ctx: PanelController, choice: PickerChoice): Promise<vo
   } finally {
     setLoading(ctx, undefined);
   }
+}
+
+/** After the first successful download of weights into this browser (never at install): ask
+ *  Chrome to keep them when space runs low. Once only; Chrome decides, and a refusal is fine. */
+function askPersistence(ctx: PanelController, choice: PickerChoice): void {
+  const { deps, state } = ctx;
+  if (choice.runtime !== 'webllm' && choice.runtime !== 'cpu') return;
+  if (state.persisted.persistAsked === true || !deps.persistStorage) return;
+  state.persisted = { ...state.persisted, persistAsked: true };
+  void deps.saveState({ persistAsked: true }).catch(() => undefined);
+  void deps.persistStorage().catch(() => undefined);
 }
 
 /** A graphics-card model reports the wait for its first token; the stored measurement decides
@@ -278,6 +294,6 @@ export function bindModel(ctx: PanelController): void {
     void ctx.state.runtime?.model.unload().catch(() => undefined);
   });
   select(ctx).addEventListener('change', () => saveChoice(ctx));
-  bindConsent(ctx, (choice) => void loadModel(ctx, choice));
+  bindConsent(ctx, (choice) => void loadModel(ctx, choice, true));
   bindBanner(deps.doc);
 }

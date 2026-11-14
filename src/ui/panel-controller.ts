@@ -69,6 +69,9 @@ export interface PanelDeps {
   copyText(text: string): Promise<void>;
   /** The extension version, for "Copy details". */
   readonly version: string;
+  /** `navigator.storage.persist()`: asked once after the first successful download. Chrome
+   *  decides; the panel does not claim the answer. Absent where the browser has no such call. */
+  persistStorage?(): Promise<boolean>;
   /** Chrome's built-in model state (never starts a download); absent in tests that skip it. */
   builtInState?(): Promise<BuiltInState>;
   /** What the site publishes and the browser events the panel follows; a host without it shows
