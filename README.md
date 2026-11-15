@@ -148,7 +148,7 @@ local model on that tab; it is not offered with a chat endpoint.
   cannot open it.
 - **Copy report** (More in the panel, for developers): a Markdown note about the open page's
   tools: name, title, read-only mark, schema and annotation problems, and a "Security review
-  flags" section that stays empty until its rules are connected (`src/core/review-flags.ts`). It
+  flags" section with one row per finding of the tool review ([docs/TOOL-REVIEW.md](docs/TOOL-REVIEW.md)). It
   names the WebMCP draft date it was checked against (13 Nov 2026) and is informational, not a
   score or a certification. Preview first, copy on the second click; tool names, titles and
   descriptions only, nothing sent anywhere.
@@ -171,7 +171,8 @@ local model on that tab; it is not offered with a chat endpoint.
 - **Give the model short facts from what the site publishes**: on by default.
 - **Downloaded models**: the list with sizes, and removal of one or all.
 - **Forget all sites**: clears what is kept for every site at once.
-- **Language**: English.
+- **Language**: English. The texts are in `src/ui/messages-en.ts` and its sibling files; the build also writes
+  them as Chrome's locale file, `_locales/en/messages.json` (`scripts/locale.mjs`).
 - **Reset to defaults** restores all of them.
 
 ## Other runtimes

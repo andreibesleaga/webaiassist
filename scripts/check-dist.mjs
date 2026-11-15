@@ -75,6 +75,14 @@ function checkIdentity(m) {
   return problems;
 }
 
+/** A description taken from the locale file has its length checked by the build (scripts/locale.mjs). */
+function checkLocale(m) {
+  const fromFile = /^__MSG_/.test(String(m.description ?? ''));
+  return fromFile && typeof m.default_locale !== 'string'
+    ? ['a description from the locale file needs default_locale']
+    : [];
+}
+
 /** The install-time hosts each build may have, with the words of the problem; the release build has none. */
 const HOSTS_OF = {
   eval: [EVAL_HOSTS, 'eval build host_permissions must be'],
@@ -130,6 +138,7 @@ function checkFiles(m, exists, variant) {
     m.options_page,
     ...Object.values(m.icons ?? {}),
     ...Object.values(m.action?.default_icon ?? {}),
+    ...(m.default_locale ? [`_locales/${m.default_locale}/messages.json`] : []),
     ...EXTRA_FILES,
     ...(variant !== 'release' ? DEV_FILES : []),
   ];
@@ -140,6 +149,7 @@ function checkFiles(m, exists, variant) {
 export function checkManifest(manifest, exists, variant = 'release') {
   return [
     ...checkIdentity(manifest),
+    ...checkLocale(manifest),
     ...checkAccess(manifest, variant),
     ...checkCommands(manifest),
     ...checkFiles(manifest, exists, variant),

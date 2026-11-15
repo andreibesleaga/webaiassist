@@ -521,7 +521,7 @@ is therefore untrusted:
 src/core/       agent loop, gate, parser, prompt, fence, node mode, consent, export, ports
 src/adapters/   model runtimes, page bridge, router, memory, settings, grants, validators, probes
 src/protocol/   message types, JSON schemas, generated validators, parseMessage
-src/ui/         side panel and Options page logic, strings (messages-en.ts), the explorer tab (src/ui/explorer/)
+src/ui/         side panel and Options page logic, strings (messages-en.ts; the build writes them to _locales/en/messages.json, scripts/locale.mjs), the explorer tab (src/ui/explorer/)
 src/fakes/      in-memory fakes of the ports, the scripted test model
 src/spike/      browser check logic (report, stub node tools, WebMCP check)
 src/entries/    service worker, offscreen, side panel, Options, page scripts, polyfill, spike page

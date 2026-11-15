@@ -51,7 +51,7 @@ export const EN = {
   threadMany: '{count} threads',
   noGpu: 'This browser has no usable graphics acceleration here: {why}.',
   whyBuiltIn:
-    'Why: Chrome’s own model is available here and starts fastest. It needs a recent Chrome and 22 GB free disk.',
+    'Why: Chrome’s own model is available here, so WebAIAssist downloads nothing more. It needs a recent Chrome and 22 GB free disk.',
   whyCpu:
     'Why: this works on every computer. It runs in memory (about {size} MB) and needs no graphics card.',
   whyGpu:
@@ -209,7 +209,7 @@ export const EN = {
     'Runs in this browser, on your processor and memory. Works on every computer. Downloads about {size} MB once. Slower than a graphics card. Nothing leaves your computer.',
   runtimeWebllm: 'Graphics card',
   runtimeWebllmHelp:
-    'Runs in this browser, on your graphics card (WebGPU). Downloads a model once (350 MB to 2.8 GB). Fast on a good card, slow on a weak one. Nothing leaves your computer.',
+    'Runs in this browser, on your graphics card (WebGPU). Downloads a model once (350 MB to 2.8 GB). Speed depends on the card. Nothing leaves your computer.',
   cpuModelLabel: 'Model on the processor',
   cpuModelHelp: 'Automatic picks the small model; the larger one downloads only if you choose it.',
   runtimePromptApi: 'Chrome’s built-in model',

@@ -214,4 +214,10 @@ test('200 percent zoom of a 480 px panel loses no text and does not scroll sidew
   });
   expect(report.sideways).toBeLessThanOrEqual(0);
   expect(report.clipped).toEqual([]);
+  // Wider letters stand for a computer whose fonts are wider: the top row wraps, nothing scrolls sideways.
+  const wider = await panel.evaluate(() => {
+    document.body.style.letterSpacing = '1.6px';
+    return document.documentElement.scrollWidth - document.documentElement.clientWidth;
+  });
+  expect(wider).toBeLessThanOrEqual(0);
 });

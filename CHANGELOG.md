@@ -10,6 +10,9 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Added
 
+- **Locale file**: the build writes `_locales/en/messages.json` from the typed English dictionary, and the
+  description and the toolbar button title in the manifest come from it (`default_locale: en`), so another
+  language is one more dictionary and one more folder.
 - **Tool security review and parity features**: nine written rules read each tool's definition (hidden
   characters, orders to the AI, a call to another tool, look-alike names, links, encoded text, a read-only mark
   that the name contradicts, oversized text, a definition changed since first seen); a tool with a finding is

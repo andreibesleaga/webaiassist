@@ -26,7 +26,7 @@ const ON_GPU = 'in this browser, on your graphics card';
 const WEBLLM_MODELS: readonly ModelChoice[] = [
   {
     id: SMALL,
-    label: `Qwen3 0.6B (small and fast; ${ON_GPU}; needs about 1.4 GB of GPU memory)`,
+    label: `Qwen3 0.6B (the smallest; ${ON_GPU}; needs about 1.4 GB of GPU memory)`,
     runtime: 'webllm',
   },
   {

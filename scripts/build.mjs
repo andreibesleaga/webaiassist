@@ -15,6 +15,7 @@ import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
 import { copyExplorer } from './explorer-pins.mjs';
 import { checkQueryPins } from './query-pins.mjs';
+import { chromeMessages, localiseManifest } from './locale.mjs';
 import { bundleModelLibs, webLlmNoRemoteLibs, wllamaNoRemote } from './model-libs.mjs';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
@@ -102,7 +103,27 @@ await bundleModelLibs(fileURLToPath(out));
 cpSync(new URL('LICENSE', root), new URL('LICENSE', out));
 cpSync(new URL('NOTICE', root), new URL('NOTICE', out));
 
-const manifest = JSON.parse(readFileSync(new URL('static/manifest.json', root), 'utf8'));
+/** The English dictionary (src/ui/messages-en.ts), bundled in memory and loaded as a module. */
+async function englishDictionary() {
+  const built = await build({
+    entryPoints: [fileURLToPath(new URL('src/ui/messages-en.ts', root))],
+    bundle: true,
+    format: 'esm',
+    write: false,
+  });
+  const code = Buffer.from(built.outputFiles[0].contents).toString('base64');
+  return (await import(`data:text/javascript;base64,${code}`)).EN;
+}
+
+// The manifest texts Chrome shows and every interface text, as Chrome's locale file (scripts/locale.mjs).
+const { manifest, texts } = localiseManifest(
+  JSON.parse(readFileSync(new URL('static/manifest.json', root), 'utf8')),
+);
+mkdirSync(new URL('_locales/en/', out), { recursive: true });
+writeFileSync(
+  new URL('_locales/en/messages.json', out),
+  `${JSON.stringify(chromeMessages(await englishDictionary(), texts), null, 2)}\n`,
+);
 manifest.version = pkg.version;
 if (smoke) manifest.host_permissions = ['http://127.0.0.1/*', 'http://127.0.0.2/*'];
 if (evalBuild) {

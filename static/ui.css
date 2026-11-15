@@ -299,6 +299,8 @@ progress[value='1'] {
 }
 .panel header {
   display: flex;
+  /* The buttons go to a second line when the row is too narrow (200 percent zoom, wide fonts). */
+  flex-wrap: wrap;
   gap: var(--space-1);
   align-items: center;
 }

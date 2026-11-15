@@ -185,6 +185,18 @@ not only on a node.
   tool only after Allow, only in the tab the Activity view was opened for and only when the page still lists the same
   tool. It is offered only where the arguments were saved.
 
+## Tool review and the toolbar number (14 Nov 2026)
+
+The tool review ([TOOL-REVIEW.md](TOOL-REVIEW.md)) reads what a page wrote about its tools (name, title,
+description, fields, hints) inside this browser. It makes no request and sends nothing. The first definition of
+each tool, used to notice a later change, is kept in the panel's memory only and is gone when the panel closes.
+
+The number on the toolbar icon is the count of tools the open page offers. It is read only for a site you
+allowed, uses no new permission, and is stored nowhere.
+
+A tool you run by hand from its detail view goes through the same questions as a call by the model. In this
+version a run by hand is not written to the activity log; its result is shown in the panel only.
+
 ## Conformance page and demo pages
 
 The conformance page (`conformance/`) is not part of the extension and sends nothing. The one host
