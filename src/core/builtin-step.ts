@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 // The built-in graph tool inside the agent loop (builtin-tools.ts says what it is). The loop's own
 // files call the two functions here: `listedTools` when the tools are listed, and `runBuiltin` for a call
-// of the built-in tool. A call is not a page tool: it skips the page bridge, the "tool changed" check
-// and the question (it reads files the node published and the tab already read, writes nothing, sends
-// nothing); it is still shown, recorded and fenced as untrusted data like any tool result.
+// of the built-in tool. A call is not a page tool: it skips the page bridge and the "tool changed" check
+// (it reads files the node published and the tab already read, writes nothing, sends nothing). The
+// site question comes first, then the per-call question only when the user chose "ask for every call"
+// (tool-step.ts); the result is shown, recorded and fenced as untrusted data like any tool result.
 import { failureText, mergeTools, QUERY_TOOL, STOP_NOTE } from './builtin-tools';
 import type { GraphQuery, QueryOutcome } from './ports/graph-query';
 import { callKey } from './repeat';
-import type { AgentDeps, Call, LoopState, RunScope } from './tool-step';
+import type { AgentDeps, Call, LoopState, RunScope, ToolDeps } from './tool-step';
 import type { ToolArgs, ToolInfo } from './types';
 import { wrapUntrusted } from './untrusted';
 
@@ -55,7 +56,7 @@ function modelText(state: LoopState, outcome: QueryOutcome): string {
 }
 
 export async function runBuiltin(
-  deps: AgentDeps,
+  deps: ToolDeps,
   scope: RunScope,
   state: LoopState,
   call: Call,
@@ -70,7 +71,7 @@ export async function runBuiltin(
   await deps.memory.recordToolResult(scope.origin, name, outcome.ok, deps.clock.nowIso());
   deps.ui.show({ kind: 'tool-result', name, ok: outcome.ok, text: outcome.text });
   state.made.set(callKey(name, call.args), { name, text });
-  const compact = deps.model.capabilities().compactPrompt === true;
+  const compact = deps.model?.capabilities().compactPrompt === true;
   const cap = compact ? COMPACT_RESULT_CAP : RESULT_CAP;
   state.messages.push({ role: 'tool', content: wrapUntrusted(name, text, cap) });
   // True when rows came back: only then does the loop add its "answer now" line.

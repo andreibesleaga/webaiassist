@@ -57,7 +57,7 @@ describe('startMainBridge: tools/list', () => {
             title: '',
             description: 'd',
             inputSchema: 'not an object',
-            annotations: { readOnlyHint: true, debugging: true, consequentialHint: 'yes' },
+            annotations: { readOnlyHint: true, bogusHint: true, consequentialHint: 'yes' },
           },
           { name: 'b', title: 'Bee', description: 'e', inputSchema: [] },
           { name: 'c', description: 'f', inputSchema: { type: 'object' } },

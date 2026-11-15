@@ -26,8 +26,10 @@ import { cpuTestModels } from './shared/cpu-engine';
 import { panelGraphQuery } from './shared/graph-query-deps';
 import { createModelStore } from './shared/model-store';
 import { createRuntime } from './shared/panel-runtimes';
-import { explorerQuery } from '../ui/explorer-url';
+import { activityQuery, explorerQuery } from '../ui/explorer-url';
 import { siteDeps } from './shared/site-deps';
+import { lazyActivityLog } from './shared/activity-log';
+import { withActivity } from '../adapters/forget-activity';
 import { fromExtensionPage } from './shared/sender';
 
 const fixedTab = __WEBAIASSIST_SMOKE__
@@ -103,9 +105,12 @@ const compatDeps = {
 
 const forgetDeps = {
   // Memory is cleared even when it is off now: it may hold chats from before.
-  memory: {
-    clear: async (origin?: string) => (await (indexedDb ??= openIndexedDbMemory())).clear(origin),
-  },
+  memory: withActivity(
+    {
+      clear: async (origin?: string) => (await (indexedDb ??= openIndexedDbMemory())).clear(origin),
+    },
+    lazyActivityLog,
+  ),
   grants: new SessionSiteGrants(chrome.storage.session),
   compat: {
     unregister: (ids: string[]) => chrome.scripting.unregisterContentScripts({ ids }),
@@ -130,6 +135,20 @@ function computerEnv(gpu: GpuProbe): PanelDeps['env'] {
   };
 }
 
+function openGraph(tabId: number, origin: string): void {
+  void chrome.tabs.create({
+    url: chrome.runtime.getURL(`explorer.html?${explorerQuery({ tabId, origin })}`),
+  });
+}
+
+/** The Activity view of the explorer page, for the open tab and site when the panel has them. */
+function openActivity(tabId?: number, origin?: string): void {
+  const target = tabId === undefined || origin === undefined ? undefined : { tabId, origin };
+  void chrome.tabs.create({
+    url: chrome.runtime.getURL(`explorer.html?${activityQuery(target)}`),
+  });
+}
+
 async function buildDeps(bridge: MessagingToolBridge): Promise<PanelDeps> {
   const local = chrome.storage.local;
   return {
@@ -145,6 +164,7 @@ async function buildDeps(bridge: MessagingToolBridge): Promise<PanelDeps> {
       settings.memory ? (indexedDb ??= openIndexedDbMemory()) : Promise.resolve(new NoMemory()),
     targetTab,
     site: siteDeps,
+    activity: lazyActivityLog,
     readPage: (tabId) => readPageText(chrome.scripting, tabId),
     allowSite: (page) => allowSite(siteAccessDeps, page),
     enableCompat: (page) => enableCompat(compatDeps, page),
@@ -160,10 +180,8 @@ async function buildDeps(bridge: MessagingToolBridge): Promise<PanelDeps> {
     version: chrome.runtime.getManifest().version,
     download,
     openOptions: () => void chrome.runtime.openOptionsPage(),
-    openGraph: (tabId, origin) =>
-      void chrome.tabs.create({
-        url: chrome.runtime.getURL(`explorer.html?${explorerQuery({ tabId, origin })}`),
-      }),
+    openGraph,
+    openActivity,
     graphQuery: panelGraphQuery,
     builtInState: () =>
       builtInState((globalThis as { LanguageModel?: AvailabilityLike }).LanguageModel),

@@ -26,6 +26,7 @@ const PAGES: Readonly<Record<string, string>> = {
   '/node': read('node-page.html'),
   '/poison': read('poison-page.html'),
   '/thirty': read('thirty-page.html'),
+  '/review': read('review-page.html'),
 };
 
 /** One file the test server answers with (instead of a 404) for a path. */
@@ -191,6 +192,14 @@ export function openPoisonPage(
   origin = session.origin,
 ): Promise<{ page: Page; tabId: number }> {
   return openPage(session, origin, '/poison', 'registered the poisoned page');
+}
+
+/** Opens the page with one tool for each rule of the tool review. */
+export function openReviewPage(
+  session: Session,
+  origin = session.origin,
+): Promise<{ page: Page; tabId: number }> {
+  return openPage(session, origin, '/review', 'registered the review page');
 }
 
 /** Opens the page with thirty tools. */

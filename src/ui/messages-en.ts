@@ -2,7 +2,9 @@
 // Every text the side panel and the Options page show, in English. Another language is
 // one more file with the same keys (see i18n.ts). {name} marks a value filled in at runtime.
 
+import { ACTIVITY_EN } from './messages-activity-en';
 import { NODE_CARD_EN } from './messages-node-card-en';
+import { PARITY_EN } from './messages-parity-en';
 import { P2_EN } from './messages-p2-en';
 import { ENDPOINT_EN } from './messages-endpoint-en';
 import { EXPLORER_EN } from './messages-explorer-en';
@@ -16,6 +18,8 @@ export const EN = {
   ...ENDPOINT_EN,
   ...EXPLORER_EN,
   ...QUERY_EN,
+  ...ACTIVITY_EN,
+  ...PARITY_EN,
   appName: 'WebAIAssist',
   help: 'Help',
   closeHelp: 'Close help',

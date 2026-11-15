@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // One tool call of the agent loop: check the page is still on the run's site and the tool
 // is unchanged, ask through the confirmation gate, check again, call, record, fence.
-import { needsConfirmation, sameTool } from './gate';
+import { mustAsk, sameTool } from './gate';
 import type { HistorySpan } from './history';
 import { listedTools, runBuiltin } from './builtin-step';
 import type { ArgsValidator } from './ports/args-validator';
@@ -12,7 +12,9 @@ import type { Memory } from './ports/memory';
 import type { ModelRuntime } from './ports/model-runtime';
 import type { ToolBridge, ToolCallResult, ToolListing } from './ports/tool-bridge';
 import { callKey, type MadeCall } from './repeat';
-import { listableTool, quoteName } from './sanitize';
+import { quoteName } from './sanitize';
+import { offeredTools } from './tool-offer';
+import type { DefinitionLedger } from './tool-review';
 import type { CancelSignal, ChatMessage, ToolArgs, ToolInfo } from './types';
 import { wrapUntrusted } from './untrusted';
 
@@ -26,9 +28,14 @@ export interface AgentDeps {
   /** Asked before each tool call, ahead of the question about that call: false when the user
    *  did not allow the tools of this site (site-consent.ts). Absent: the site is allowed. */
   readonly siteGate?: () => Promise<boolean>;
+  /** Remembers each tool's first definition on a site, to flag a later change (tool-review.ts). */
+  readonly ledger?: DefinitionLedger;
   /** The built-in graph tool (builtin-tools.ts); offered only when the scope says so. */
   readonly builtin?: GraphQuery;
 }
+
+/** What one tool step needs: the loop's deps, and no model for a run the user started by hand. */
+export type ToolDeps = Omit<AgentDeps, 'model'> & { readonly model?: AgentDeps['model'] };
 
 /** What a tool step needs to know about the run. */
 export interface RunScope {
@@ -37,6 +44,8 @@ export interface RunScope {
   readonly origin: string;
   readonly signal?: CancelSignal;
   readonly confirmEveryCall?: boolean;
+  /** The user started this run by hand (panel-manual-run.ts): tools for developers stay in. */
+  readonly manual?: boolean;
   /** The panel offers the built-in graph tool on this run. */
   readonly graphQuery?: boolean;
 }
@@ -66,23 +75,26 @@ export interface LoopState {
 
 export type Call = { readonly tool: ToolInfo; readonly args: ToolArgs };
 
-/** The tab's tools the model may use (sanitize.ts, listableTool), or undefined (and
+/** The tab's tools the model may use (tool-offer.ts), with their review, or undefined (and
  *  `state.movedTo` set) when the tab left the site. */
 export async function listOnSite(
-  deps: AgentDeps,
+  deps: ToolDeps,
   scope: RunScope,
   state: Pick<LoopState, 'movedTo'>,
 ): Promise<ToolListing | undefined> {
   const listing = await deps.bridge.list(scope.tabId);
   if (listing.origin === undefined || listing.origin === scope.origin) {
-    return { ...listing, tools: listedTools(deps, scope, listing.tools.filter(listableTool)) };
+    const origin = listing.origin ?? scope.origin;
+    const options = { ledger: deps.ledger, manual: scope.manual };
+    const offered = offeredTools(listing.tools, origin, options);
+    return { ...listing, tools: listedTools(deps, scope, offered) };
   }
   state.movedTo = listing.origin;
   return undefined;
 }
 
 /** Lists the tools again; false (and the call is refused) when the tool or the site changed. */
-async function stillSame(deps: AgentDeps, scope: RunScope, state: LoopState, call: Call) {
+async function stillSame(deps: ToolDeps, scope: RunScope, state: LoopState, call: Call) {
   const fresh = await listOnSite(deps, scope, state);
   if (!fresh) return false;
   const name = call.tool.name;
@@ -101,7 +113,7 @@ async function stillSame(deps: AgentDeps, scope: RunScope, state: LoopState, cal
 }
 
 /** The site question, asked when a tool is first about to be used. */
-async function siteOpen(deps: AgentDeps, state: LoopState, call: Call): Promise<boolean> {
+async function siteOpen(deps: ToolDeps, state: LoopState, call: Call): Promise<boolean> {
   if (!deps.siteGate || (await deps.siteGate())) return true;
   const text = `The user did not allow the tools of this site. "${quoteName(call.tool.name)}" was not run.`;
   state.messages.push({ role: 'tool', content: text });
@@ -109,9 +121,9 @@ async function siteOpen(deps: AgentDeps, state: LoopState, call: Call): Promise<
 }
 
 /** The confirmation gate; a tool denied once in this run is refused without asking. */
-async function allowed(deps: AgentDeps, scope: RunScope, state: LoopState, call: Call) {
+async function allowed(deps: ToolDeps, scope: RunScope, state: LoopState, call: Call) {
   const name = call.tool.name;
-  const ask = scope.confirmEveryCall === true || needsConfirmation(call.tool);
+  const ask = scope.confirmEveryCall === true || mustAsk(call.tool);
   if (!ask) return true;
   const again = state.denied.has(name);
   if (!again && (await deps.ui.confirmToolCall({ ...call, origin: scope.origin }))) return true;
@@ -125,7 +137,7 @@ async function allowed(deps: AgentDeps, scope: RunScope, state: LoopState, call:
   return false;
 }
 
-async function safeCall(deps: AgentDeps, scope: RunScope, call: Call): Promise<ToolCallResult> {
+async function safeCall(deps: ToolDeps, scope: RunScope, call: Call): Promise<ToolCallResult> {
   const target = { tabId: scope.tabId, origin: scope.origin };
   try {
     return await deps.bridge.call(target, call.tool.name, call.args, scope.signal);
@@ -139,14 +151,16 @@ async function safeCall(deps: AgentDeps, scope: RunScope, call: Call): Promise<T
 
 /** Runs one call through the gates; true when it ran and its result is now in the chat. */
 export async function runTool(
-  deps: AgentDeps,
+  deps: ToolDeps,
   scope: RunScope,
   state: LoopState,
   call: Call,
 ): Promise<boolean> {
   if (call.tool.builtin === true) {
     // The built-in tool reads the site's graph, so the site question comes first for it too.
+    // It is read-only: the per-call question comes only in "ask for every call".
     if (!(await siteOpen(deps, state, call))) return false;
+    if (!(await allowed(deps, scope, state, call))) return false;
     return runBuiltin(deps, scope, state, call);
   }
   // Checked before the question and again after it: the page may change the tool, or the

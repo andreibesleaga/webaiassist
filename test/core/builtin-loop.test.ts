@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // The model's built-in graph tool in the agent loop, with fake ports: it is offered only when the panel
-// says so, it is called without the page bridge and without a question, its result is fenced as
+// says so, it is called without the page bridge (and asks only in "ask for every call"), its result is fenced as
 // untrusted data, one repair turn follows a failure and a second failure ends the queries, and a page
 // tool can never take its place.
 import { describe, expect, it } from 'vitest';
@@ -37,8 +37,13 @@ class FakeGraph implements GraphQuery {
 }
 
 const query = (sparql: string): string => call(QUERY_TOOL_NAME, { sparql });
-const withGraph = (replies: string[], graph: FakeGraph, tools?: readonly ToolInfo[]) => ({
-  ...makeDeps(replies, tools ? { tools } : {}),
+const withGraph = (
+  replies: string[],
+  graph: FakeGraph,
+  tools?: readonly ToolInfo[],
+  allow = true,
+) => ({
+  ...makeDeps(replies, { allow, ...(tools ? { tools } : {}) }),
   builtin: graph,
 });
 
@@ -66,10 +71,26 @@ describe('the built-in tool in the loop', () => {
     ]);
   });
 
-  it('asks no question even when the setting is "ask for every call"', async () => {
+  it('asks before each call when the setting is "ask for every call"', async () => {
     const graph = new FakeGraph([]);
     const deps = withGraph([query('ASK { ?s ?p ?o }'), answer('yes')], graph);
     await runAgent(deps, { ...input, confirmEveryCall: true });
+    expect(deps.ui.approvals).toHaveLength(1);
+    expect(graph.runs).toHaveLength(1);
+  });
+
+  it('runs nothing when the user denies the call in "ask for every call"', async () => {
+    const graph = new FakeGraph([]);
+    const deps = withGraph([query('ASK { ?s ?p ?o }'), answer('no')], graph, undefined, false);
+    await runAgent(deps, { ...input, confirmEveryCall: true });
+    expect(deps.ui.approvals).toHaveLength(1);
+    expect(graph.runs).toHaveLength(0);
+  });
+
+  it('asks no per-call question in the other modes', async () => {
+    const graph = new FakeGraph([]);
+    const deps = withGraph([query('ASK { ?s ?p ?o }'), answer('yes')], graph);
+    await runAgent(deps, { ...input, confirmEveryCall: false });
     expect(deps.ui.approvals).toEqual([]);
     expect(graph.runs).toHaveLength(1);
   });

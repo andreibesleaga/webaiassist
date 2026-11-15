@@ -5,9 +5,9 @@
 // shows an older page over a newer one. When the site changes, a running answer is stopped,
 // and the chat of the new site is shown (the conversation stays per site).
 import { PageError, type PageInfo } from '../adapters/messaging-tool-bridge';
-import { listableTool } from '../core/sanitize';
 import { buildSiteFacts, isNodeSite, type Outcomes, type SiteFacts } from '../core/site-facts';
 import { toolRows } from '../core/tool-card';
+import { forModel, offeredTools } from '../core/tool-offer';
 import { byId } from './dom';
 import { t } from './i18n';
 import { renderAccess, renderCard, type CardView } from './page-card';
@@ -16,6 +16,7 @@ import type { PanelController, SiteState } from './panel-controller';
 import { note } from './panel-note';
 import { showSiteChat, stopForSwitch } from './panel-switch';
 import { drawNodeCard } from './panel-node-card';
+import { runByHand } from './panel-manual-run';
 import { starterPrompts } from './starter-prompts';
 
 const hostOf = (origin: string): string => {
@@ -78,6 +79,7 @@ function cardView(ctx: PanelController, looking: boolean): CardView {
     blocked: aiBlocked(ctx),
     overridden: overridden(ctx),
     canOverride: ctx.state.runtime?.remote !== true,
+    run: (tool, text, say) => runByHand(ctx, tool, text, say),
   };
 }
 
@@ -96,7 +98,7 @@ export function drawPage(ctx: PanelController, looking = stillLooking(ctx)): voi
   drawNodeCard(ctx, isNode(ctx), blocked);
   ctx.ui.setEmptyText(emptyText(ctx, blocked));
   ctx.ui.setStarters(
-    isNode(ctx) && !blocked ? starterPrompts(ctx.state.page?.info?.tools ?? []) : [],
+    isNode(ctx) && !blocked ? starterPrompts(forModel(ctx.state.page?.info?.tools ?? [])) : [],
   );
 }
 
@@ -162,8 +164,10 @@ async function listTools(
 ): Promise<PageInfo | PageError | Error> {
   try {
     const info = await ctx.deps.bridge.page(tabId);
-    // The card shows what the model is offered: a tool whose text carries a turn marker is neither.
-    return { ...info, tools: info.tools.filter(listableTool) };
+    // The card shows what the model is offered (a tool whose text carries a turn marker is neither),
+    // plus the tools for developers, each with the review written on it (tool-offer.ts).
+    const options = { ledger: ctx.state.ledger, manual: true };
+    return { ...info, tools: offeredTools(info.tools, info.origin, options) };
   } catch (error) {
     return error instanceof Error ? error : new Error(String(error));
   }

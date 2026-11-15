@@ -6,8 +6,14 @@
 // can see and imitate every window message, so the reply is still untrusted data; what
 // this script adds itself (the origin, the linkset flag) comes from its own world. A call
 // names the site its run started on, and is refused when the page is on another one.
+// A tools/cancel (Stop in the panel) is passed on to the page script as an abort of that call.
 // Tool-change notices go out at most once per 250 ms.
-import type { Message, ToolsCallRequest, ToolsListRequest } from '../protocol/messages';
+import type {
+  Message,
+  ToolsCallRequest,
+  ToolsCancel,
+  ToolsListRequest,
+} from '../protocol/messages';
 import { parseEnvelope, parseMessage } from '../protocol/validate';
 import type { WindowLike } from './page-bridge-main';
 
@@ -35,6 +41,8 @@ export interface RelayDeps {
 }
 
 type Request = ToolsListRequest | ToolsCallRequest;
+/** The ids of the page hop by the id of the request the service worker sent: for Stop. */
+type PageIds = Map<string, string>;
 type PageResult = Extract<Message, { type: 'tools/list-result' | 'tools/call-result' }>;
 
 const TIMEOUT_MS = 10_000;
@@ -77,8 +85,10 @@ function relay(
   deps: RelayDeps,
   waiting: Map<string, (reply: PageResult) => void>,
   request: Request,
+  ids: PageIds,
 ): Promise<object> {
   const id = deps.newId();
+  ids.set(request.id, id);
   const message =
     request.type === 'tools/list'
       ? { type: 'tools/list', id }
@@ -86,16 +96,32 @@ function relay(
   return new Promise((resolve) => {
     const timer = setTimeout(() => {
       waiting.delete(id);
+      ids.delete(request.id);
+      // The page did not answer in time: its tool is told to stop as well.
+      if (request.type === 'tools/call') postCancel(deps, id);
       resolve(failure(request, TIMEOUT_TEXT));
     }, deps.timeoutMs ?? TIMEOUT_MS);
     waiting.set(id, (reply) => {
       if (reply.type !== expected(request)) return;
       clearTimeout(timer);
       waiting.delete(id);
+      ids.delete(request.id);
       resolve(answer(deps, request, reply));
     });
     deps.win.postMessage({ source: 'webaiassist', channel: deps.channel, message }, '*');
   });
+}
+
+function postCancel(deps: RelayDeps, id: string): void {
+  const message = { type: 'tools/cancel', id };
+  deps.win.postMessage({ source: 'webaiassist', channel: deps.channel, message }, '*');
+}
+
+/** Stop: the running call of the request `cancel.id` is told to abort; the answer is empty. */
+function cancelCall(deps: RelayDeps, ids: PageIds, cancel: ToolsCancel): object {
+  const pageId = ids.get(cancel.id);
+  if (pageId !== undefined) postCancel(deps, pageId);
+  return { type: 'tools/call-result', id: cancel.id, ok: true, text: '' };
 }
 
 /** A message from the MAIN script on this channel, or undefined. */
@@ -151,6 +177,7 @@ function onOtherSite(deps: RelayDeps, request: Request): boolean {
 
 export function startIsolatedRelay(deps: RelayDeps): void {
   const waiting = new Map<string, (reply: PageResult) => void>();
+  const ids: PageIds = new Map();
   const notice = throttled(() => {
     deps.runtime.sendMessage({ type: 'tools/changed' }).catch(() => undefined);
   });
@@ -162,12 +189,16 @@ export function startIsolatedRelay(deps: RelayDeps): void {
     const parsed = parseMessage(raw, 'content');
     if (!parsed.ok) return false;
     const request = parsed.value;
+    if (request.type === 'tools/cancel') {
+      sendResponse(cancelCall(deps, ids, request));
+      return false;
+    }
     if (request.type !== 'tools/list' && request.type !== 'tools/call') return false;
     if (onOtherSite(deps, request)) {
       sendResponse(failure(request, OTHER_SITE_TEXT));
       return false;
     }
-    void relay(deps, waiting, request).then(sendResponse);
+    void relay(deps, waiting, request, ids).then(sendResponse);
     return true;
   });
 }

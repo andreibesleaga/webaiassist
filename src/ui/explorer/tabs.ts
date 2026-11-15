@@ -8,6 +8,7 @@ import type { FileOutcome } from '../../core/site-files';
 import type { MessageKey } from '../messages-en';
 import type { QuerySession } from '../../adapters/query-session';
 import type { PageMeta } from '../../core/site-page';
+import { activityTab, type ActivityDeps } from './activity-tab';
 import { graphTab } from './graph-tab';
 import { pageDataTab } from './page-data-tab';
 import { queryTab } from './query-tab';
@@ -22,6 +23,8 @@ export interface ExplorerContext {
   readonly approved: Set<string>;
   /** What the Query, Vocabulary and Page data tabs read with; a page without it shows none of them. */
   readonly query?: QueryTabDeps;
+  /** What the Activity tab reads and runs with; without it the tab says it is not available. */
+  readonly activity?: ActivityDeps;
 }
 
 /** The query worker for the node's graph, a second one for its vocabulary, and the open page's data. */
@@ -37,4 +40,10 @@ export interface ExplorerTab {
   mount(root: HTMLElement, ctx: ExplorerContext): void;
 }
 
-export const EXPLORER_TABS: readonly ExplorerTab[] = [graphTab, queryTab, vocabTab, pageDataTab];
+export const EXPLORER_TABS: readonly ExplorerTab[] = [
+  graphTab,
+  queryTab,
+  vocabTab,
+  pageDataTab,
+  activityTab,
+];

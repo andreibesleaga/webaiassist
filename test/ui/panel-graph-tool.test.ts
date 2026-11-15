@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { QUERY_TOOL_NAME } from '../../src/core/builtin-tools';
 import type { GraphQuery } from '../../src/core/ports/graph-query';
 import { AGSC_TOOLS, answer, call } from '../helpers';
-import { loadPage } from './dom';
+import { byId, click, loadPage } from './dom';
 import { fakeDeps, FakePanelBridge, FakeSite, ORIGIN, type FakeDeps } from './panel-fakes';
 import { ask, fakeClock, flush, noAi, nodeOutcomes, open, startModel, text } from './site-helpers';
 
@@ -29,6 +29,7 @@ async function node(
     port?: GraphQuery;
     outcomes?: ReturnType<typeof nodeOutcomes>;
     linkset?: boolean;
+    quiet?: boolean;
   } = {},
 ): Promise<FakeDeps> {
   const site = new FakeSite();
@@ -38,6 +39,7 @@ async function node(
     bridge: new FakePanelBridge(AGSC_TOOLS, options.linkset ?? true),
   });
   deps.grants.origins.add(ORIGIN);
+  if (options.quiet) deps.settings = { ...deps.settings, confirmMode: 'per-site' };
   const withPort: FakeDeps = { ...deps, ...(options.port ? { graphQuery: options.port } : {}) };
   await open(withPort);
   await startModel();
@@ -68,12 +70,24 @@ describe('the built-in graph tool in the panel', () => {
     const port = graph();
     const deps = await node([call(QUERY_TOOL_NAME, { sparql: 'ASK { ?s ?p ?o }' }), answer('13')], {
       port,
+      quiet: true,
     });
     await asked('How many concepts?');
     expect(system(deps)).toContain('Built-in tool (written by WebAIAssist, not by the page):');
     expect(port.runs).toEqual(['ASK { ?s ?p ?o }']);
     expect(deps.bridge.calls).toEqual([]);
     expect(text('transcript')).toContain('13');
+  });
+
+  it('asks before each call in "ask for every call", and runs nothing on Deny', async () => {
+    const port = graph();
+    const query = call(QUERY_TOOL_NAME, { sparql: 'ASK { ?s ?p ?o }' });
+    await node([query, answer('no')], { port });
+    await asked('How many concepts?');
+    expect(byId('confirm').hasAttribute('open')).toBe(true);
+    click('confirm-deny');
+    for (let i = 0; i < 5; i += 1) await flush();
+    expect(port.runs).toEqual([]);
   });
 
   it('is not offered on a page that is not a node', async () => {

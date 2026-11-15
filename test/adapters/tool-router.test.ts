@@ -132,7 +132,8 @@ describe('routeToolRequest', () => {
 
   it('says the page did not answer when the page closes during a tool call (F13.5)', async () => {
     const tab: TabDeps = {
-      sendToTab: () => Promise.reject(new Error('The message port closed before a response.')),
+      sendToTab: () =>
+        Promise.reject(new Error('The message port closed before a response was received.')),
       inject: () => Promise.resolve(),
     };
     const call = {

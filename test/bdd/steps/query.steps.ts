@@ -2,7 +2,7 @@
 // Steps of features/22-query-tools.feature: a stub node that publishes graph.nq and its vocabulary
 // (test/smoke/explorer-helpers.ts), and the Query, Vocabulary and Page data tabs of the explorer page.
 import { expect, type Page } from '@playwright/test';
-import { askPanel, startScripted } from '../../../scripts/eval/conformance-run.ts';
+import { askPanel, startScripted, useConfirmMode } from '../../../scripts/eval/conformance-run.ts';
 import {
   openExplorer,
   openNodePage,
@@ -216,6 +216,13 @@ Given('the side panel is open on that page with the scripted model', async ({ wo
   await startScripted(panel);
 });
 
+Given('the confirmation setting is {string}', async ({ world }, mode: string) => {
+  const panel = panelOf.get(world);
+  if (!panel) throw new Error('open the panel first');
+  await useConfirmMode(panel, mode === 'per-site' ? 'per-site' : 'every-call');
+  await startScripted(panel);
+});
+
 async function callTool(world: World, sparql: string): Promise<void> {
   const panel = panelOf.get(world);
   if (!panel) throw new Error('open the panel first');
@@ -235,6 +242,10 @@ function seen(world: World) {
   if (!result) throw new Error('ask the model first');
   return result;
 }
+
+Then('a question to run the built-in graph tool was asked', ({ world }) => {
+  expect(seen(world).questions).toContain('Run the tool webaiassist_query_graph?');
+});
 
 Then('no question to run a tool was asked', ({ world }) => {
   expect(seen(world).questions.filter((q) => q.startsWith('Run the tool'))).toEqual([]);

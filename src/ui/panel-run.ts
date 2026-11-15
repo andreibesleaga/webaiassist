@@ -2,6 +2,7 @@
 // One question: read the page, ask for the site when a tool is first used, run the agent loop
 // with the Options (step cap, confirmation mode, memory), and let Stop end it.
 import { runAgent, type AgentDeps } from '../core/agent-loop';
+import { forModel } from '../core/tool-offer';
 import { isNodeSite } from '../core/site-facts';
 import { siteContext, siteContextLimit } from '../core/site-context';
 import type { ToolBridge } from '../core/ports/tool-bridge';
@@ -15,6 +16,7 @@ import { aiBlocked, refreshPage } from './panel-page';
 import { dismissFirstRun } from './panel-notices';
 import { graphToolFor } from './panel-graph-tool';
 import { shownText } from './panel-problems';
+import { startActivity } from './panel-activity';
 
 /** The bridge used when the page has no tools. */
 const NO_TOOLS: ToolBridge = {
@@ -31,6 +33,16 @@ interface ToolPlan {
   readonly gate?: () => Promise<boolean>;
 }
 
+/** The question "use the tools of this site?" for a site, asked when a tool is first used. */
+export function siteQuestion(ctx: PanelController, origin: string, toolCount: number) {
+  return siteGate(
+    ctx.deps.grants,
+    (r) => ctx.ui.confirmSite(r),
+    { origin, toolCount },
+    () => note(ctx, t('siteDenied')),
+  );
+}
+
 function toolPlan(ctx: PanelController): ToolPlan {
   const page = ctx.state.page;
   const info = page?.info;
@@ -41,18 +53,14 @@ function toolPlan(ctx: PanelController): ToolPlan {
     info.linkset,
     ctx.state.site?.facts,
   );
-  if (info.tools.length === 0) return { bridge: NO_TOOLS, origin, node };
-  const site = { origin, toolCount: info.tools.length };
-  const gate = siteGate(
-    ctx.deps.grants,
-    (r) => ctx.ui.confirmSite(r),
-    site,
-    () => note(ctx, t('siteDenied')),
-  );
+  // Tools marked for developers are not the model's: they are neither counted nor asked about.
+  const toolCount = forModel(info.tools).length;
+  if (toolCount === 0) return { bridge: NO_TOOLS, origin, node };
+  const gate = siteQuestion(ctx, origin, toolCount);
   return { bridge: ctx.deps.bridge, origin, node, gate };
 }
 
-function setRunning(ctx: PanelController, controller: AbortController | undefined): void {
+export function setRunning(ctx: PanelController, controller: AbortController | undefined): void {
   ctx.state.running = controller;
   byId<HTMLButtonElement>(ctx.deps.doc, 'send').disabled = controller !== undefined;
   byId<HTMLButtonElement>(ctx.deps.doc, 'stop').disabled = controller === undefined;
@@ -90,7 +98,7 @@ type Parts = Pick<AgentDeps, 'model' | 'memory' | 'ui'>;
 function agentDepsFor(ctx: PanelController, parts: Parts, plan: ToolPlan): AgentDeps {
   const { clock, validator } = ctx.deps;
   const gate = plan.gate ? { siteGate: plan.gate } : {};
-  return { ...parts, bridge: plan.bridge, clock, validator, ...gate };
+  return { ...parts, bridge: plan.bridge, clock, validator, ledger: ctx.state.ledger, ...gate };
 }
 
 async function runQuestion(ctx: PanelController, text: string, tabId: number): Promise<void> {
@@ -105,12 +113,13 @@ async function runQuestion(ctx: PanelController, text: string, tabId: number): P
   const pageText = pageTextFor(ctx, tabId, plan.origin);
   const siteText = siteFactsFor(ctx, plan.origin);
   const notice = withSlowStartNotice(ui);
+  const activity = await startActivity(ctx, plan.origin, text, controller.signal);
   const graph = await graphToolFor(ctx, plan, tabId);
   const agentDeps = {
     ...graph.deps,
-    ...agentDepsFor(ctx, { model, memory, ui: notice.ui }, plan),
+    ...agentDepsFor(ctx, activity.wrap({ model, memory, ui: notice.ui }), plan),
   };
-  const result = await runAgent(agentDeps, {
+  const result = await activity.watched(runAgent)(agentDeps, {
     tabId,
     origin: plan.origin,
     userText: text,

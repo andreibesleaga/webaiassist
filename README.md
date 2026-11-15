@@ -91,6 +91,13 @@ A model you choose yourself is kept. Details are under [Other runtimes](#other-r
   access to a site until you allow that site.
 - What a tool does is the page's code, which the extension cannot check.
 
+## Activity log
+
+The panel keeps a log of what you asked, with the model, tokens, price (when the service reports one), times and
+the tool calls, in this browser only. Open it from **Activity log** in the panel's More area: totals per day, filters
+by site, model and day, Export JSON and CSV, and Clear. The question, tool arguments and results are not kept unless
+you switch on **Include content**. See [docs/PRIVACY.md](docs/PRIVACY.md), "The activity log".
+
 ## What it reads from a site
 
 The plain version is [What the extension reads](docs/WHAT-THE-EXTENSION-READS.md); the table of
@@ -115,7 +122,7 @@ The same tab has **Query**, **Vocabulary** and **Page data**. Query is a text bo
 questions of the AgenticSystemCore vocabulary; it runs in your browser with Oxigraph (WebAssembly, in the package)
 and sends nothing. An update or a `SERVICE` clause is refused. On a node, the model has one built-in tool,
 `webaiassist_query_graph`, for counts, lists and links that the page's tools cannot give; the same engine
-answers it, and no page tool can take its name.
+answers it, and no page tool can take its name. In the mode "ask for every call" it asks before each call, like a page tool; in the other modes it runs without a per-call question.
 
 A site that says it wants no AI input (`Content-Signal: ai-input=no` in `robots.txt`) gets no
 text sent to the model and no **Read this page**. The results of the site's own tools still go
@@ -250,6 +257,16 @@ Two routes need no switch: **Read this page** gives the model the page text, and
 this site** (compat mode) loads the WebMCP polyfill on that one site, after you allow access to it.
 Other browsers: [docs/BROWSERS.md](docs/BROWSERS.md).
 
+## Tool review and tool details
+
+Each tool of the open page is read against nine written rules ([docs/TOOL-REVIEW.md](docs/TOOL-REVIEW.md)). A
+tool with a finding is marked **check** with its reasons and is always asked about. Click a tool's name in the
+list to see everything the page said about it (title, full description, the four hints, its fields), and **Run…**
+to run it by hand: you are asked first, as for any call. A tool the page marks as having hard-to-undo
+consequences is asked about twice. A form tool tells you that the page waits for you to press Submit. A tool
+with the `debugging` hint is shown as **for developers** and the model is never offered it. The number on the
+toolbar icon counts the tools of a site you allowed.
+
 ## Privacy
 
 With the model in the browser or Chrome's built-in model, your questions, the page text and
@@ -353,6 +370,7 @@ release steps. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) explains the design.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): parts of the extension, message flow,
   confirmation gate, permissions.
 - [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md): threats, controls and the tests that prove them.
+- [docs/TOOL-REVIEW.md](docs/TOOL-REVIEW.md): the nine rules of the tool review, the comparison with OWASP and its gaps.
 - [docs/PRIVACY.md](docs/PRIVACY.md): what leaves the computer and what is stored.
 - [docs/A11Y.md](docs/A11Y.md): accessibility checks and results.
 - [docs/SCENARIOS.md](docs/SCENARIOS.md): every scenario of `features/`, its tags, its test and

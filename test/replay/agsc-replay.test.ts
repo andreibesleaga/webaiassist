@@ -80,6 +80,8 @@ async function allowEverything(): Promise<string[]> {
   return titles;
 }
 
+const SECOND_QUESTION = new Set(['propose', 'remember']);
+
 describe('fixture replay: the ten AgenticSystemCore tools through the whole message path', () => {
   beforeEach(() => {
     loadPage('sidepanel.html');
@@ -108,7 +110,9 @@ describe('fixture replay: the ten AgenticSystemCore tools through the whole mess
     byId<HTMLFormElement>('ask').requestSubmit();
     const titles = await allowEverything();
 
-    expect(titles).toEqual([`Use the tools of ${ORIGIN}?`, `Run the tool ${name}?`]);
+    // A tool the page marks as consequential is asked about a second time.
+    const again = SECOND_QUESTION.has(name) ? [`Are you sure about ${name}?`] : [];
+    expect(titles).toEqual([`Use the tools of ${ORIGIN}?`, `Run the tool ${name}?`, ...again]);
     expect(context.executed).toEqual([{ name, args: CALLS[name] }]);
     const result = byId('transcript').querySelector('[data-trust="untrusted"] pre')?.textContent;
     expect(JSON.parse(result ?? '{}')).toMatchObject({ source: name, trust: 'untrusted' });

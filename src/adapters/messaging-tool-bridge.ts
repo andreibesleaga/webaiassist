@@ -8,7 +8,7 @@ import type {
   ToolListing,
   ToolTarget,
 } from '../core/ports/tool-bridge';
-import type { ToolAnnotations, ToolArgs, ToolInfo } from '../core/types';
+import type { CancelSignal, ToolAnnotations, ToolArgs, ToolInfo } from '../core/types';
 import type { ToolsListResult, WireTool } from '../protocol/messages';
 import { parseMessage } from '../protocol/validate';
 
@@ -22,7 +22,7 @@ export interface PageInfo {
 
 export type SendMessage = (message: object) => Promise<unknown>;
 
-const HINTS = ['readOnlyHint', 'consequentialHint', 'untrustedContentHint'] as const;
+const HINTS = ['readOnlyHint', 'consequentialHint', 'untrustedContentHint', 'debugging'] as const;
 
 function toAnnotations(wire: NonNullable<WireTool['annotations']>): ToolAnnotations {
   const out: { -readonly [K in keyof ToolAnnotations]: ToolAnnotations[K] } = {};
@@ -38,8 +38,14 @@ export function toToolInfo(wire: WireTool): ToolInfo {
     description: wire.description,
     ...(wire.inputSchema ? { inputSchema: wire.inputSchema } : {}),
     ...(wire.annotations ? { annotations: toAnnotations(wire.annotations) } : {}),
+    ...(wire.form
+      ? { form: { autosubmit: wire.form.autosubmit, sensitive: wire.form.sensitive } }
+      : {}),
   };
 }
+
+/** The call was not sent: Stop was pressed first. */
+const STOPPED_TEXT = 'Tool error: stopped before the call was sent.';
 
 const errorText = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
@@ -93,21 +99,43 @@ export class MessagingToolBridge implements ToolBridge {
     return { origin, tools };
   }
 
-  /** The call carries the run's origin; the page script refuses it on any other site. */
-  async call(target: ToolTarget, name: string, args: ToolArgs): Promise<ToolCallResult> {
+  /**
+   * The call carries the run's origin; the page script refuses it on any other site. When
+   * `signal` aborts (Stop in the panel) while the call runs, the page's tool is told to abort.
+   */
+  async call(
+    target: ToolTarget,
+    name: string,
+    args: ToolArgs,
+    signal?: CancelSignal,
+  ): Promise<ToolCallResult> {
     const id = this.newId();
     const { tabId, origin } = target;
+    if (signal?.aborted === true) return { ok: false, text: STOPPED_TEXT };
+    const stopWatching = this.cancelOnAbort(signal, id, tabId);
     let reply: unknown;
     try {
       reply = await this.send({ type: 'tools/call', id, tabId, origin, name, args });
     } catch (error) {
       return { ok: false, text: `Tool error: ${errorText(error)}` };
+    } finally {
+      stopWatching();
     }
     const parsed = parseMessage(reply, 'panel');
     if (!parsed.ok || parsed.value.type !== 'tools/call-result' || parsed.value.id !== id) {
       return { ok: false, text: 'Tool error: the page gave an answer WebAIAssist cannot use.' };
     }
     return { ok: parsed.value.ok, text: parsed.value.text };
+  }
+
+  /** Sends tools/cancel for call `id` when the signal aborts; returns a function that stops watching. */
+  private cancelOnAbort(signal: CancelSignal | undefined, id: string, tabId: number): () => void {
+    const target = signal as Partial<EventTarget> | undefined;
+    if (typeof target?.addEventListener !== 'function') return () => undefined;
+    const send = (): void =>
+      void this.send({ type: 'tools/cancel', id, tabId }).catch(() => undefined);
+    target.addEventListener('abort', send, { once: true });
+    return () => target.removeEventListener?.('abort', send);
   }
 
   onChange(listener: (tabId: number) => void): () => void {

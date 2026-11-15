@@ -15,13 +15,21 @@ import { loadNodeFile } from '../adapters/graph-load';
 import { createQuerySession } from '../adapters/query-session';
 import { readPageData } from '../adapters/site-files';
 import { sha256Base64 } from '../adapters/sha256';
-import { explorerQuery, parseExplorerQuery, type ExplorerTarget } from '../ui/explorer-url';
+import { MessagingToolBridge } from '../adapters/messaging-tool-bridge';
+import {
+  explorerQuery,
+  parseExplorerQuery,
+  wantsActivity,
+  type ExplorerTarget,
+} from '../ui/explorer-url';
 import { visible } from '../core/tool-card';
 import { byId } from '../ui/dom';
 import { applyI18n, t } from '../ui/i18n';
 import { bindLinkOpener, openInNewTab } from '../ui/explorer/link-opener';
+import { activityTab, type ActivityDeps } from '../ui/explorer/activity-tab';
 import { startShell } from '../ui/explorer/shell';
 import { EXPLORER_TABS, type ExplorerContext } from '../ui/explorer/tabs';
+import { lazyActivityLog } from './shared/activity-log';
 import { explorerDeps } from './shared/explorer-deps';
 import { makeQueryWorker } from './shared/query-worker-factory';
 
@@ -34,6 +42,28 @@ function showProblem(text: string): void {
   const line = byId(document, 'graph-problem');
   line.textContent = text;
   line.hidden = false;
+}
+
+function download(fileName: string, text: string, mime: string): void {
+  const url = URL.createObjectURL(new Blob([text], { type: mime }));
+  const link = Object.assign(document.createElement('a'), { href: url, download: fileName });
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+/** The log, and (for a re-run) the same bridge the side panel uses: any extension page is accepted. */
+function activityDeps(target?: ExplorerTarget): ActivityDeps {
+  const bridge = new MessagingToolBridge(
+    (message) => chrome.runtime.sendMessage(message),
+    () => crypto.randomUUID(),
+  );
+  return {
+    log: lazyActivityLog,
+    bridge,
+    nowIso: () => new Date().toISOString(),
+    download,
+    ...(target ? { target } : {}),
+  };
 }
 
 function install(target: ExplorerTarget, approved: Set<string>): ExplorerContext {
@@ -57,7 +87,7 @@ function install(target: ExplorerTarget, approved: Set<string>): ExplorerContext
     vocabulary: session('ontology'),
     pageData: () => readPageData(explorerDeps, target),
   };
-  return { doc: document, target, readTab, approved, query };
+  return { doc: document, target, readTab, approved, query, activity: activityDeps(target) };
 }
 
 function withoutTarget(): void {
@@ -68,9 +98,27 @@ function withoutTarget(): void {
   byId(document, 'explorer-body').hidden = true;
 }
 
+/** The Activity log needs no node: this is the only tab then, and the Graph panel stays hidden. */
+function activityOnly(): void {
+  byId(document, 'explorer-heading').textContent = t('activityHeading');
+  const note = byId(document, 'graph-note');
+  note.textContent = t('activityNoNode');
+  note.hidden = false;
+  byId(document, 'panel-graph').remove();
+  bindLinkOpener(document, openInNewTab);
+  const ctx = { doc: document, activity: activityDeps(parseExplorerQuery(location.search)) };
+  startShell(
+    ctx,
+    [activityTab],
+    byId(document, 'explorer-tabs'),
+    byId(document, 'explorer-panels'),
+  );
+}
+
 function main(): void {
   applyI18n(document);
   document.title = t('explorerPageTitle');
+  if (wantsActivity(location.search)) return activityOnly();
   const target = parseExplorerQuery(location.search);
   if (!target) return withoutTarget();
   normaliseAddress(target);

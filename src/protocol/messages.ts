@@ -13,6 +13,13 @@ export interface WireAnnotations {
   readOnlyHint?: boolean;
   consequentialHint?: boolean;
   untrustedContentHint?: boolean;
+  debugging?: boolean;
+}
+
+/** A declarative form tool: the page's form, found in its own DOM by the MAIN-world script. */
+export interface WireForm {
+  autosubmit: boolean;
+  sensitive: ('password' | 'payment' | 'personal')[];
 }
 
 export interface WireTool {
@@ -21,6 +28,7 @@ export interface WireTool {
   description: string;
   inputSchema?: Record<string, unknown>;
   annotations?: WireAnnotations;
+  form?: WireForm;
 }
 
 export interface WireChatMessage {
@@ -71,6 +79,13 @@ export interface ToolsCallRequest {
   origin?: string;
   name: string;
   args: Record<string, unknown>;
+}
+/** Stop: tells the page's running tool call `id` (the id of the tools/call) to abort. The
+ *  answer is a tools/call-result with the same id, ok and an empty text. */
+export interface ToolsCancel {
+  type: 'tools/cancel';
+  id: string;
+  tabId?: number;
 }
 export interface ToolsCallResult {
   type: 'tools/call-result';
@@ -201,6 +216,7 @@ export type Message =
   | ToolsListResult
   | ToolsCallRequest
   | ToolsCallResult
+  | ToolsCancel
   | ToolsChanged
   | ModelLoadRequest
   | ModelProgress
@@ -227,6 +243,7 @@ const TOOL_TYPES = [
   'tools/list-result',
   'tools/call',
   'tools/call-result',
+  'tools/cancel',
   'tools/changed',
 ] as const;
 const MODEL_TYPES = [

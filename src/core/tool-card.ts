@@ -5,8 +5,9 @@
 // the same rule as the confirmation gate.
 import { isReservedName } from './builtin-tools';
 import { needsConfirmation } from './gate';
+import { forDevelopers } from './tool-offer';
 import { revealInvisible } from './sanitize';
-import type { ToolInfo } from './types';
+import type { ToolFlag, ToolInfo } from './types';
 
 export type ToolEffect = 'reads' | 'changes';
 
@@ -23,6 +24,12 @@ export interface ToolRow {
   readonly pageContent: boolean;
   /** The name is, or reads like, a name of WebAIAssist's own tool: not offered to the model. */
   readonly reserved?: boolean;
+  /** What the security review found (tool-review.ts); empty for a tool without a finding. */
+  readonly flags: readonly ToolFlag[];
+  /** The page marked the tool for developers: the model is not offered it. */
+  readonly forDevelopers: boolean;
+  /** The tool as the page gave it, for the detail view (every text of it is shown as text). */
+  readonly source: ToolInfo;
 }
 
 const NAME_CAP = 64;
@@ -62,6 +69,9 @@ export function toolRow(tool: ToolInfo): ToolRow {
     unmarked: tool.annotations?.readOnlyHint === undefined,
     pageContent: tool.annotations?.untrustedContentHint === true,
     ...(isReservedName(tool.name) ? { reserved: true } : {}),
+    flags: tool.review ?? [],
+    forDevelopers: forDevelopers(tool),
+    source: tool,
   };
 }
 

@@ -41,6 +41,7 @@ const SAMPLES: Message[] = [
     args: { query: 'x' },
   },
   { type: 'tools/call-result', id: 'a2', ok: true, text: '{"trust":"untrusted"}' },
+  { type: 'tools/cancel', id: 'a2', tabId: 4 },
   { type: 'tools/changed' },
   { type: 'model/load', id: 'm1', modelId: 'Llama-3.2-3B-Instruct-q4f16_1-MLC' },
   { type: 'model/progress', id: 'm1', fraction: 0.5, text: 'half' },

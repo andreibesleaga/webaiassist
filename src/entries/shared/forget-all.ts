@@ -8,6 +8,8 @@ import { forgetAllSites } from '../../adapters/forget-site';
 import { openIndexedDbMemory } from '../../adapters/indexeddb-memory';
 import { SessionSiteGrants } from '../../adapters/session-site-grants';
 import { loadSettings } from '../../adapters/settings';
+import { withActivity } from '../../adapters/forget-activity';
+import { lazyActivityLog } from './activity-log';
 import { endpointAccess } from '../../ui/options-form';
 
 async function endpointPattern(): Promise<string[]> {
@@ -35,7 +37,10 @@ async function unregisterAll(): Promise<void> {
 
 export async function forgetAll(): Promise<void> {
   await forgetAllSites({
-    memory: { clear: async (origin) => (await openIndexedDbMemory()).clear(origin) },
+    memory: withActivity(
+      { clear: async (origin) => (await openIndexedDbMemory()).clear(origin) },
+      lazyActivityLog,
+    ),
     grants: new SessionSiteGrants(chrome.storage.session),
     compat: {
       unregisterAll,

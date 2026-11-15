@@ -12,6 +12,7 @@ const VALIDATORS: Record<MessageType, StandaloneValidator> = {
   'tools/list-result': generated.validate_tools_list_result,
   'tools/call': generated.validate_tools_call,
   'tools/call-result': generated.validate_tools_call_result,
+  'tools/cancel': generated.validate_tools_cancel,
   'tools/changed': generated.validate_tools_changed,
   'model/load': generated.validate_model_load,
   'model/progress': generated.validate_model_progress,

@@ -5,13 +5,17 @@
 // It lists the page's tools with getTools(), runs one with executeTool(), and reports
 // toolchange events, all as PageEnvelope messages on window.postMessage. It answers only
 // messages whose source is its own window, never a frame of the page. Listing and running
-// use one rule: entries of the page's own origin whose name no other entry uses.
+// use one rule: entries of the page's own origin and own (top) window whose name no other
+// entry uses. A tools/cancel aborts the signal passed to the running call's executeTool.
 import type {
   ToolsCallRequest,
+  ToolsCancel,
   ToolsListRequest,
   WireAnnotations,
+  WireForm,
   WireTool,
 } from '../protocol/messages';
+import { formsByTool, type DocumentLike } from './form-tools';
 import { parseEnvelope, parseMessage } from '../protocol/validate';
 import type { ModelContextLike } from './webmcp-reader';
 
@@ -22,6 +26,8 @@ export interface WindowLike {
     listener: (event: { data: unknown; source?: unknown }) => void,
   ): void;
   readonly location: { readonly origin: string };
+  /** The page's own DOM, to read its declarative form tools; left out, no tool is a form. */
+  readonly document?: DocumentLike;
 }
 
 const STARTED = Symbol.for('webaiassist.main-bridge');
@@ -30,7 +36,10 @@ const DESCRIPTION_CAP = 10000;
 const TITLE_CAP = 256;
 const RESULT_CAP = 1_000_000;
 const ERROR_CAP = 2000;
-const HINTS = ['readOnlyHint', 'consequentialHint', 'untrustedContentHint'] as const;
+const HINTS = ['readOnlyHint', 'consequentialHint', 'untrustedContentHint', 'debugging'] as const;
+/** What a call that ends in a navigation (the browser gives null) is shown as. */
+export const NO_RESULT_TEXT =
+  'The tool returned no result (the page navigated, or the tool gave nothing back).';
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -78,18 +87,20 @@ function titleOf(value: unknown): string | undefined {
   return typeof value === 'string' && value !== '' ? value.slice(0, TITLE_CAP) : undefined;
 }
 
-function toWire(entry: unknown): WireTool | undefined {
+function toWire(entry: unknown, forms: ReadonlyMap<string, WireForm>): WireTool | undefined {
   if (!isObject(entry) || !validName(entry)) return undefined;
   const schema = copySchema(entry.inputSchema);
   if (schema === null) return undefined;
   const annotations = hints(entry.annotations);
   const title = titleOf(entry.title);
+  const form = forms.get(entry.name);
   return {
     name: entry.name,
     ...(title ? { title } : {}),
     description: entry.description.slice(0, DESCRIPTION_CAP),
     ...(schema ? { inputSchema: schema } : {}),
     ...(annotations ? { annotations } : {}),
+    ...(form ? { form } : {}),
   };
 }
 
@@ -101,11 +112,24 @@ async function readEntries(context: ModelContextLike | undefined): Promise<unkno
   return raw as unknown[];
 }
 
-/** Entries of this page's own origin (an entry with no origin counts as the page's). */
-function ownEntries(entries: unknown[], origin: string): Record<string, unknown>[] {
+/** Where the bridge runs: the page's tool registry, its origin and its own top window. */
+interface Page {
+  readonly context: ModelContextLike | undefined;
+  readonly origin: string;
+  readonly win: WindowLike;
+}
+
+/**
+ * Entries of this page's own origin that the top window registered (an entry with no origin
+ * counts as the page's). A tool of a same-origin frame says so through its `window`: it is not
+ * the top window, so it is neither listed nor run (tools of frames are not in this release).
+ */
+function ownEntries(entries: unknown[], page: Page): Record<string, unknown>[] {
   return entries.filter(
     (e): e is Record<string, unknown> =>
-      isObject(e) && (typeof e.origin !== 'string' || e.origin === origin),
+      isObject(e) &&
+      (typeof e.origin !== 'string' || e.origin === page.origin) &&
+      (!('window' in e) || e.window === page.win),
   );
 }
 
@@ -117,28 +141,27 @@ function duplicateNames(entries: Record<string, unknown>[]): Set<unknown> {
   return twice;
 }
 
-/** The entries the extension lists and runs: own origin, unique name. */
-async function usableEntries(context: ModelContextLike | undefined, origin: string) {
-  const own = ownEntries(await readEntries(context), origin);
+/** The entries the extension lists and runs: own origin, own window, unique name. */
+async function usableEntries(page: Page) {
+  const own = ownEntries(await readEntries(page.context), page);
   const twice = duplicateNames(own);
   return own.filter((e) => !twice.has(e.name));
 }
 
-async function listTools(
-  context: ModelContextLike | undefined,
-  request: ToolsListRequest,
-  origin: string,
-) {
+async function listTools(page: Page, request: ToolsListRequest) {
   const id = request.id;
   try {
-    const entries = await usableEntries(context, origin);
-    const tools = entries.map(toWire).filter((t): t is WireTool => t !== undefined);
+    const entries = await usableEntries(page);
+    const forms = page.win.document ? formsByTool(page.win.document) : new Map<string, WireForm>();
+    const tools = entries
+      .map((e) => toWire(e, forms))
+      .filter((t): t is WireTool => t !== undefined);
     return {
       type: 'tools/list-result',
       id,
       ok: true,
       tools: tools.slice(0, MAX_TOOLS),
-      webmcp: context !== undefined,
+      webmcp: page.context !== undefined,
     };
   } catch (error) {
     const text = errorText(error).slice(0, ERROR_CAP);
@@ -146,27 +169,26 @@ async function listTools(
   }
 }
 
-async function runTool(
-  context: ModelContextLike | undefined,
-  request: ToolsCallRequest,
-  origin: string,
-) {
-  const entries = await usableEntries(context, origin);
-  const entry = entries.find((e) => e.name === request.name);
-  if (!entry) throw new Error('no such tool on this page');
-  if (typeof context?.executeTool !== 'function') throw new Error('executeTool() is not available');
-  const result: unknown = await context.executeTool(entry, request.args);
-  return typeof result === 'string' ? result : String(JSON.stringify(result));
+/** The text of a result: a string as it is, nothing (null, undefined, or Chrome's text "null")
+ *  as one plain sentence. */
+function resultText(result: unknown): string {
+  if (typeof result === 'string') return result === 'null' ? NO_RESULT_TEXT : result;
+  return result === null || result === undefined ? NO_RESULT_TEXT : String(JSON.stringify(result));
 }
 
-async function callTool(
-  context: ModelContextLike | undefined,
-  request: ToolsCallRequest,
-  origin: string,
-) {
+async function runTool(page: Page, request: ToolsCallRequest, signal: AbortSignal) {
+  const entry = (await usableEntries(page)).find((e) => e.name === request.name);
+  if (!entry) throw new Error('no such tool on this page');
+  if (typeof page.context?.executeTool !== 'function') {
+    throw new Error('executeTool() is not available');
+  }
+  return resultText(await page.context.executeTool(entry, request.args, { signal }));
+}
+
+async function callTool(page: Page, request: ToolsCallRequest, signal: AbortSignal) {
   const id = request.id;
   try {
-    const text = await runTool(context, request, origin);
+    const text = await runTool(page, request, signal);
     return { type: 'tools/call-result', id, ok: true, text: text.slice(0, RESULT_CAP) };
   } catch (error) {
     const text = `Tool error: ${request.name}: ${errorText(error)}`.slice(0, RESULT_CAP);
@@ -174,16 +196,22 @@ async function callTool(
   }
 }
 
-/** A tools/list or tools/call request in a valid envelope, with its channel. */
-function readRequest(
-  data: unknown,
-): { channel: string; request: ToolsListRequest | ToolsCallRequest } | undefined {
+type Request = ToolsListRequest | ToolsCallRequest | ToolsCancel;
+
+/** A tools/list, tools/call or tools/cancel request in a valid envelope, with its channel. */
+function readRequest(data: unknown): { channel: string; request: Request } | undefined {
   const envelope = parseEnvelope(data);
   if (!envelope.ok) return undefined;
   const parsed = parseMessage(envelope.value.message, 'page');
   if (!parsed.ok) return undefined;
   const request = parsed.value;
-  if (request.type !== 'tools/list' && request.type !== 'tools/call') return undefined;
+  if (
+    request.type !== 'tools/list' &&
+    request.type !== 'tools/call' &&
+    request.type !== 'tools/cancel'
+  ) {
+    return undefined;
+  }
   return { channel: envelope.value.channel, request };
 }
 
@@ -201,6 +229,8 @@ export function startMainBridge(
   if (!markStarted(win)) return;
   let lastChannel: string | undefined;
   const watched = new WeakSet<object>();
+  /** The calls that are running, by request id, so that a tools/cancel can abort one. */
+  const running = new Map<string, AbortController>();
   const post = (message: object, channel: string | undefined): void => {
     if (channel) win.postMessage({ source: 'webaiassist', channel, message }, '*');
   };
@@ -212,6 +242,17 @@ export function startMainBridge(
       post({ type: 'tools/changed' }, lastChannel),
     );
   };
+  const answer = (found: { channel: string; request: Request }, page: Page): void => {
+    const { request, channel } = found;
+    if (request.type === 'tools/cancel') return void running.get(request.id)?.abort();
+    if (request.type === 'tools/list')
+      return void listTools(page, request).then((m) => post(m, channel));
+    const controller = new AbortController();
+    running.set(request.id, controller);
+    void callTool(page, request, controller.signal)
+      .then((message) => post(message, channel))
+      .finally(() => running.delete(request.id));
+  };
   win.addEventListener('message', (event) => {
     // Only the top window itself (the isolated script) may ask; a frame in the page may not.
     if (event.source !== win) return;
@@ -220,11 +261,6 @@ export function startMainBridge(
     lastChannel = found.channel;
     const context = findContext();
     watch(context);
-    const { request, channel } = found;
-    const reply =
-      request.type === 'tools/list'
-        ? listTools(context, request, win.location.origin)
-        : callTool(context, request, win.location.origin);
-    void reply.then((message) => post(message, channel));
+    answer(found, { context, origin: win.location.origin, win });
   });
 }

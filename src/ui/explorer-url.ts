@@ -21,6 +21,22 @@ export function explorerQuery(target: ExplorerTarget): string {
   return query.toString();
 }
 
+/** The address of the Activity view: the log needs no node. The tab and site are added when the
+ *  panel has them, only so a past tool call can be run again there (after the usual question). */
+export function activityQuery(target?: ExplorerTarget): string {
+  const query = new URLSearchParams({ view: 'activity' });
+  if (target) {
+    query.set('tabid', String(target.tabId));
+    query.set('origin', target.origin);
+  }
+  return query.toString();
+}
+
+/** True when the address asks for the Activity view only. */
+export function wantsActivity(search: string): boolean {
+  return new URLSearchParams(search).get('view') === 'activity';
+}
+
 /** The tab and origin named by an explorer page address, or undefined when either is missing or odd. */
 export function parseExplorerQuery(search: string): ExplorerTarget | undefined {
   const query = new URLSearchParams(search);

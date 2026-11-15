@@ -134,6 +134,10 @@ describe('PanelUI (the ChatUI port in the side panel)', () => {
     expect(body).toContain('may change something');
     expect(document.activeElement?.id).toBe('confirm-deny');
     click('confirm-allow');
+    // The fixture tool is marked consequential: the page's mark brings a second question.
+    await tick();
+    expect(byId('confirm-title').textContent).toBe('Are you sure about propose?');
+    click('confirm-allow');
     expect(await answer).toBe(true);
     expect(byId<HTMLDialogElement>('confirm').open).toBe(false);
     expect(document.activeElement?.id).toBe('question');

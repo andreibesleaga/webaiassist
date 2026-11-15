@@ -13,6 +13,14 @@ export function needsConfirmation(tool: ToolInfo): boolean {
   return hints.readOnlyHint !== true;
 }
 
+/**
+ * Asks whatever the mode: the gate above, or a tool the security review flagged (tool-review.ts).
+ * A flagged tool is never run without a question, in every confirmation mode.
+ */
+export function mustAsk(tool: ToolInfo): boolean {
+  return needsConfirmation(tool) || (tool.review?.length ?? 0) > 0;
+}
+
 /** JSON with object keys sorted at every depth, so two equal values give one string. */
 export function canonicalJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`;

@@ -403,6 +403,22 @@ webaiassist") before the list is built, so a call by name can only meet the buil
 section; the card marks the removed tools. Its results are node-author text and are fenced as untrusted like any tool result.
 Threats and controls: [THREAT-MODEL.md](THREAT-MODEL.md), "Query and semantic tools".
 
+## Activity log
+
+A port `ActivityLog` (`src/core/ports/activity-log.ts`) with an IndexedDB adapter (`src/adapters/indexeddb-activity.ts`,
+database `webaiassist-activity`, stores `questions` and `settings`). The side panel watches a question without a change
+in the agent loop: `traceModel` wraps the `ModelRuntime` (first word, usage, price, window use) and `traceUi` wraps
+the `ChatUI` (the confirmation and the loop's tool events) in `src/core/activity-wrap.ts`; a `QuestionTrace`
+(`activity-trace.ts`) builds one record, and `src/ui/panel-activity.ts` writes it when the question ends, also after a
+failure or Stop. The built-in query tool needs no hook of its own: `runBuiltin` already shows its call and result, so the
+wrapper records it as a built-in call (`test/core/activity-builtin-loop.test.ts`).
+
+The Activity tab (`src/ui/explorer/activity-tab.ts`, with `activity-view.ts`, `activity-ask.ts` and
+`activity-rerun-ui.ts`) is one more entry of the tab registry. `explorer.html?view=activity` starts the page with this
+tab only, so it works when no node is open; the panel's **Activity log** button (More area) opens that address. Totals,
+filters, export and re-run are pure code in `src/core/activity-summary.ts`, `activity-export.ts` (schema in
+`activity-schema.ts`) and `activity-rerun.ts`. Threats and controls: [THREAT-MODEL.md](THREAT-MODEL.md), "Activity log".
+
 ## Look and feel
 
 All colours, sizes and type are design tokens at the top of `static/ui.css` (light in `:root`,
@@ -550,3 +566,18 @@ for starting Google Chrome). Nothing in `src/` depends on it.
 - Developer report: `src/core/tool-report.ts` (Markdown text, schema and annotation checks);
   `src/core/review-flags.ts` is the hook for the "Security review flags" rows: replace the body of
   `reviewFlags` (same signature) and the report needs no change.
+
+## Package P7b additions (14 Nov 2026)
+
+- Review: `src/core/tool-review.ts` (nine rules, `DefinitionLedger`, `reviewTools`), `src/core/tool-review-text.ts`
+  (one plain sentence for each finding, used by the panel and the report), `src/core/tool-offer.ts` (which tools
+  the model is offered and which the user sees), `mustAsk` in `src/core/gate.ts`. `reviewFlags` in
+  `src/core/review-flags.ts` now returns the findings for the developer report.
+- Panel: `src/ui/tool-item.ts` (a list row), `src/ui/tool-detail.ts` (detail view and the "Run…" box),
+  `src/ui/panel-manual-run.ts` (a run started by hand: core `runTool` with `manual` and "ask for every call",
+  no model), `src/ui/confirm-parts.ts` (reasons and form lines in the question), `src/ui/messages-parity-en.ts`.
+  The second question lives in `PanelUI.confirmToolCall`.
+- Wire: `tools/cancel` (panel, service worker, isolated relay, MAIN script) so Stop reaches the page's tool;
+  the `debugging` hint and the declarative form facts travel with a tool.
+- Toolbar number: `src/adapters/tool-badge.ts` (pure, injected browser calls) and `src/entries/shared/badge-wiring.ts`
+  (events); it asks `permissions.contains` for the tab's origin and lists tools only when the site is allowed.

@@ -41,10 +41,15 @@ function stubChrome(): Stub {
       id: EXT,
       getURL: (path: string) => `${BASE}${path}`,
       onMessage: { addListener: (l: Listener) => stub.messageListeners.push(l) },
+      onInstalled: { addListener: () => undefined },
+      onStartup: { addListener: () => undefined },
       onConnect: { addListener: (l: ConnectListener) => stub.connectListeners.push(l) },
       sendMessage: () => Promise.resolve(undefined),
     },
+    permissions: { onRemoved: { addListener: () => undefined } },
     tabs: {
+      onUpdated: { addListener: () => undefined },
+      onActivated: { addListener: () => undefined },
       sendMessage: (_tab: number, message: unknown) => {
         stub.tabMessages.push(message);
         return Promise.resolve(undefined);

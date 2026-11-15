@@ -8,10 +8,11 @@ import type { LoadProgress } from '../core/ports/model-runtime';
 import { revealInvisible } from '../core/sanitize';
 import type { SiteRequest } from '../core/site-consent';
 import type { ToolInfo } from '../core/types';
-import { ConfirmDialog } from './confirm-dialog';
+import { ConfirmDialog, type Question } from './confirm-dialog';
+import { formLines, needsSecondQuestion, reviewLines } from './confirm-parts';
 import { byId, element } from './dom';
 import { t } from './i18n';
-import { sign } from './page-card';
+import { sign } from './marks';
 import { renderEntry } from './transcript-view';
 
 /** "Read-only" only when the gate also treats the tool as read-only. */
@@ -66,29 +67,58 @@ export class PanelUI implements ChatUI {
   }
 
   /** Page text in the question (name, arguments) shows hidden characters as [U+XXXX]. */
-  confirmToolCall(request: ToolCallApproval): Promise<boolean> {
+  async confirmToolCall(request: ToolCallApproval): Promise<boolean> {
+    this.pending = request.tool.name;
+    try {
+      if (!(await this.dialog.ask(this.firstQuestion(request)))) return false;
+      if (needsSecondQuestion(request.tool)) {
+        if (!(await this.dialog.ask(this.secondQuestion(request.tool)))) return false;
+      }
+      this.noteForm(request.tool);
+      return true;
+    } finally {
+      this.pending = undefined;
+    }
+  }
+
+  private firstQuestion(request: ToolCallApproval): Question {
     const doc = this.doc;
     const json = revealInvisible(JSON.stringify(request.args, null, 2));
-    this.pending = request.tool.name;
     const hint = element(doc, 'p', hintText(request.tool));
     if (needsConfirmation(request.tool)) {
       hint.classList.add('warning');
       hint.prepend(sign(doc));
     }
-    const answer = this.dialog.ask({
+    return {
       title: t('confirmTitle', { name: revealInvisible(request.tool.name) }),
       body: [
         element(doc, 'p', t('confirmSite', { origin: revealInvisible(request.origin) })),
+        ...reviewLines(doc, request.tool),
         hint,
+        ...formLines(doc, request.tool),
         element(doc, 'p', t('confirmArgs')),
         element(doc, 'pre', json),
       ],
       allowLabel: t('allowOnce'),
       denyLabel: t('deny'),
-    });
-    return answer.finally(() => {
-      this.pending = undefined;
-    });
+    };
+  }
+
+  /** Asked after the first Allow for a tool the page marks as consequential. */
+  private secondQuestion(tool: ToolInfo): Question {
+    const warning = element(this.doc, 'p', t('againBody'), 'warning');
+    warning.prepend(sign(this.doc));
+    return {
+      title: t('againTitle', { name: revealInvisible(tool.name) }),
+      body: [warning],
+      allowLabel: t('againAllow'),
+      denyLabel: t('deny'),
+    };
+  }
+
+  /** A form tool without autosubmit: say in the transcript that the page waits for Submit. */
+  private noteForm(tool: ToolInfo): void {
+    if (tool.form && !tool.form.autosubmit) this.add({ kind: 'note', text: t('formWaitNote') });
   }
 
   /** The name of the tool whose question is open, or undefined. */

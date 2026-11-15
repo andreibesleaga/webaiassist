@@ -41,17 +41,18 @@ offer.
 
 ## What is stored, and where
 
-| What                                                                                                                                                                   | Where                                                 | How long                                                                                                          |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Options, including the endpoint address, model name and API key                                                                                                        | `chrome.storage.local` in this browser profile        | Until you change them, press Reset to defaults, or remove the extension. The key is not encrypted.                |
-| Sites whose tools you allowed                                                                                                                                          | `chrome.storage.session`                              | Until the browser restarts                                                                                        |
-| Chat per site, with the tool results and the page text you read with Read this page (up to 4000 characters per read), and how often each tool worked per site (memory) | The extension's IndexedDB                             | Until you press Clear memory in Options or remove the extension. Nothing is kept when memory is off.              |
-| Model weights                                                                                                                                                          | The extension's Cache Storage (WebLLM's cache)        | Until you remove them in Options (Downloaded models) or remove the extension                                      |
-| Model file of the processor model                                                                                                                                      | The extension's private file storage (wllama's cache) | Until you remove it in Options (Downloaded models) or remove the extension                                        |
-| Whether the welcome screen was dismissed, and how long the first answer of your graphics card took                                                                     | `chrome.storage.local`                                | Until you remove the extension; the time is a number with the adapter's name, used only to pick the default model |
-| The last error text the panel showed (addresses and the endpoint key removed, cut to 300 characters), and whether persistent storage was asked for                     | `chrome.storage.local`                                | Until the next error replaces it, or you remove the extension; used only by Copy diagnostics                      |
-| Compat mode for a site                                                                                                                                                 | A content script registered for that site             | Until the browser restarts                                                                                        |
-| Access to a site (compat mode, endpoint)                                                                                                                               | Chrome's permission list for the extension            | Until you remove it in `chrome://extensions`, under the extension's site access                                   |
+| What                                                                                                                                                                                                                                                                                                | Where                                                 | How long                                                                                                                                                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Options, including the endpoint address, model name and API key                                                                                                                                                                                                                                     | `chrome.storage.local` in this browser profile        | Until you change them, press Reset to defaults, or remove the extension. The key is not encrypted.                                                                                            |
+| Sites whose tools you allowed                                                                                                                                                                                                                                                                       | `chrome.storage.session`                              | Until the browser restarts                                                                                                                                                                    |
+| Chat per site, with the tool results and the page text you read with Read this page (up to 4000 characters per read), and how often each tool worked per site (memory)                                                                                                                              | The extension's IndexedDB                             | Until you press Clear memory in Options or remove the extension. Nothing is kept when memory is off.                                                                                          |
+| The activity log: one entry per question (site, model, where it ran, counts of tokens, price when the service reports one, times, the tools called and whether you allowed them, an estimate of the window use). No question text, no arguments and no results unless you switch on Include content | The extension's own IndexedDB `webaiassist-activity`  | Until you press Clear in the Activity view, press Forget this site or Forget all sites, or remove the extension. The oldest entries go first above 8 MiB. Nothing is kept when memory is off. |
+| Model weights                                                                                                                                                                                                                                                                                       | The extension's Cache Storage (WebLLM's cache)        | Until you remove them in Options (Downloaded models) or remove the extension                                                                                                                  |
+| Model file of the processor model                                                                                                                                                                                                                                                                   | The extension's private file storage (wllama's cache) | Until you remove it in Options (Downloaded models) or remove the extension                                                                                                                    |
+| Whether the welcome screen was dismissed, and how long the first answer of your graphics card took                                                                                                                                                                                                  | `chrome.storage.local`                                | Until you remove the extension; the time is a number with the adapter's name, used only to pick the default model                                                                             |
+| The last error text the panel showed (addresses and the endpoint key removed, cut to 300 characters), and whether persistent storage was asked for                                                                                                                                                  | `chrome.storage.local`                                | Until the next error replaces it, or you remove the extension; used only by Copy diagnostics                                                                                                  |
+| Compat mode for a site                                                                                                                                                                                                                                                                              | A content script registered for that site             | Until the browser restarts                                                                                                                                                                    |
+| Access to a site (compat mode, endpoint)                                                                                                                                                                                                                                                            | Chrome's permission list for the extension            | Until you remove it in `chrome://extensions`, under the extension's site access                                                                                                               |
 
 ## Downloaded models
 
@@ -152,6 +153,37 @@ query text and the rows never leave the computer, and a query cannot ask any add
 query worker and is dropped when the tab or the panel moves to another site. The text of a query, and the rows the
 model reads, go where the model runs: the same rule as every other tool result, including the one-time question
 before a remote chat service gets page content.
+
+## The activity log (14 Nov 2026)
+
+Every question you ask in the panel adds one entry to a log that stays in this browser and is sent nowhere. The
+**Activity log** button in the panel's More area opens `explorer.html` on the Activity view; it works on any page,
+not only on a node.
+
+- **What is stored.** The time, the site, the model, where it ran (graphics card, processor, Chrome's model, your
+  own server or a remote service, with the host for the last two), the number of model calls, the tokens
+  (counted by the runtime when it reports them, otherwise estimated from the text and then marked "estimated"),
+  the price when the service reported one, the times, how the answer ended, and for every tool call: its name,
+  whether it is a tool of WebAIAssist, whether you were asked and what you answered, how long it took, whether it
+  worked, and the sizes of its arguments and result. The context numbers (instructions, tool list, site text, chat,
+  reply) are estimates. The text of a page you read is never stored, only counted.
+- **What is not stored by default.** The question, the tool arguments and the tool results. They are kept only
+  while **Include content** is on (off at the start; the switch is in the Activity view and applies to new
+  entries only). Even then the endpoint API key is removed wherever it appears, argument values whose names look like
+  secrets become `[redacted]`, results are cut to 4,000 characters and arguments over 4,000 characters are dropped.
+- **Where.** An IndexedDB database of the extension, `webaiassist-activity`. It is a separate database from the
+  chat memory, so removing one does not touch the other. It needs no permission beyond the ones the extension has.
+- **How much.** At most 8 MiB. When a new entry would pass the cap the oldest entries are removed first; the newest
+  is never removed.
+- **How to clear it.** **Clear** in the Activity view (it asks first, inside the page); **Forget this site** in the
+  panel removes the entries of that site; **Forget all sites** removes all of them; turning memory off in Options keeps
+  nothing new. Removing the extension removes the database.
+- **Export.** **Export JSON** and **Export CSV** save what the filters show, only when you press them. The CSV puts an
+  apostrophe before a cell that starts with `=`, `+`, `-`, `@`, a tab or a line break, so a spreadsheet does not read
+  a model name or tool name as a formula.
+- **Run again.** The button next to a past tool call asks the usual question (tool, site, arguments) and runs the
+  tool only after Allow, only in the tab the Activity view was opened for and only when the page still lists the same
+  tool. It is offered only where the arguments were saved.
 
 ## Conformance page and demo pages
 

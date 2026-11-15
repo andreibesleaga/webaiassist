@@ -12,6 +12,7 @@ import { onActionClick, type ActionDeps } from '../adapters/action-click';
 import { probeWebGpu } from '../adapters/webgpu-probe';
 import type { GpuProbeRequest, GpuProbeResult } from '../protocol/messages';
 import { parseMessage } from '../protocol/validate';
+import { startBadge } from './shared/badge-wiring';
 import { hostModels } from './shared/model-hosting';
 import { fromExtensionPage } from './shared/sender';
 import { injectBridge, startToolRouting } from './shared/tool-routing';
@@ -88,4 +89,5 @@ chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
 });
 
 startToolRouting();
+startBadge();
 hostModels('worker');

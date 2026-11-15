@@ -118,6 +118,13 @@ function openGraph(ctx: PanelController): void {
   ctx.deps.openGraph?.(page.tabId, page.origin);
 }
 
+/** "Activity log" in More: works on any page, node or not. */
+function openActivity(ctx: PanelController): void {
+  const page = ctx.state.page;
+  if (page?.origin === undefined) ctx.deps.openActivity?.();
+  else ctx.deps.openActivity?.(page.tabId, page.origin);
+}
+
 function bindHelp(ctx: PanelController): void {
   const doc = ctx.deps.doc;
   const toggle = byId(doc, 'help-toggle');
@@ -144,6 +151,7 @@ export function bindActions(ctx: PanelController): void {
   byId(doc, 'compat').addEventListener('click', () => compat(ctx));
   byId(doc, 'forget').addEventListener('click', () => forget(ctx));
   byId(doc, 'export').addEventListener('click', () => exportChat(ctx));
+  byId(doc, 'open-activity').addEventListener('click', () => openActivity(ctx));
   byId(doc, 'open-options').addEventListener('click', () => ctx.deps.openOptions());
   // The chip is drawn in code, after the files are read: one listener on the row serves it.
   byId(doc, 'site-chips').addEventListener('click', (event) => {

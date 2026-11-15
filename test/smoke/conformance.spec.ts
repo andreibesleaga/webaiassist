@@ -10,7 +10,6 @@ import { expandNames, listedOf, loadExpect } from '../../scripts/eval/conformanc
 import {
   askPanel,
   listedAfter,
-  listedNames,
   runExtensionCase,
   startScripted,
   useConfirmMode,
@@ -64,38 +63,41 @@ test('the default mode asks before a read-only tool too ("ask for every call")',
   await page.close();
 });
 
-test.fixme('C08 Stop in the panel cancels the running tool call on the page (finding: the page never sees the abort)', async () => {
+test('C08 Stop in the panel cancels the running tool call on the page', async () => {
   const { page, panel } = await open('c08');
   await useConfirmMode(panel, 'per-site');
   await startScripted(panel);
   const seen = await askPanel(panel, '/tool c08_cancellable {}', { stopAfterMs: 1_500 });
   expect(seen.transcript).toContain('Stopped.');
-  // Today the run ends in the panel but the page's execute keeps running: no signal is passed on.
+  // The panel passes the abort on: the page's execute sees its signal abort.
   await expect(page.locator('#c08-log')).toContainText('execute saw the abort', { timeout: 3_000 });
   await page.close();
 });
 
 // Findings and later packages ------------------------------------------------------------
 
-test.fixme('C05 a tool with the debugging hint is not offered to the model (P7b)', async () => {
+test('C05 a tool with the debugging hint is listed for you, marked "for developers", and not offered to the model', async () => {
   const { page, panel } = await open('c05');
   await listedAfter(
     panel,
     expandNames(listedOf(expectFile.cases.c05 ?? { title: '', tools: [], selfStatus: [] })),
   );
-  expect(await listedNames(panel)).not.toContain('c05_debugging');
+  await panel.click('#tools-toggle');
+  const row = panel.locator('#tools-rows li', { hasText: 'c05_debugging' });
+  await expect(row).toContainText('for developers');
+  // The model's request does not contain it: asking for it by name gets "unknown tool" (expect.json c05).
   await page.close();
 });
 
-test.fixme('C05 the tool detail view shows every hint of a tool, debugging included (P7b)', async () => {
+test('C05 the tool detail view shows every hint of a tool, debugging included', async () => {
   const { page, panel } = await open('c05');
   await panel.click('#tools-toggle');
-  await panel.getByText('c05_all').click();
-  await expect(panel.getByText('debugging')).toBeVisible();
+  await panel.getByRole('button', { name: 'Open the tool c05_all' }).click();
+  await expect(panel.getByText('debugging: yes')).toBeVisible();
   await page.close();
 });
 
-test.fixme('C03 a null result after a navigation is shown as "the page navigated" (P7b)', async () => {
+test('C03 a null result after a navigation is shown as "the page navigated"', async () => {
   const { page, panel } = await open('c03');
   await startScripted(panel);
   const seen = await askPanel(panel, '/tool c03_navigate {}');
@@ -103,7 +105,7 @@ test.fixme('C03 a null result after a navigation is shown as "the page navigated
   await page.close();
 });
 
-test.fixme('C11 the panel says the page waits for you to press Submit for a form tool without toolautosubmit (P7b)', async () => {
+test('C11 the panel says the page waits for you to press Submit for a form tool without toolautosubmit', async () => {
   const { page, panel } = await open('c11');
   await startScripted(panel);
   const seen = await askPanel(panel, '/tool c11_wait {"q":"y"}', { timeoutMs: 6_000 });
@@ -111,15 +113,12 @@ test.fixme('C11 the panel says the page waits for you to press Submit for a form
   await page.close();
 });
 
-test.fixme('C15 the tool security review flags look-alike names and a destructive name marked read-only (P7b)', async () => {
+test('C15 the tool security review flags look-alike names and a destructive name marked read-only', async () => {
   const { page, panel } = await open('c15');
   await panel.click('#tools-toggle');
-  await expect(panel.locator('#tools-rows li', { hasText: 'c15_account_deIete' })).toContainText(
-    'look-alike',
-  );
-  await expect(panel.locator('#tools-rows li', { hasText: 'c15_delete_account' })).toContainText(
-    'check',
-  );
+  const row = (name: string) => panel.locator(`#tools-rows li[data-tool="${name}"]`);
+  await expect(row('c15_account_deIete')).toContainText('look-alike');
+  await expect(row('c15_delete_account')).toContainText('check');
   await page.close();
 });
 
@@ -137,10 +136,16 @@ test('C16 no page tool named like webaiassist_query_graph reaches the model, and
   await page.close();
 });
 
-test.fixme('C09 a slow call and its end appear in the activity log (P7c)', async () => {
+test('C09 a slow call and its end appear in the activity log', async () => {
   const { page, panel } = await open('c09');
   await startScripted(panel);
   await askPanel(panel, '/tool c09_two_seconds {}');
-  await expect(panel.getByRole('log', { name: /activity/i })).toContainText('c09_two_seconds');
+  await panel.click('#more-toggle');
+  const opened = session.context.waitForEvent('page');
+  await panel.click('#open-activity');
+  const explorer = await opened;
+  await explorer.waitForLoadState('domcontentloaded');
+  await expect(explorer.getByRole('log', { name: /activity/i })).toContainText('c09_two_seconds');
+  await explorer.close();
   await page.close();
 });

@@ -59,14 +59,14 @@ Scenarios whose wording changed when they stopped being pending:
 
 | Tag | Scenarios |
 |---|---|
-| @smoke | 128 |
-| @unit | 169 |
+| @smoke | 134 |
+| @unit | 197 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 9 |
-| all | 311 |
-| run by `npm run test:bdd` now | 128 |
+| all | 345 |
+| run by `npm run test:bdd` now | 134 |
 
 ### Every scenario
 
@@ -333,13 +333,14 @@ Scenarios whose wording changed when they stopped being pending:
 | F22.9 | Query and semantic tools | The graph is used only when its digest in the node's linkset matches | @unit | `test/adapters/graph-query.test.ts` | unit test |
 | F22.10 | Query and semantic tools | Every cell of a result is text | @unit | `test/ui/explorer-query-tabs.test.ts` | unit test |
 | F22.11 | Query and semantic tools | The query engine files are the published ones, byte for byte | @unit | `test/third-party/agsc-query-pins.test.ts` | unit test |
-| F22.12 | Query and semantic tools | The model asks the node's graph with its built-in tool and no question is asked | @smoke | `features/22-query-tools.feature`, `test/core/builtin-loop.test.ts` | npm run test:bdd |
-| F22.13 | Query and semantic tools | An update asked by the model through the built-in tool is refused | @smoke | `features/22-query-tools.feature`, `test/core/builtin-loop.test.ts` | npm run test:bdd |
-| F22.14 | Query and semantic tools | A page tool with the built-in tool's name is marked on the card and never answers | @smoke | `features/22-query-tools.feature`, `test/core/builtin-tools.test.ts`, `test/core/builtin-loop.test.ts` | npm run test:bdd |
-| F22.15 | Query and semantic tools | A name that is or reads like a WebAIAssist name is reserved | @unit | `test/core/builtin-tools.test.ts` | unit test |
-| F22.16 | Query and semantic tools | The built-in tool is listed apart and its results are fenced as untrusted data | @unit | `test/core/builtin-loop.test.ts` | unit test |
-| F22.17 | Query and semantic tools | After a failed query the model may fix it once, and after two failures it queries no more | @unit | `test/core/builtin-loop.test.ts` | unit test |
-| F22.18 | Query and semantic tools | The panel offers the built-in tool only on a node that publishes its graph and allows AI input | @unit | `test/ui/panel-graph-tool.test.ts` | unit test |
+| F22.12 | Query and semantic tools | The model asks the node's graph with its built-in tool and, in the default mode, you are asked first | @smoke | `features/22-query-tools.feature`, `test/core/builtin-loop.test.ts` | npm run test:bdd |
+| F22.13 | Query and semantic tools | When you chose to be asked only about tools that change something, the built-in graph tool runs without a question | @smoke | `features/22-query-tools.feature`, `test/core/builtin-loop.test.ts` | npm run test:bdd |
+| F22.14 | Query and semantic tools | An update asked by the model through the built-in tool is refused | @smoke | `features/22-query-tools.feature`, `test/core/builtin-loop.test.ts` | npm run test:bdd |
+| F22.15 | Query and semantic tools | A page tool with the built-in tool's name is marked on the card and never answers | @smoke | `features/22-query-tools.feature`, `test/core/builtin-tools.test.ts`, `test/core/builtin-loop.test.ts` | npm run test:bdd |
+| F22.16 | Query and semantic tools | A name that is or reads like a WebAIAssist name is reserved | @unit | `test/core/builtin-tools.test.ts` | unit test |
+| F22.17 | Query and semantic tools | The built-in tool is listed apart and its results are fenced as untrusted data | @unit | `test/core/builtin-loop.test.ts` | unit test |
+| F22.18 | Query and semantic tools | After a failed query the model may fix it once, and after two failures it queries no more | @unit | `test/core/builtin-loop.test.ts` | unit test |
+| F22.19 | Query and semantic tools | The panel offers the built-in tool only on a node that publishes its graph and allows AI input | @unit | `test/ui/panel-graph-tool.test.ts` | unit test |
 | F23.1 | The WebMCP conformance page and suite | A conformance case registers exactly its tools and its own check ends as expected | @smoke | `features/23-webmcp-conformance.feature`, `test/ui/conformance-files.test.ts` | npm run test:bdd |
 | F23.2 | The WebMCP conformance page and suite | The side panel lists, asks and shows results for the conformance cases of errors, large and slow tools | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
 | F23.3 | The WebMCP conformance page and suite | A page that swaps a tool's description while the question to run it is open gets its call refused | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
@@ -374,6 +375,20 @@ Scenarios whose wording changed when they stopped being pending:
 | F26.4 | A chat endpoint, on this computer or remote | An endpoint on this computer never shows the question | @unit | `test/ui/panel-remote-consent.test.ts` | unit test |
 | F26.5 | A chat endpoint, on this computer or remote | The endpoint's token counts and price are read, streamed or not | @unit | `test/adapters/endpoint-usage.test.ts` | unit test |
 | F26.6 | A chat endpoint, on this computer or remote | A service that echoes the API key in an error cannot show it | @unit | `test/security/endpoint-key-leaks.test.ts`, `test/adapters/endpoint-usage.test.ts` | unit test |
+| F27.1 | Activity log | A question adds an entry, also when it stops or fails | @unit | `test/ui/panel-activity.test.ts`, `test/core/activity-trace.test.ts` | unit test |
+| F27.2 | Activity log | Without "Include content" no question text, argument or result is kept | @unit | `test/core/activity-trace.test.ts`, `test/security/activity-key-leaks.test.ts` | unit test |
+| F27.3 | Activity log | The API key is never in the log, with or without "Include content" | @unit | `test/security/activity-key-leaks.test.ts` | unit test |
+| F27.4 | Activity log | The built-in graph tool is logged as a built-in call with the query as its argument | @unit | `test/core/activity-builtin-loop.test.ts` | unit test |
+| F27.5 | Activity log | The log is capped at 8 MiB and the oldest entries go first | @unit | `test/core/activity-cap.test.ts`, `test/adapters/indexeddb-activity.test.ts` | unit test |
+| F27.6 | Activity log | The Activity view shows totals and filters by site, model and day | @unit | `test/ui/explorer-activity-tab.test.ts`, `test/core/activity-summary.test.ts` | unit test |
+| F27.7 | Activity log | Export JSON follows the published schema and Export CSV guards formulas | @unit | `test/ui/explorer-activity-tab.test.ts`, `test/core/activity-export.test.ts` | unit test |
+| F27.8 | Activity log | Clear asks inside the page and never uses the browser's confirm | @unit | `test/ui/explorer-activity-tab.test.ts` | unit test |
+| F27.9 | Activity log | A past tool call runs again only after the usual question | @unit | `test/ui/explorer-activity-tab.test.ts`, `test/core/activity-rerun.test.ts` | unit test |
+| F27.10 | Activity log | Text from a page or a service stays text in the Activity view | @unit | `test/ui/explorer-activity-tab.test.ts` | unit test |
+| F27.11 | Activity log | Forget this site and Forget all sites remove the entries | @unit | `test/adapters/forget-activity.test.ts` | unit test |
+| F27.12 | Activity log | The Activity log button is in the More area and opens the Activity address | @unit | `test/ui/panel-activity-button.test.ts`, `test/ui/explorer-activity-url.test.ts` | unit test |
+| F27.13 | Activity log | A question adds an entry that the Activity view lists | @smoke | `features/27-activity-log.feature` | npm run test:bdd |
+| F27.14 | Activity log | The Activity view opens on a page that is not a node, with only its own tab | @smoke | `features/27-activity-log.feature` | npm run test:bdd |
 | F30.1 | Node card, first-run help screens and the developer report | The node card is headed with the node's own spec version | @unit | `test/ui/node-card.test.ts` | unit test |
 | F30.2 | Node card, first-run help screens and the developer report | Start your own node shows the command as text to copy | @unit | `test/ui/node-card.test.ts` | unit test |
 | F30.3 | Node card, first-run help screens and the developer report | Compose is offered as a starter only when the page has the compose tool | @unit | `test/ui/node-card.test.ts` | unit test |
@@ -383,6 +398,25 @@ Scenarios whose wording changed when they stopped being pending:
 | F30.7 | Node card, first-run help screens and the developer report | Copy report shows a preview first and copies on the second click | @unit | `test/ui/node-card.test.ts`, `test/core/tool-report.test.ts` | unit test |
 | F30.8 | Node card, first-run help screens and the developer report | The report lists tools, problems and the review hook, and is informational | @unit | `test/core/tool-report.test.ts` | unit test |
 | F30.9 | Node card, first-run help screens and the developer report | The report holds no page text beyond tool names, titles and descriptions | @unit | `test/core/tool-report.test.ts` | unit test |
+| F31.1 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | Each rule of the review flags what it names and leaves a harmless tool alone | @unit | `test/core/tool-review.test.ts` | unit test |
+| F31.2 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A flagged tool is asked about in every confirmation mode | @unit | `test/core/agent-loop-review.test.ts` | unit test |
+| F31.3 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool whose definition changed while the question was open is refused | @unit | `test/core/agent-loop-review.test.ts` | unit test |
+| F31.4 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool marked for developers is listed for you but never offered to the model | @unit | `test/core/agent-loop-review.test.ts` | unit test |
+| F31.5 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool opens a detail view with every hint, its fields and the reasons it was marked | @unit | `test/ui/panel-tool-marks.test.ts` | unit test |
+| F31.6 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool is run by hand through the same questions | @unit | `test/ui/panel-manual-run.test.ts` | unit test |
+| F31.7 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | Arguments that are not JSON, not an object or not fitting the fields are not run | @unit | `test/ui/panel-manual-run.test.ts` | unit test |
+| F31.8 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A form tool says the page waits for you to press Submit | @unit | `test/ui/panel-confirm-review.test.ts` | unit test |
+| F31.9 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A form with a password, payment or personal field carries a warning | @unit | `test/ui/panel-confirm-review.test.ts` | unit test |
+| F31.10 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool the page marks as consequential is asked about a second time | @unit | `test/ui/panel-confirm-review.test.ts` | unit test |
+| F31.11 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | The built-in graph tool asks before each call only in "ask for every call" | @unit | `test/core/builtin-loop.test.ts` | unit test |
+| F31.12 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | The toolbar number counts the tools of a site you allowed, and nothing else | @unit | `test/adapters/tool-badge.test.ts` | unit test |
+| F31.13 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | Stop reaches the tool that runs on the page | @unit | `test/adapters/parity-bridge.test.ts` | unit test |
+| F31.14 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool that returns nothing, or the page navigates, is shown as one plain sentence | @unit | `test/adapters/parity-bridge.test.ts` | unit test |
+| F31.15 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool of a same-origin frame is neither listed nor run | @unit | `test/adapters/parity-bridge.test.ts` | unit test |
+| F31.16 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A call whose page navigated is not sent again to the page that follows | @unit | `test/adapters/tool-router-closed.test.ts` | unit test |
+| F31.17 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | The review page marks each hostile tool "check" with its reason and not the clean one | @smoke | `features/31-tool-review-and-parity.feature` | npm run test:bdd |
+| F31.18 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | A tool is run by hand from its detail view in the browser | @smoke | `features/31-tool-review-and-parity.feature` | npm run test:bdd |
+| F31.19 | Tool security review, tool details, forms, running a tool by hand and the toolbar number | The toolbar number is the tool count on an allowed site and empty on one that is not | @smoke | `features/31-tool-review-and-parity.feature` | npm run test:bdd |
 
 ### Requirement rows
 
@@ -398,7 +432,7 @@ Scenarios whose wording changed when they stopped being pending:
 | ASI05-1 | F17.5 |
 | ASI06-1 | F14.9 |
 | ASI07-1 | F09.5, F20.13, F21.8 |
-| ASI07-2 | F20.9, F21.5, F22.8, F22.9, F22.10, F22.11, F22.14, F22.15, F22.16, F22.18 |
+| ASI07-2 | F20.9, F21.5, F22.8, F22.9, F22.10, F22.11, F22.15, F22.16, F22.17, F22.19 |
 | ASI08-1 | F10.9 |
 | ASI09-1 | F07.4 |
 | ASI09-2 | F10.11, F20.15 |
@@ -418,6 +452,7 @@ Scenarios whose wording changed when they stopped being pending:
 | EU-2 | F14.5, F14.8, F20.18 |
 | EU-3 | F01.2 |
 | EU-5 | F20.8 |
+| LLM01 | F31.1, F31.2, F31.3 |
 | LLM01-1 | F09.1, F09.2 |
 | LLM01-2 | F09.3, F21.8, F21.9 |
 | LLM01-3 | F06.4, F20.16 |
@@ -434,6 +469,7 @@ Scenarios whose wording changed when they stopped being pending:
 | LLM05-1 | F09.6, F14.7, F20.4 |
 | LLM05-2 | F09.5 |
 | LLM05-3 | F10.2 |
+| LLM06 | F31.4, F31.10 |
 | LLM06-1 | F05.5, F07.1, F07.5, F20.1, F20.13 |
 | LLM06-2 | F07.12, F20.5 |
 | LLM06-3 | F07.1 |
@@ -469,8 +505,8 @@ Scenarios whose wording changed when they stopped being pending:
 | R4-4 | F10.18 |
 | R4-5 | F10.6 |
 | R4-6 | F10.7 |
-| R4-7 | F10.4, F11.6, F21.1, F22.1, F22.12 |
-| R4-8 | F11.5, F21.4, F21.12, F21.14, F22.2, F22.7, F22.13, F22.17 |
+| R4-7 | F10.4, F11.6, F21.1, F22.1, F22.12, F22.13 |
+| R4-8 | F11.5, F21.4, F21.12, F21.14, F22.2, F22.7, F22.14, F22.18 |
 | R4-9 | F10.10 |
 
 <!-- scenarios:end -->

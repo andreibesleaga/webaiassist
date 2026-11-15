@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // The model's built-in graph tool, end to end in the smoke build: the side panel, the scripted model, a stub
-// node that publishes graph.nq. The tool answers from the node's graph, asks no question, shows its call and
+// node that publishes graph.nq. The tool answers from the node's graph, asks one question in the default mode, shows its call and
 // its result in the transcript, and a page that registers a tool with the same name does not get in the way.
 import { expect, test } from '@playwright/test';
 import { askPanel, startScripted } from '../../scripts/eval/conformance-run.ts';
@@ -35,13 +35,15 @@ await document.modelContext.registerTool({
 });
 </script></body></html>`;
 
-test('the model asks the node’s graph: no question, the call and the rows in the transcript', async () => {
+test('the model asks the node’s graph: one question (default mode), then the call and the rows in the transcript', async () => {
   const { tabId } = await openPage(session, session.origin, '/node', 'node page');
   const panel = await openPanelFor(session, tabId);
   await startScripted(panel);
   const seen = await askPanel(panel, command(COUNT));
   expect(seen.timedOut).toBe(false);
-  expect(seen.questions.filter((q) => q.startsWith('Run the tool'))).toEqual([]);
+  expect(seen.questions.filter((q) => q.startsWith('Run the tool'))).toEqual([
+    'Run the tool webaiassist_query_graph?',
+  ]);
   expect(seen.transcript).toContain('webaiassist_query_graph');
   expect(seen.transcript).toContain('"13"^^xsd:integer');
 });
@@ -62,7 +64,10 @@ test('a page tool with the built-in tool’s name is marked on the card and neve
   await expect(panel.locator('#tools-rows li')).toContainText(['built-in']);
   await startScripted(panel);
   const seen = await askPanel(panel, command(COUNT));
-  expect(seen.questions.filter((q) => q.startsWith('Run the tool'))).toEqual([]);
+  // The built-in tool is the one asked about (default mode); the page's tool of that name is never run.
+  expect(seen.questions.filter((q) => q.startsWith('Run the tool'))).toEqual([
+    'Run the tool webaiassist_query_graph?',
+  ]);
   expect(seen.transcript).toContain('"13"^^xsd:integer');
   expect(seen.transcript).not.toContain('this came from the page, not from the assistant');
 });

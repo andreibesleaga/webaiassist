@@ -5,9 +5,19 @@
 // otherwise it is created here. Labels are WebAIAssist's own texts.
 import { element } from '../dom';
 import { t } from '../i18n';
-import type { ExplorerContext, ExplorerTab } from './tabs';
+import type { MessageKey } from '../messages-en';
 
-function panelFor(ctx: ExplorerContext, tab: ExplorerTab, host: HTMLElement): HTMLElement {
+/** A tab of the list; the context is the page's own (the explorer's, or the Activity-only one). */
+export interface ShellTab<C> {
+  readonly id: string;
+  readonly labelKey: MessageKey;
+  mount(root: HTMLElement, ctx: C): void;
+}
+interface HasDoc {
+  readonly doc: Document;
+}
+
+function panelFor(ctx: HasDoc, tab: ShellTab<never>, host: HTMLElement): HTMLElement {
   const existing = ctx.doc.getElementById(`panel-${tab.id}`);
   if (existing) return existing;
   const panel = element(ctx.doc, 'div');
@@ -19,7 +29,7 @@ function panelFor(ctx: ExplorerContext, tab: ExplorerTab, host: HTMLElement): HT
 }
 
 /** Shows `selected`, hides the other panels, and keeps one tab in the tab order. */
-function select(buttons: Map<string, HTMLButtonElement>, selected: string, ctx: ExplorerContext) {
+function select(buttons: Map<string, HTMLButtonElement>, selected: string, ctx: HasDoc) {
   for (const [id, button] of buttons) {
     const on = id === selected;
     button.setAttribute('aria-selected', String(on));
@@ -38,9 +48,9 @@ function move(key: string, order: string[], current: string): string | undefined
 }
 
 /** Builds the tab list in `bar` and mounts each tab into its panel inside `host`. */
-export function startShell(
-  ctx: ExplorerContext,
-  tabs: readonly ExplorerTab[],
+export function startShell<C extends HasDoc>(
+  ctx: C,
+  tabs: readonly ShellTab<C>[],
   bar: HTMLElement,
   host: HTMLElement,
 ): void {

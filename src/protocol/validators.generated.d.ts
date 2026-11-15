@@ -9,6 +9,7 @@ export declare const validate_tools_list: StandaloneValidator;
 export declare const validate_tools_list_result: StandaloneValidator;
 export declare const validate_tools_call: StandaloneValidator;
 export declare const validate_tools_call_result: StandaloneValidator;
+export declare const validate_tools_cancel: StandaloneValidator;
 export declare const validate_tools_changed: StandaloneValidator;
 export declare const validate_model_load: StandaloneValidator;
 export declare const validate_model_progress: StandaloneValidator;

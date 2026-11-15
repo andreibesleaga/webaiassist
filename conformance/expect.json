@@ -80,7 +80,7 @@
           "tool": "c03_null",
           "args": {},
           "confirm": false,
-          "shows": ["The tool said: null"]
+          "shows": ["The tool returned no result"]
         },
         {
           "tool": "c03_number",
@@ -159,8 +159,16 @@
         {
           "tool": "c05_all",
           "args": {},
-          "confirm": true,
-          "shows": ["ran c05_all"]
+          "confirm": false,
+          "shows": ["unknown tool"],
+          "hides": ["ran c05_all"]
+        },
+        {
+          "tool": "c05_debugging",
+          "args": {},
+          "confirm": false,
+          "shows": ["unknown tool"],
+          "hides": ["ran c05_debugging"]
         }
       ]
     },
@@ -310,7 +318,7 @@
         {
           "tool": "c07_reject",
           "args": {},
-          "confirm": false,
+          "confirm": true,
           "shows": ["Tool error"]
         },
         {
@@ -447,7 +455,7 @@
         {
           "tool": "c13_removes_itself",
           "args": {},
-          "confirm": false,
+          "confirm": true,
           "shows": ["finished after removal"]
         }
       ],
@@ -464,7 +472,8 @@
           "confirm": false,
           "shows": ["from the top window"]
         }
-      ]
+      ],
+      "listed": ["c14_top"]
     },
     "c15": {
       "title": "Hostile definitions",
@@ -510,7 +519,7 @@
         {
           "tool": "c15_delete_account",
           "args": {},
-          "confirm": false,
+          "confirm": true,
           "shows": ["ran c15_delete_account"]
         },
         {

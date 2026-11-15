@@ -8,6 +8,7 @@ import type { BuiltInState } from '../adapters/prompt-api-state';
 import type { AllowResult } from '../adapters/site-access';
 import type { ArgsValidator } from '../core/ports/args-validator';
 import type { Clock } from '../core/ports/clock';
+import type { ActivityLog } from '../core/ports/activity-log';
 import type { Memory } from '../core/ports/memory';
 import type { GraphQuery } from '../core/ports/graph-query';
 import type { ModelRuntime } from '../core/ports/model-runtime';
@@ -32,6 +33,7 @@ import { startFollowing } from './panel-follow';
 import { PanelUI } from './panel-ui';
 import { reportProblem, type ReportOptions } from './panel-problems';
 import { bindQuestion } from './panel-run';
+import { DefinitionLedger } from '../core/tool-review';
 
 export type HostName = 'offscreen' | 'worker' | 'cpu';
 
@@ -61,6 +63,8 @@ export interface PanelDeps {
   openOptions(): void;
   /** Opens the graph explorer tab for a tab and its site (the "Graph: N items" chip); absent in tests that skip it. */
   openGraph?(tabId: number, origin: string): void;
+  /** Opens the Activity view of the explorer page; the tab and site only when the panel has them. */
+  openActivity?(tabId?: number, origin?: string): void;
   /** The model's read-only questions to the node's graph (the built-in tool); absent in tests that skip it. */
   readonly graphQuery?: GraphQuery;
   /** The model files stored in this browser (for the question before a download). */
@@ -82,6 +86,8 @@ export interface PanelDeps {
   /** What the site publishes and the browser events the panel follows; a host without it shows
    *  the tools of the page only. */
   readonly site?: SiteDeps;
+  /** The activity log (kept only in this browser); a host without it records nothing. */
+  readonly activity?: ActivityLog;
 }
 
 export interface PanelState {
@@ -106,6 +112,8 @@ export interface PanelState {
     readonly title?: string;
     readonly url?: string;
   };
+  /** The first definition of each tool seen on each site, to flag a later change (tool-review.ts). */
+  readonly ledger: DefinitionLedger;
   /** Counts refreshes: an answer that comes back after a newer refresh began is dropped. */
   refreshSeq: number;
   /** What was read from the open site: the files once per tab and origin, then the facts. */
@@ -180,6 +188,7 @@ export async function startPanel(deps: PanelDeps): Promise<PanelController> {
     persisted,
     choices: [],
     refreshSeq: 0,
+    ledger: new DefinitionLedger(),
   };
   const ctx: PanelController = {
     deps,

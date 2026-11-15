@@ -10,6 +10,8 @@ import { t } from './i18n';
 import { accessBadge, siteName, type PageStatus } from './page-status';
 import { chipLabel, factLines, policyLines } from './site-fact-lines';
 import { chipTitleFor, peerHosts } from './site-fact-lines-p2';
+import type { RunByHand } from './tool-detail';
+import { openRows, toolItem } from './tool-item';
 
 export interface CardView {
   readonly title?: string;
@@ -23,51 +25,21 @@ export interface CardView {
   readonly overridden: boolean;
   /** The "use anyway" button is offered (not for a remote model). */
   readonly canOverride: boolean;
+  /** Runs a tool by hand from its detail view (panel-manual-run.ts); absent: no such box. */
+  readonly run?: RunByHand;
 }
 
 const TITLE_CAP = 200;
 
-function renderTools(doc: Document, rows: readonly ToolRow[]): void {
+function renderTools(doc: Document, rows: readonly ToolRow[], run?: RunByHand): void {
   const toggle = byId<HTMLButtonElement>(doc, 'tools-toggle');
   const list = byId(doc, 'tools-rows');
-  list.replaceChildren(...rows.map((row) => toolItem(doc, row)));
+  const open = openRows(list);
+  list.replaceChildren(...rows.map((row) => toolItem(doc, row, run, open)));
   toggle.hidden = rows.length === 0;
   if (rows.length === 0) byId(doc, 'tools-list').hidden = true;
   const { reads, changes } = countEffects(rows);
   toggle.textContent = t('toolsToggle', { count: rows.length, reads, changes });
-}
-
-function toolItem(doc: Document, row: ToolRow): HTMLLIElement {
-  const item = element(doc, 'li');
-  item.dataset.trust = 'untrusted';
-  const marks = element(doc, 'span', undefined, 'marks');
-  const mark = element(
-    doc,
-    'span',
-    t(row.effect === 'reads' ? 'toolReads' : 'toolChanges'),
-    `mark ${row.effect}`,
-  );
-  if (row.unmarked) mark.title = t('toolUnmarked');
-  if (row.effect === 'changes') marks.append(sign(doc));
-  marks.append(mark);
-  if (row.unmarked) marks.append(element(doc, 'span', t('toolNotMarked'), 'mark unmarked'));
-  if (row.pageContent) {
-    const extra = element(doc, 'span', t('toolPageContent'), 'mark page');
-    extra.title = t('toolPageContentTitle');
-    marks.append(extra);
-  }
-  if (row.reserved) marks.append(element(doc, 'span', t('toolReserved'), 'mark reserved'));
-  const what = element(doc, 'span', row.summary, 'what');
-  what.title = row.detail;
-  item.append(element(doc, 'code', row.name), marks, what);
-  return item;
-}
-
-/** A shape as well as a colour: a tool that changes something carries a "!" in front of its word. */
-export function sign(doc: Document): HTMLSpanElement {
-  const mark = element(doc, 'span', '!', 'sign');
-  mark.setAttribute('aria-hidden', 'true');
-  return mark;
 }
 
 /** "Graph: N items": one button in the chips row that opens the explorer tab (set as text). */
@@ -139,7 +111,7 @@ export function renderCard(doc: Document, view: CardView): void {
   renderChips(doc, view.facts);
   const lines = view.facts ? factLines(view.facts) : [];
   byId(doc, 'site-facts-list').replaceChildren(...lines.map((line) => element(doc, 'li', line)));
-  renderTools(doc, view.tools);
+  renderTools(doc, view.tools, view.run);
   const read = byId<HTMLButtonElement>(doc, 'read-page');
   read.hidden = view.blocked;
   // With no tools, reading the page is the main way in; with tools it is the second choice.

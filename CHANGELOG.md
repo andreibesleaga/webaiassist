@@ -10,6 +10,19 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Added
 
+- **Tool security review and parity features**: nine written rules read each tool's definition (hidden
+  characters, orders to the AI, a call to another tool, look-alike names, links, encoded text, a read-only mark
+  that the name contradicts, oversized text, a definition changed since first seen); a tool with a finding is
+  marked "check", shows its reasons in the list, the detail view and the question, and is always asked about
+  ([docs/TOOL-REVIEW.md](docs/TOOL-REVIEW.md)). A tool detail view with every hint, its fields and its reasons;
+  "Run it by hand" through the same questions; a second question for a tool the page marks as consequential;
+  form tools say that the page waits for you to press Submit and warn about password, payment and personal
+  fields; tools with the `debugging` hint are listed as "for developers" and are not offered to the model; a number
+  on the toolbar icon counts the tools of a site you allowed; "Copy report" lists the review's findings. Stop now
+  reaches the tool that runs on the page, a result of nothing reads as one plain sentence, a same-origin frame's
+  tools are neither listed nor run, and a call whose page navigated is not sent again. The built-in graph tool
+  asks before each call in "ask for every call".
+
 - **Node card, help screens and Copy report**: node card heading from the node's own link set
   and a "Start your own node" command to copy; a fourth starter ("Compose a harness for my task")
   and an `explain` starter that asks why two items are linked; help screens for "This site has no
@@ -105,6 +118,15 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   message; the graph must match the SHA-256 digest in the linkset or it is not drawn; other nodes are read only
   after you tick them and press a button (https, public name, three fixed paths, no redirect, 2 MiB). No new
   permission and no `web_accessible_resources`.
+- **Activity log**: one entry per question, kept only in this browser (IndexedDB, at most 8 MiB):
+  site, model, where it ran, tokens (marked "estimated" when the runtime gave no count), price when
+  the service reports one, times, the tool calls with your answer to each, and context numbers. The
+  question, the arguments and the results are kept only with the "Include content" switch (off at
+  the start). The explorer page gains an **Activity** tab (totals per day and in all, filters by site,
+  model and day, Export JSON, Export CSV, Clear with a question inside the page, and Run again of a past
+  tool call through the usual question); a button **Activity log** in the panel's More area opens it on
+  any page, with no node needed. The calls of the built-in graph tool are logged too. Forget this site
+  and Forget all sites remove the entries.
 - **Query and semantic tools**: the explorer tab gains **Query** (a text box, Run, Stop, a result table
   built as text, ten example questions with "Put in editor"), **Vocabulary** (classes and properties from the
   node's vocabulary file, in a store of its own) and **Page data** (the open page's JSON-LD as text). The

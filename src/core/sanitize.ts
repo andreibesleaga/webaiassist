@@ -91,6 +91,9 @@ export function cleanPageText(text: string): string {
   return breakMarkers(dropHidden(text));
 }
 
+/** True when the text holds an invisible or control character (tab and line breaks excepted). */
+export const hasHiddenCharacters = (text: string): boolean => dropHidden(text) !== text;
+
 /** True when the text holds a turn-marker shape or an invisible or control character. */
 export function unsafePageText(text: string): boolean {
   const visible = dropHidden(text);

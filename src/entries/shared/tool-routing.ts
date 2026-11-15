@@ -30,7 +30,13 @@ export function startToolRouting(): void {
     const parsed = parseMessage(raw, 'panel');
     if (!parsed.ok) return false;
     const request = parsed.value;
-    if (request.type !== 'tools/list' && request.type !== 'tools/call') return false;
+    if (
+      request.type !== 'tools/list' &&
+      request.type !== 'tools/call' &&
+      request.type !== 'tools/cancel'
+    ) {
+      return false;
+    }
     void routeToolRequest(request, TAB_DEPS).then(sendResponse);
     return true;
   });

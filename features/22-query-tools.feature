@@ -89,9 +89,20 @@ Feature: Query and semantic tools
   # req: R4-7
   # test: test/core/builtin-loop.test.ts
   @smoke
-  Scenario: The model asks the node's graph with its built-in tool and no question is asked
+  Scenario: The model asks the node's graph with its built-in tool and, in the default mode, you are asked first
     Given a node page that publishes its graph as N-Quads and its vocabulary
     And the side panel is open on that page with the scripted model
+    When the model calls the built-in graph tool with a count of the concepts
+    Then a question to run the built-in graph tool was asked
+    And the transcript shows the call and the count 13
+
+  # req: R4-7
+  # test: test/core/builtin-loop.test.ts
+  @smoke
+  Scenario: When you chose to be asked only about tools that change something, the built-in graph tool runs without a question
+    Given a node page that publishes its graph as N-Quads and its vocabulary
+    And the side panel is open on that page with the scripted model
+    And the confirmation setting is "per-site"
     When the model calls the built-in graph tool with a count of the concepts
     Then no question to run a tool was asked
     And the transcript shows the call and the count 13

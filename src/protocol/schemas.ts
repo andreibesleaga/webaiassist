@@ -20,11 +20,13 @@ import type {
   PageEnvelope,
   ToolsCallRequest,
   ToolsCallResult,
+  ToolsCancel,
   ToolsChanged,
   ToolsListRequest,
   ToolsListResult,
   WireAnnotations,
   WireChatMessage,
+  WireForm,
   WireTool,
 } from './messages';
 
@@ -48,8 +50,23 @@ const annotations: JSONSchemaType<WireAnnotations> = {
     readOnlyHint: OPTIONAL_FLAG,
     consequentialHint: OPTIONAL_FLAG,
     untrustedContentHint: OPTIONAL_FLAG,
+    debugging: OPTIONAL_FLAG,
   },
   required: [],
+};
+
+const form: JSONSchemaType<WireForm> = {
+  type: 'object',
+  properties: {
+    autosubmit: { type: 'boolean' },
+    sensitive: {
+      type: 'array',
+      items: { type: 'string', enum: ['password', 'payment', 'personal'] },
+      maxItems: 3,
+    },
+  },
+  required: ['autosubmit', 'sensitive'],
+  additionalProperties: false,
 };
 
 const tool: JSONSchemaType<WireTool> = {
@@ -60,6 +77,7 @@ const tool: JSONSchemaType<WireTool> = {
     description: { type: 'string', maxLength: 10000 },
     inputSchema: { ...OBJECT, nullable: true },
     annotations: { ...annotations, nullable: true },
+    form: { ...form, nullable: true },
   },
   required: ['name', 'description'],
 };
@@ -134,6 +152,13 @@ const toolsCallResult: JSONSchemaType<ToolsCallResult> = {
   type: 'object',
   properties: { type: typed('tools/call-result'), id: ID, ok: { type: 'boolean' }, text: TEXT },
   required: ['type', 'id', 'ok', 'text'],
+  additionalProperties: false,
+};
+
+const toolsCancel: JSONSchemaType<ToolsCancel> = {
+  type: 'object',
+  properties: { type: typed('tools/cancel'), id: ID, tabId: TAB },
+  required: ['type', 'id'],
   additionalProperties: false,
 };
 
@@ -247,6 +272,7 @@ export const MESSAGE_SCHEMAS: Record<MessageType, object> = {
   'tools/list-result': toolsListResult,
   'tools/call': toolsCallRequest,
   'tools/call-result': toolsCallResult,
+  'tools/cancel': toolsCancel,
   'tools/changed': toolsChanged,
   'model/load': modelLoadRequest,
   'model/progress': modelProgress,
