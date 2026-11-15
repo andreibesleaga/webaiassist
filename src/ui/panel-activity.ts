@@ -118,3 +118,43 @@ export async function startActivity(
     watched: (run) => watching(run, trace, save, signal),
   };
 }
+
+export interface HandRun {
+  /** The chat surface, watched: the question, the answer and the result of the one call. */
+  readonly ui: ChatUI;
+  /** Writes the entry; `error` is the text of the failure when the run failed. */
+  done(error?: string): Promise<void>;
+}
+
+/** The entry of a tool run by hand (panel-manual-run.ts): no model, one tool call, the same
+ *  rules for content and secrets as a question. Nothing is kept when memory is off. */
+export async function startHandActivity(ctx: PanelController, origin: string): Promise<HandRun> {
+  const log = ctx.deps.activity;
+  if (!log || !ctx.state.settings.memory) return { ui: ctx.ui, done: () => Promise.resolve() };
+  const { apiKey } = ctx.state.settings.endpoint;
+  const trace = new QuestionTrace(
+    {
+      origin,
+      model: t('activityByHand'),
+      place: 'by-hand',
+      windowTokens: 0,
+      text: '',
+      includeContent: await log.includeContent().catch(() => false),
+      secrets: apiKey === '' ? [] : [apiKey],
+    },
+    { nowMs: () => ctx.deps.nowMs(), nowIso: () => ctx.deps.clock.nowIso() },
+    () => globalThis.crypto.randomUUID(),
+  );
+  return {
+    ui: traceUi(ctx.ui, trace),
+    done: async (error) => {
+      const failed = error === undefined ? {} : { error };
+      const status = error === undefined ? 'answered' : 'failed';
+      try {
+        await log.append(trace.build({ status, steps: 0, ...failed }));
+      } catch {
+        note(ctx, t('activityNotSaved'));
+      }
+    },
+  };
+}

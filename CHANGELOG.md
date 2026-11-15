@@ -18,7 +18,7 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   that the name contradicts, oversized text, a definition changed since first seen); a tool with a finding is
   marked "check", shows its reasons in the list, the detail view and the question, and is always asked about
   ([docs/TOOL-REVIEW.md](docs/TOOL-REVIEW.md)). A tool detail view with every hint, its fields and its reasons;
-  "Run it by hand" through the same questions; a second question for a tool the page marks as consequential;
+  "Run it by hand" through the same questions, written to the activity log as an entry with no model; a second question for a tool the page marks as consequential;
   form tools say that the page waits for you to press Submit and warn about password, payment and personal
   fields; tools with the `debugging` hint are listed as "for developers" and are not offered to the model; a number
   on the toolbar icon counts the tools of a site you allowed; "Copy report" lists the review's findings. Stop now

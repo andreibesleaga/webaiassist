@@ -3,8 +3,8 @@
 // An entry holds names, counts, sizes and times. The question, the tool arguments and the tool
 // results are in it only when the user turned on "include content" (default off).
 
-/** Where the model ran. */
-export type PlaceKind = 'gpu' | 'cpu' | 'chrome' | 'own-server' | 'remote';
+/** Where the model ran; `by-hand` is a tool the user ran from its detail view, with no model. */
+export type PlaceKind = 'gpu' | 'cpu' | 'chrome' | 'own-server' | 'remote' | 'by-hand';
 /** What happened to a tool call at the confirmation step. */
 export type Decision = 'not-asked' | 'allowed' | 'denied';
 export type Outcome = 'answered' | 'stopped' | 'step-limit' | 'error';

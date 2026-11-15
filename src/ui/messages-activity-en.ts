@@ -3,6 +3,7 @@
 // page. Part of the English dictionary (messages-en.ts).
 
 export const ACTIVITY_EN = {
+  activityByHand: 'Run by hand (no model)',
   activityNotSaved: 'The activity log could not be written. The answer is not affected.',
   activityOpen: 'Activity log',
   explorerTabActivity: 'Activity',

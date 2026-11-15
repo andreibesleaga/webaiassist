@@ -194,8 +194,8 @@ each tool, used to notice a later change, is kept in the panel's memory only and
 The number on the toolbar icon is the count of tools the open page offers. It is read only for a site you
 allowed, uses no new permission, and is stored nowhere.
 
-A tool you run by hand from its detail view goes through the same questions as a call by the model. In this
-version a run by hand is not written to the activity log; its result is shown in the panel only.
+A tool you run by hand from its detail view goes through the same questions as a call by the model, and is
+written to the activity log as one entry marked "Run by hand (no model)", under the same rules as a question.
 
 ## Conformance page and demo pages
 

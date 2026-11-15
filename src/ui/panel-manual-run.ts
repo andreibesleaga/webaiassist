@@ -2,11 +2,13 @@
 // Run a tool by hand: the "Run…" button of the tool detail view. It uses the same steps as a call
 // the model asks for (core runTool): the question about the site, the check that the tool is
 // unchanged, the question about the call (always asked, in every mode), the call, and the result
-// shown as the page's. No model is involved. The arguments are checked against the tool's own
+// shown as the page's. No model is involved. The run is written to the activity log as one entry
+// marked "Run by hand (no model)". The arguments are checked against the tool's own
 // fields before anything is asked.
 import { runTool, type LoopState, type RunScope, type ToolDeps } from '../core/tool-step';
 import type { ToolArgs, ToolInfo } from '../core/types';
 import { t } from './i18n';
+import { startHandActivity } from './panel-activity';
 import type { PanelController } from './panel-controller';
 import { setRunning, siteQuestion } from './panel-run';
 import { shownText } from './panel-problems';
@@ -59,10 +61,11 @@ async function execute(ctx: PanelController, tool: ToolInfo, args: ToolArgs): Pr
   setRunning(ctx, controller);
   Object.assign(ctx.state, { runOrigin: origin, stoppedBySwitch: false, pageChangedTo: undefined });
   const settings = await ctx.deps.loadSettings();
+  const activity = await startHandActivity(ctx, origin);
   const deps: ToolDeps = {
     bridge: ctx.deps.bridge,
     memory: await ctx.deps.memory(settings),
-    ui: ctx.ui,
+    ui: activity.ui,
     clock: ctx.deps.clock,
     validator: ctx.deps.validator,
     ledger: ctx.state.ledger,
@@ -76,7 +79,13 @@ async function execute(ctx: PanelController, tool: ToolInfo, args: ToolArgs): Pr
     manual: true,
   };
   const state = freshState(tool);
-  await runTool(deps, scope, state, { tool, args });
+  try {
+    await runTool(deps, scope, state, { tool, args });
+  } catch (error) {
+    await activity.done(shownText(error));
+    throw error;
+  }
+  await activity.done();
   if (state.movedTo !== undefined) {
     ctx.ui.show({ kind: 'note', text: t('runMoved', { origin: state.movedTo }) });
   }

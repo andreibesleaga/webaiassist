@@ -26,7 +26,7 @@ export const BUILTIN_TOOLS: readonly string[] = ['webaiassist_query_graph'];
 
 const ERROR_LIMIT = 300;
 const MIN_SECRET_LENGTH = 8;
-const LOCAL_PLACES: readonly PlaceKind[] = ['gpu', 'cpu', 'chrome', 'own-server'];
+const LOCAL_PLACES: readonly PlaceKind[] = ['gpu', 'cpu', 'chrome', 'own-server', 'by-hand'];
 
 export interface TraceMeta {
   readonly origin: string;
