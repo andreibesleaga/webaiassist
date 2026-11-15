@@ -8,6 +8,7 @@ import {
   openBoomPage,
   openPlainPage,
   openStubPage,
+  pageShown,
   type Session,
 } from '../../smoke/harness';
 import { withFakeModel, type FakeModelConfig } from '../../smoke/fake-language-model';
@@ -180,6 +181,12 @@ Given('the CPU model is downloaded', async ({ world }) => {
   await chooseCpu(world, 'cpu:smoke-cpu');
   await startAndWait(world);
   await restartModelHost(world);
+  // A fresh panel: the "Ready" line of this first load is gone, so the next Start is the one the
+  // scenario reads (a stale line let the question go out while the second load still ran).
+  const panel = world.requirePanel();
+  await panel.reload();
+  await pageShown(panel);
+  await expect(panel.locator('#model')).toHaveValue('cpu:smoke-cpu');
 });
 
 Given('the CPU model was downloaded earlier', async ({ world }) => {
