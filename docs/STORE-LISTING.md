@@ -22,7 +22,10 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 - [x] **The graphics-card numbers.** Run of 15 to 16 Nov 2026 (table below).
 - [x] **The built-in model re-run** after the last change: run of 15 Nov 2026 (table below).
 - [x] **The data-type answer** on the Privacy tab: "Website content" (decided 16 Nov 2026; see Data usage below).
-- [ ] **Placeholders**: `<STORE-LINK>`, `<PRIVACY-POLICY-URL>`, `<DEMO-NODE-URL>`.
+- [x] **Privacy policy URL** `https://agenticsystemcore.com/webaiassist/privacy/` and **demo node URL**
+      `https://agenticsystemcore.com/concepts/harness/`, as submitted on 16 Nov 2026.
+- [ ] **Store link**: the listing is under review (item ID `mekikidmpikblfalilhckiadncbjfppi`); the link goes into
+      the README when the listing is public.
 - [x] **Screenshots** from a real run of 16 Nov 2026: five files `docs/store/screenshot-*-1280x800.png` (see Images).
 
 ## Store listing tab
@@ -39,28 +42,27 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 
 **Description:**
 
-> WebAIAssist puts an AI inside your browser's side panel, with no server to install, and lets it use the tools a web page offers. By default, before any call runs, you see what it will do and press Allow once or Deny.
+This is the text as submitted on 16 Nov 2026 (the maintainer's wording in the dashboard).
+
+> WebAIAssist puts an AI inside your browser's side panel, with no server to install, and lets it use the tools a web page offers. By default, before any call runs, you see what it will do and press Allow or Deny.
 >
 > The AI runs on your computer: on the graphics card, on the processor, or as Chrome's own built-in one. What you type stays in this browser, except the arguments of a tool call you allow, which go to the page that offers the tool, and the chat when you set up a chat server.
 >
-> Sites can offer tools through WebMCP, a draft that lets a page describe what it can do, such as a search or a form. WebAIAssist lists them with what the page says each does and whether it only reads. By default, for each call you see the name, the site and the exact arguments.
+> Sites can offer tools through WebMCP, a specification that lets a page describe what it can do, such as a search or a form. WebAIAssist lists them with what the page says each does and whether it only reads. By default, for each call you see the name, the site and the exact arguments.
 >
 > It also reads what a site publishes about itself: llms.txt, a knowledge link set, robots.txt, security.txt and a few other files. The panel shows them. A site that asks for no AI input gets none of its page text or files sent, unless you press Use on this tab anyway (a model in the browser only). For a node of the AgenticSystemCore project, a card shows its version and graph, and you can run read-only SPARQL queries over it.
 >
 > Before you start:
 >
-> - Chrome keeps WebMCP behind a switch. Open chrome://flags/#enable-webmcp-testing, choose Enabled and relaunch. Without it, sites' tools do not appear.
-> - WebMCP is a draft of 13 Nov 2026, not a W3C Standard. It may change.
-> - Needs Chrome or another Chromium browser. The first start downloads 350 MB to 2.8 GB, after you agree.
-> - Answers can be wrong. Small models often miss the right tool, so check what matters.
+> Chrome keeps WebMCP behind a switch. Open chrome://flags/#enable-webmcp-testing, choose Enabled and relaunch. Without it, sites' tools do not appear. WebGPU and WebLLM allow AI models to run locally in user's browser. WebMCP is a draft, not yet a W3C Standard. It may change. Needs Chrome or another Chromium browser. The first LLM model start downloads ~ 350 MB to 2.8 GB, after you agree to use in browser, or you can use a local (eg: ollama), or remote server model, via an OpenAI-style address (eg: OpenRouter).
 >
+> Answers can be wrong. Small models often miss the right tool, so check what matters.
 > No account, no analytics. No access to any site at install; you allow one site at a time.
 >
-> Works with AgenticSystemCore, by the same author. Open source, Apache-2.0: <https://github.com/andreibesleaga/webaiassist>
+> Works also with AgenticSystemCore, by the same author. Open source, Apache-2.0: <https://github.com/andreibesleaga/webaiassist>
 
-**Word counts of the description.** 318 words. After function words are left out, the most used
-words are: page 5, site 5, tools 3, call 3, WebMCP 3, AI 3, WebAIAssist 3, allow 3. The word
-"model" is used once ("models" once more; it was used 11 times in the earlier text). The test
+**Word counts of the description.** 369 words. After function words are left out, the most used
+words are: page 5, browser 5, site 5, AI 4, use 4, allow 4. The test
 `test/security-review/docs-review.test.ts` fails when any word is used more than five times.
 
 ## Measured results
@@ -203,7 +205,7 @@ not use them for advertising or credit decisions, and does not send them to the 
 leaves the computer, and when, is in the privacy policy and in
 [WHAT-THE-EXTENSION-READS.md](WHAT-THE-EXTENSION-READS.md).
 
-**Privacy policy URL:** `<PRIVACY-POLICY-URL>`: the public page that mirrors `docs/PRIVACY.md`,
+**Privacy policy URL:** `https://agenticsystemcore.com/webaiassist/privacy/`: the public page that mirrors `docs/PRIVACY.md`,
 `https://agenticsystemcore.com/webaiassist/privacy/`. It must be live before the submission; it carries the
 Limited Use statement the store asks for.
 
@@ -214,7 +216,7 @@ Limited Use statement the store asks for.
 > 1. Click the toolbar button to open the side panel and press Start. The panel shows the size
 >    and the source of the model and waits for Download; the model then downloads once from
 >    huggingface.co (about 350 MB for the smallest).
-> 2. Open `<DEMO-NODE-URL>` (a page that offers WebMCP tools) and ask "Find items about review".
+> 2. Open `https://agenticsystemcore.com/concepts/harness/` (a page that offers WebMCP tools) and ask "Find items about review".
 >    The panel asks to use the site's tools, then asks before each tool call.
 > 3. On a page without WebMCP, press "Read this page" and ask about it.
 >    Without WebGPU, choose "Qwen3 0.6B on the processor" in the model list (a 397 MB download,

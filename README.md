@@ -53,7 +53,7 @@ and test pages that stand for a node, so they show the interface, not a real mod
 
 | Part                            | Version                                                                                                                                                                                     |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| This extension                  | 0.1.0 (first release; not yet tagged)                                                                                                                                                       |
+| This extension                  | 0.1.0 (first release, 16 Nov 2026)                                                                                                                                                          |
 | AgenticSystemCore specification | 1.1.0: the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 Nov 2026                                                                     |
 | AgenticSystemCore engine        | 1.1.0: a node page offers ten WebMCP tools; the extension's test fixture is taken from that engine                                                                                          |
 | Chrome                          | Needs 126 or later; the processor models need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 15 Nov 2026; hand test, 16 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
@@ -65,7 +65,7 @@ that any body or company has checked the extension, or that it meets a specifica
 
 ## Install
 
-From the Chrome Web Store: `<STORE-LINK>` (listing under review), then **Add to Chrome**.
+From the Chrome Web Store: the listing is under review since 16 Nov 2026 and has no public address yet.
 
 Or load the release zip yourself:
 
