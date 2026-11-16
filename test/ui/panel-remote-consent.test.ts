@@ -76,6 +76,25 @@ describe('the question before a remote endpoint is first used', () => {
     expect(deps.created.length).toBe(2);
   });
 
+  it('asks again when the agreed hosts were forgotten elsewhere while the panel was open', async () => {
+    click('consent-ok');
+    await settle();
+    deps.panelState = { firstRunDone: true }; // "Forget all" or "Reset" in Options
+    click('start');
+    await settle();
+    expect(byId('consent').hidden).toBe(false);
+    click('consent-ok');
+    await settle();
+    expect(deps.panelState.endpointHosts).toEqual(['openrouter.ai']);
+  });
+
+  it('does not bring back hosts that were forgotten while the question was open', async () => {
+    deps.panelState = { firstRunDone: true }; // the list held another host when the question opened
+    click('consent-ok');
+    await settle();
+    expect(deps.panelState.endpointHosts).toEqual(['openrouter.ai']);
+  });
+
   it('asks again when the host changes', async () => {
     click('consent-ok');
     await settle();

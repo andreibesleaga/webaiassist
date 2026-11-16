@@ -1,0 +1,187 @@
+{
+  "date": "2026-11-16",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true
+  },
+  "models": [
+    {
+      "key": "qwen",
+      "id": "Qwen3-0.6B-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 42.9,
+      "status": "Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document)."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:53700/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    },
+    {
+      "name": "live",
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 71.8,
+      "totalS": 79.4
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 17.4,
+      "totalS": 25.8
+    },
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 29.1,
+      "totalS": 29.3
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 44,
+      "totalS": 44,
+      "error": "Error: The model could not fill in the arguments for propose. It takes: slug (string, required), agent (string), at (string), task_state (string)."
+    }
+  ],
+  "summary": [
+    {
+      "model": "qwen",
+      "target": "stub",
+      "prompts": 2,
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": "2 of 2",
+      "taskDone": 2,
+      "gateShown": "2 of 2",
+      "factInAnswer": "2 of 2",
+      "hallucinated": 0,
+      "errors": 0,
+      "repeated": 0,
+      "medianFirstTokenS": 44.599999999999994
+    },
+    {
+      "model": "qwen",
+      "target": "live",
+      "prompts": 2,
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": "0 of 2",
+      "taskDone": 0,
+      "gateShown": "0 of 0",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 0,
+      "errors": 1,
+      "repeated": 0,
+      "medianFirstTokenS": 36.55
+    }
+  ],
+  "checks": [
+    {
+      "name": "Cancel stops the download",
+      "result": "pass",
+      "detail": "Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0"
+    },
+    {
+      "name": "storage.local.setAccessLevel",
+      "result": "pass",
+      "detail": "resolved in the service worker"
+    },
+    {
+      "name": "Hosts contacted on first Start",
+      "result": "review",
+      "detail": "6 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start"
+    },
+    {
+      "name": "Idle 10 min, then a question",
+      "result": "pass",
+      "detail": "answered"
+    },
+    {
+      "name": "Corrupted cached library is refused",
+      "result": "skipped",
+      "detail": "no cached .wasm (scripted or library served from the package)"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

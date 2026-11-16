@@ -60,6 +60,11 @@ test('a question adds an entry; the Activity view opens from More with only its 
   await expect(log).toContainText('echo');
   await expect(log).toContainText('127.0.0.1');
   await expect(explorer.getByRole('tab')).toHaveCount(1);
+  // One page heading (the extension's name), one "Activity log" heading, no sentence of the graph page.
+  await expect(explorer.getByRole('heading', { level: 1 })).toHaveText('WebAIAssist');
+  await expect(explorer.getByRole('heading', { name: 'Activity log' })).toHaveCount(1);
+  await expect(explorer).toHaveTitle('Activity log - WebAIAssist');
+  await expect(explorer.getByText('Drawn in your browser')).toHaveCount(0);
   await expect(explorer.getByRole('tab', { name: 'Activity' })).toBeVisible();
   await expect(explorer.getByRole('checkbox', { name: /Include content/ })).not.toBeChecked();
 });

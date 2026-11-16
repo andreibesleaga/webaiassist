@@ -42,6 +42,8 @@ export interface WebLlmEngineLike {
   };
   interruptGenerate(): void;
   unload(): Promise<void>;
+  /** Ends the engine at once, without waiting for it (in a Worker: terminate). */
+  kill?(): void;
   /** Where the factory put the engine (offscreen-worker, offscreen-main, service-worker). */
   readonly where?: string;
 }
@@ -62,12 +64,26 @@ async function* deltas(chunks: AsyncIterable<WebLlmChunk>): AsyncIterable<string
 
 const CANCELLED = 'The download was cancelled.';
 
+/** Settles when the signal is aborted (at once when it already is). */
+const cancelled = (signal: AbortSignal): Promise<void> =>
+  new Promise((resolve) => {
+    if (signal.aborted) resolve();
+    else signal.addEventListener('abort', () => resolve(), { once: true });
+  });
+
+/** How long a reply may run on after Stop before the engine is ended. WebLLM's interrupt is read
+ *  between two pieces of GPU work; a model too slow for the graphics card can stay inside one
+ *  piece for minutes and keep the browser's GPU busy (runs of 15 and 16 Nov 2026). */
+export const STOP_GRACE_MS = 5_000;
+
 export class WebLlmRuntime implements ModelRuntime {
   private engine: WebLlmEngineLike | undefined;
   private modelId = '';
   /** Loads run one after another; `current` is the newest one's cancel (the older is cancelled). */
   private queue: Promise<void> = Promise.resolve();
   private current: AbortController | undefined;
+  /** The unload of an engine that was ended and could not be killed; the next load waits for it. */
+  private ending: Promise<void> = Promise.resolve();
 
   constructor(private readonly factory: WebLlmFactory) {}
 
@@ -111,6 +127,8 @@ export class WebLlmRuntime implements ModelRuntime {
       return;
     }
     await this.unload();
+    await Promise.race([this.ending, cancelled(abort.signal)]); // Cancel ends the wait too
+    if (abort.signal.aborted) throw new Error(CANCELLED);
     const engine = await this.factory(
       modelId,
       (report) => onProgress({ fraction: report.progress, text: report.text }),
@@ -128,16 +146,48 @@ export class WebLlmRuntime implements ModelRuntime {
     const engine = this.engine;
     if (!engine) throw new Error('No model is loaded.');
     const signal = asAbortSignal(request.signal);
-    const stop = (): void => engine.interruptGenerate();
-    signal?.addEventListener('abort', stop, { once: true });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let giveUp: (error: Error) => void = () => undefined;
+    const stuck = new Promise<never>((_, reject) => (giveUp = reject));
+    const stop = (): void => {
+      if (timer !== undefined) return;
+      timer = setTimeout(() => {
+        this.end(engine);
+        giveUp(new Error(MODEL_STOPPED));
+      }, STOP_GRACE_MS);
+      try {
+        engine.interruptGenerate();
+      } catch {
+        // An engine that cannot even be interrupted is ended by the timer.
+      }
+    };
+    if (signal?.aborted) stop();
+    else signal?.addEventListener('abort', stop, { once: true });
+    const reply = this.reply(engine, request);
+    reply.catch(() => undefined); // when `stuck` wins, the reply's own end is of no interest
     try {
-      const chunks = await engine.chat.completions.create(this.request(request));
-      return await collectStream(deltas(chunks), request.onToken);
+      return await Promise.race([reply, stuck]);
     } catch (error) {
       throw this.afterFailure(engine, error);
     } finally {
       signal?.removeEventListener('abort', stop);
+      clearTimeout(timer);
     }
+  }
+
+  private async reply(engine: WebLlmEngineLike, request: ChatRequest): Promise<string> {
+    const chunks = await engine.chat.completions.create(this.request(request));
+    return collectStream(deltas(chunks), request.onToken);
+  }
+
+  /** Lets go of an engine that does not stop: the next load really loads again. An engine in a
+   *  Worker is killed at once (its unload would never answer). One on the main thread cannot be
+   *  killed: the next load waits for its unload, so two models never share the GPU. */
+  private end(engine: WebLlmEngineLike): void {
+    if (this.engine === engine) this.engine = undefined;
+    const unloaded = engine.unload().catch(() => undefined);
+    if (engine.kill) engine.kill();
+    else this.ending = unloaded;
   }
 
   /** An engine that lost its GPU device, or that WebLLM no longer has loaded, is dead: it is let

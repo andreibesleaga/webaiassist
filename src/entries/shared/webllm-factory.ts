@@ -81,7 +81,8 @@ async function inWorker(
     worker.terminate();
   };
   const like = engine as unknown as WebLlmEngineLike;
-  return { chat: like.chat, interruptGenerate: () => like.interruptGenerate(), unload };
+  const kill = (): void => worker.terminate();
+  return { chat: like.chat, interruptGenerate: () => like.interruptGenerate(), unload, kill };
 }
 
 /** The engine on the document's main thread; the Worker that answered the probe ends with it. */

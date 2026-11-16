@@ -216,7 +216,9 @@ that runs past the time limit leaves its browser unable to open the next page: Q
 E2B (`EVAL-GPU-2026-11-16-gemma4.json`); merged in `EVAL-2026-11-16-156.0.8078.4.json`. A row with 1
 question is a model whose browser stopped after its first question. The check "Idle 10 min, then a
 question" ran with Qwen3.5 2B, which needs 2 to 5 minutes per answer, so its "fail" is that model's
-time limit, not a finding about the idle path; it was not re-run with a faster model.
+time limit, not a finding about the idle path. Re-run on 16 Nov 2026 with Qwen3 0.6B alone (the build
+with the Stop change, a new browser profile, 2 questions per page): "Idle 10 min, then a question" passed,
+the question was answered (`docs/eval/EVAL-GPU-2026-11-16-idle.json`).
 
 ## When the model fails on a GPU
 

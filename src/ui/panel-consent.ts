@@ -59,21 +59,38 @@ export async function downloadNeed(
   return { name: shortName(choice.label), megabytes: 0, host: 'Chrome', kind: 'chrome' };
 }
 
+/** The hosts the user agreed to, read from storage at the question: "Forget all" or "Reset" in
+ *  Options may have emptied the list while this panel was open. When storage cannot be read the
+ *  list is taken as empty, so the question is asked again. */
+async function agreedHosts(ctx: PanelController): Promise<readonly string[]> {
+  let hosts: readonly string[] = [];
+  try {
+    hosts = (await ctx.deps.loadState()).endpointHosts ?? [];
+  } catch {
+    // Asking again is the safe answer.
+  }
+  const { endpointHosts: _old, ...rest } = ctx.state.persisted;
+  ctx.state.persisted = hosts.length > 0 ? { ...rest, endpointHosts: hosts } : rest;
+  return hosts;
+}
+
 /** The question for a remote endpoint whose host the user has not agreed to yet. */
-function remoteNeed(ctx: PanelController): DownloadNeed | undefined {
+async function remoteNeed(ctx: PanelController): Promise<DownloadNeed | undefined> {
   const { url } = ctx.state.settings.endpoint;
   if (isLocalEndpoint(url)) return undefined;
   const host = endpointHost(url);
-  if (ctx.state.persisted.endpointHosts?.includes(host) === true) return undefined;
+  if ((await agreedHosts(ctx)).includes(host)) return undefined;
   return { name: host, megabytes: 0, host, kind: 'remote' };
 }
 
-/** Keeps the host the user agreed to, so the question is not asked again for it. */
-function rememberHost(ctx: PanelController): void {
+/** Keeps the host the user agreed to, so the question is not asked again for it. The list it
+ *  adds to is read from storage again at the click: a list emptied in Options while the question
+ *  was open stays empty but for this host. */
+async function rememberHost(ctx: PanelController): Promise<void> {
   const host = endpointHost(ctx.state.settings.endpoint.url);
-  const hosts = [...(ctx.state.persisted.endpointHosts ?? []), host];
+  const hosts = [...(await agreedHosts(ctx)).filter((known) => known !== host), host];
   ctx.state.persisted = { ...ctx.state.persisted, endpointHosts: hosts };
-  void ctx.deps.saveState({ endpointHosts: hosts }).catch(() => undefined);
+  await ctx.deps.saveState({ endpointHosts: hosts }).catch(() => undefined);
 }
 
 function consentTexts(need: DownloadNeed): {
@@ -143,7 +160,7 @@ export function bindConsent(ctx: PanelController, load: (choice: PickerChoice) =
   byId(doc, 'consent-ok').addEventListener('click', () => {
     const choice = ctx.state.consent?.choice;
     closeConsent(ctx, false);
-    if (choice?.runtime === 'endpoint') rememberHost(ctx);
+    if (choice?.runtime === 'endpoint') void rememberHost(ctx);
     if (choice) load(choice);
   });
   byId(doc, 'consent-no').addEventListener('click', () => closeConsent(ctx, true));

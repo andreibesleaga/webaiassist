@@ -102,7 +102,11 @@ function withoutTarget(): void {
 
 /** The Activity log needs no node: this is the only tab then, and the Graph panel stays hidden. */
 function activityOnly(): void {
-  byId(document, 'explorer-heading').textContent = t('activityHeading');
+  // The view's own heading says "Activity log"; the page heading names the extension, and the
+  // sentence about a node's files (the graph page's) does not belong here.
+  document.title = `${t('activityHeading')} - ${t('appName')}`;
+  byId(document, 'explorer-heading').textContent = t('appName');
+  document.querySelector('header.page .note')?.remove();
   const note = byId(document, 'graph-note');
   note.textContent = t('activityNoNode');
   note.hidden = false;

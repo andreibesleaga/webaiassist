@@ -201,7 +201,7 @@ local model on that tab; it is not offered with a chat endpoint.
 - **Language**: English. The texts are in `src/ui/messages-en.ts` and its sibling files; the build also writes
   them as Chrome's locale file, `_locales/en/messages.json` (`scripts/locale.mjs`).
 - **Reset to defaults** restores all of them, clears the list of remote endpoint hosts you agreed to and
-  removes the endpoint's host access.
+  removes the endpoint's host access (it stays when the same host is also a site you allowed).
 
 ## Other runtimes
 

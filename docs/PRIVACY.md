@@ -107,7 +107,8 @@ API key removed.
 **Forget all sites** in Options removes every saved chat and tool count, every "use the tools of
 this site" answer, the list of sites you allowed, the list of remote endpoint hosts you agreed to, every
 compat script and every site access you granted, except the host access of your chat endpoint. **Reset to
-defaults** also clears the list of remote endpoint hosts and removes the endpoint's host access.
+defaults** also clears the list of remote endpoint hosts and removes the endpoint's host access, unless
+the same host is also a site you allowed.
 **Forget this site** (below) does the same for the open site, except the endpoint lists.
 
 ## Forget this site

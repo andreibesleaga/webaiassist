@@ -31,11 +31,16 @@ export class StoredAllowedSites implements AllowedSites {
     await this.area.remove(ALLOWED_SITES_KEY);
   }
 
-  private async read(): Promise<string[]> {
-    const value = (await this.area.get(ALLOWED_SITES_KEY))[ALLOWED_SITES_KEY];
-    if (!Array.isArray(value)) return [];
-    return value.filter((item): item is string => typeof item === 'string');
+  private read(): Promise<string[]> {
+    return readAllowedOrigins(this.area);
   }
+}
+
+/** The stored list of allowed origins; anything that is not a list of strings reads as empty. */
+export async function readAllowedOrigins(area: StorageAreaLike): Promise<string[]> {
+  const value = (await area.get(ALLOWED_SITES_KEY))[ALLOWED_SITES_KEY];
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
 }
 
 /** The origin of an http(s) address, or undefined for anything else. */

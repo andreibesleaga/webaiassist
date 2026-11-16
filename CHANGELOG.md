@@ -18,6 +18,13 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Added
 
+- **Stop ends a model that does not stop**: when a graphics-card model is still running five seconds after
+  Stop, its engine is ended (the Worker is terminated) and the panel says to press Start again. A model too
+  slow for the graphics card could otherwise keep the browser's graphics process busy for minutes.
+- **The agreed remote hosts are read when the question is due**, not when the panel opened: after "Forget
+  all" or "Reset to defaults" an open panel asks again before it uses a remote chat service.
+- **Reset to defaults keeps the host access of a site you allowed**, when the chat endpoint is on the same host.
+- **The Activity page** has one heading and no longer shows the graph page's sentence about a node's files.
 - **Default models from the measured runs** (15 and 16 Nov 2026): Chrome's built-in model when Chrome has it
   ready; otherwise Qwen3 0.6B on the graphics card unless its first answer was measured slow; otherwise Qwen3 1.7B
   on the processor. Llama 3.2 3B and Gemma 4 E2B stay in the graphics-card list, each marked "slow: may stall on
@@ -241,7 +248,8 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 - The graphics-card path was run on one laptop GPU (AMD gcn-5) on 16 Nov 2026: Qwen3 0.6B picked the right
   tool in 8 of 10 test-node questions but 2 of 10 on the live node; Qwen3.5 2B in 6 of 10, at 2 to 5 minutes a
   question; Llama 3.2 3B and Gemma 4 E2B ran past five minutes on their first question and stopped the browser
-  (both are marked slow in the list). Other graphics cards are not measured.
+  (both are marked slow in the list). Other graphics cards are not measured. When the engine runs on the page's
+  main thread and not in a Worker (a graphics card the Worker cannot reach), Stop cannot end it at once.
 - The 0.6B processor model called no tool in the first measured run; the 1.7B model did, at 47 to
   116 seconds a question; Qwen3.5 2B, in its first run, called the expected tool first in four of five, at 153 to 256 seconds a question.
 - WebMCP is a draft standard.

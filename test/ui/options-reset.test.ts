@@ -51,6 +51,21 @@ describe('resetOptions', () => {
     expect(f.removed).toEqual([['http://localhost/*']]);
   });
 
+  it('keeps the permission when the endpoint host is also a site the user allowed', async () => {
+    const f = await setup('https://api.example.com/v1', 'm');
+    await f.area.set({ allowedOrigins: ['https://api.example.com'] });
+    await resetOptions({ area: f.area, removeOrigins: f.remove });
+    expect(f.removed).toEqual([]);
+    expect((await loadPanelState(f.area)).endpointHosts).toBeUndefined();
+  });
+
+  it('gives the permission back when the allowed sites are other hosts', async () => {
+    const f = await setup('https://api.example.com/v1', 'm');
+    await f.area.set({ allowedOrigins: ['https://example.org'] });
+    await resetOptions({ area: f.area, removeOrigins: f.remove });
+    expect(f.removed).toEqual([['https://api.example.com/*']]);
+  });
+
   it('removes no permission when no endpoint was set up', async () => {
     const f = await setup('http://localhost:11434/v1', '');
     await resetOptions({ area: f.area, removeOrigins: f.remove });

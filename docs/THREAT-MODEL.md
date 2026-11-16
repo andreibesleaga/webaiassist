@@ -340,8 +340,8 @@ built files).
   changes the default until the next measurement. The user's own choice is never overridden.
 - **Forget all sites keeps the endpoint's host access.** That access is by host name, not port, so
   it can cover other `localhost` pages; it is not used for tool listing or file reads there, because
-  those need the site to be on the list of allowed sites. Reset to defaults removes it; so does
-  `chrome://extensions`.
+  those need the site to be on the list of allowed sites. Reset to defaults removes it (unless the
+  same host is also an allowed site, which still needs it); so does `chrome://extensions`.
 - **The endpoint key is stored unencrypted** in `chrome.storage.local`, readable by anyone
   with access to the browser profile. Content scripts cannot read it
   (`setAccessLevel('TRUSTED_CONTEXTS')`).

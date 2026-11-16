@@ -19,6 +19,11 @@ alone.
   (about 32 MB, not in git). Later builds use that copy and check its SHA-256 every time. The
   llama.cpp engine (`wllama.wasm`) comes from `node_modules/@wllama/wllama` and is checked the
   same way.
+- After a rebuild, press **Reload** on `chrome://extensions`, or use a new browser profile. Chrome keeps
+  the service worker script of an unpacked extension for as long as its version stays the same, so a
+  profile that loaded an older build of the same version runs the old background script with the new
+  panel and shows no tools (found on 16 Nov 2026 in two test profiles kept since 13 Nov). Store updates
+  always carry a higher version, which makes Chrome take the new script.
 
 ## Commands
 
