@@ -34,8 +34,8 @@ function session(outcomes: RunOutcome[] | (() => Promise<RunOutcome>)): QuerySes
         ? Promise.resolve(queue.shift() as RunOutcome)
         : (outcomes as () => Promise<RunOutcome>)();
     },
-    stop: vi.fn(),
-    close: vi.fn(),
+    stop: vi.fn<() => void>(),
+    close: vi.fn<() => void>(),
   };
 }
 

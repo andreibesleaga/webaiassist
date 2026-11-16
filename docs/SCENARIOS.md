@@ -58,7 +58,7 @@ Scenarios whose wording changed when they stopped being pending:
 ### Count per tag
 
 | Tag | Scenarios |
-|---|---|
+| --- | --- |
 | @smoke | 134 |
 | @unit | 198 |
 | @gpu | 2 |
@@ -71,7 +71,7 @@ Scenarios whose wording changed when they stopped being pending:
 ### Every scenario
 
 | Id | Area | Scenario | Tags | Test | Status |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | F01.1 | Install and first run | The toolbar button opens the side panel and lets WebAIAssist use that page | @smoke | `features/01-install-and-first-run.feature` | npm run test:bdd |
 | F01.2 | Install and first run | The first run shows a welcome screen with the steps, the model and the privacy line | @smoke | `features/01-install-and-first-run.feature` | npm run test:bdd |
 | F01.3 | Install and first run | "Got it" hides the welcome screen and it stays hidden after a restart | @smoke | `features/01-install-and-first-run.feature` | npm run test:bdd |
@@ -422,7 +422,7 @@ Scenarios whose wording changed when they stopped being pending:
 ### Requirement rows
 
 | Requirement | Scenarios |
-|---|---|
+| --- | --- |
 | ASI01-1 | F07.6, F09.2, F09.4, F20.1 |
 | ASI02-1 | F07.9, F20.1 |
 | ASI02-2 | F06.4, F06.5 |

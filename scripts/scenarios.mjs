@@ -143,7 +143,7 @@ function countsTable(scenarios) {
   const now = scenarios.filter(runsInBdd).length;
   return [
     '| Tag | Scenarios |',
-    '|---|---|',
+    '| --- | --- |',
     ...rows,
     `| all | ${scenarios.length} |`,
     `| run by \`npm run test:bdd\` now | ${now} |`,
@@ -172,13 +172,13 @@ export function renderTable(scenarios) {
     '### Every scenario',
     '',
     '| Id | Area | Scenario | Tags | Test | Status |',
-    '|---|---|---|---|---|---|',
+    '| --- | --- | --- | --- | --- | --- |',
     ...rows,
     '',
     '### Requirement rows',
     '',
     '| Requirement | Scenarios |',
-    '|---|---|',
+    '| --- | --- |',
     ...reqs,
   ].join('\n');
 }
