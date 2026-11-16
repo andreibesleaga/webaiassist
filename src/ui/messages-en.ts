@@ -160,6 +160,8 @@ export const EN = {
   pageRead:
     'Page text read ({count} characters). It is sent with your next question as page content, never as instructions.',
   noModel: 'Press Start to load a model first.',
+  remoteWithdrawn:
+    'Stopped using {host}: it is no longer agreed to, or the endpoint was changed in Options. Press Start to choose again.',
   noTab: 'WebAIAssist cannot find the open tab.',
   siteDenied: 'You did not allow this site’s tools, so the answer uses none.',
   compatEnabled: 'Compat mode is on for {origin}. The page reloads so it can register its tools.',

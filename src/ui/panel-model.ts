@@ -20,6 +20,7 @@ import {
 } from './model-picker';
 import type { HostName, PanelController } from './panel-controller';
 import { bindConsent, closeConsent, downloadNeed, shortName, showConsent } from './panel-consent';
+import { remoteOf } from './panel-consent';
 import { drawPage } from './panel-page';
 import { problemText } from './problems';
 
@@ -117,7 +118,7 @@ async function loadModel(
     state.runtime = {
       model: measured(ctx, choice, runtime),
       label: choice.label,
-      remote: choice.runtime === 'endpoint',
+      ...remoteOf(ctx, choice),
     };
     ui.showProgress({ fraction: 1, text: readyLine(ctx, choice, host, runtime) });
     drawPage(ctx);

@@ -51,9 +51,26 @@ describe('routeToolRequest with the allowed-sites gate', () => {
     expect(t.sent).toEqual([]);
   });
 
-  it('lets a tab the extension cannot read through to the injection, which reports why', async () => {
+  it('never asks the scripts left in a tab the extension cannot read (a forgotten site)', async () => {
+    const t = tab([ORIGIN], null);
+    const reply = await routeToolRequest(list, t.deps);
+    expect(reply).toMatchObject({ ok: false, access: 'denied' });
+    expect(t.sent).toEqual([]);
+    const call = { type: 'tools/call', id: 'c1', tabId: 1, origin: ORIGIN, name: 'x', args: {} };
+    const called = await routeToolRequest(call as Parameters<typeof routeToolRequest>[0], t.deps);
+    expect(called).toMatchObject({ ok: false });
+    expect(t.sent).toEqual([]);
+  });
+
+  it('for a tab it cannot read, tries only the injection and reports why that fails', async () => {
     const t = tab([], null);
-    expect(await routeToolRequest(list, t.deps)).toMatchObject({ ok: true });
+    const deps: TabDeps = {
+      ...t.deps,
+      inject: () => Promise.reject(new Error('Cannot access contents of the page.')),
+    };
+    const reply = await routeToolRequest(list, deps);
+    expect(reply).toMatchObject({ ok: false });
+    expect(t.sent).toEqual([]);
   });
 
   it('refuses when the gate itself fails', async () => {

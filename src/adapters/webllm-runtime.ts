@@ -75,6 +75,11 @@ const cancelled = (signal: AbortSignal): Promise<void> =>
  *  between two pieces of GPU work; a model too slow for the graphics card can stay inside one
  *  piece for minutes and keep the browser's GPU busy (runs of 15 and 16 Nov 2026). */
 export const STOP_GRACE_MS = 5_000;
+/** How long a Start waits for an engine that was ended but could not be killed. */
+export const ENDING_WAIT_MS = 15_000;
+export const STILL_STOPPING =
+  'The model that was stopped is still running. Wait a moment and press Start again; if this stays, restart the browser.';
+const STOPPED_EARLY = 'The answer was stopped before it began.';
 
 export class WebLlmRuntime implements ModelRuntime {
   private engine: WebLlmEngineLike | undefined;
@@ -127,8 +132,15 @@ export class WebLlmRuntime implements ModelRuntime {
       return;
     }
     await this.unload();
-    await Promise.race([this.ending, cancelled(abort.signal)]); // Cancel ends the wait too
-    if (abort.signal.aborted) throw new Error(CANCELLED);
+    // Cancel ends the wait too, and so does the time limit: a second model is never put on the
+    // GPU beside one that is still stopping.
+    const waited = await Promise.race([
+      this.ending.then(() => 'ended' as const),
+      cancelled(abort.signal).then(() => 'cancelled' as const),
+      new Promise<'late'>((resolve) => setTimeout(() => resolve('late'), ENDING_WAIT_MS)),
+    ]);
+    if (waited === 'cancelled' || abort.signal.aborted) throw new Error(CANCELLED);
+    if (waited === 'late') throw new Error(STILL_STOPPING);
     const engine = await this.factory(
       modelId,
       (report) => onProgress({ fraction: report.progress, text: report.text }),
@@ -161,8 +173,9 @@ export class WebLlmRuntime implements ModelRuntime {
         // An engine that cannot even be interrupted is ended by the timer.
       }
     };
-    if (signal?.aborted) stop();
-    else signal?.addEventListener('abort', stop, { once: true });
+    // Stop pressed before the reply began: nothing is started on the GPU.
+    if (signal?.aborted) throw new Error(STOPPED_EARLY);
+    signal?.addEventListener('abort', stop, { once: true });
     const reply = this.reply(engine, request);
     reply.catch(() => undefined); // when `stuck` wins, the reply's own end is of no interest
     try {

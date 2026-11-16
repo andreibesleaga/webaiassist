@@ -32,10 +32,11 @@ function withEndpoint(deps: FakeDeps, url: string): FakeDeps {
 
 describe('the question before a remote endpoint is first used', () => {
   let deps: FakeDeps;
+  let panel: Awaited<ReturnType<typeof startPanel>>;
   beforeEach(async () => {
     loadPage('sidepanel.html');
     deps = withEndpoint(fakeDeps([answer('hi')]), 'https://openrouter.ai/api/v1');
-    await startPanel(deps);
+    panel = await startPanel(deps);
     click('start');
     await settle();
   });
@@ -93,6 +94,31 @@ describe('the question before a remote endpoint is first used', () => {
     click('consent-ok');
     await settle();
     expect(deps.panelState.endpointHosts).toEqual(['openrouter.ai']);
+  });
+
+  it('stops using a started remote model once its host is no longer agreed to', async () => {
+    click('consent-ok');
+    await settle();
+    expect(deps.created.length).toBe(1);
+    deps.panelState = { firstRunDone: true }; // "Forget all" or "Reset" in Options
+    const model = deps.model as FakeModelRuntime;
+    const before = model.requests.length;
+    byId<HTMLTextAreaElement>('question').value = 'hello';
+    click('send');
+    await settle();
+    expect(model.requests.length).toBe(before);
+    expect(text('model-status')).toMatch(/Stopped using openrouter\.ai/);
+  });
+
+  it('asks for the new host when the endpoint changes while the question is open', async () => {
+    deps.settings = withEndpoint(deps, 'https://llm.example.com/v1').settings;
+    await panel.reloadSettings();
+    click('consent-ok'); // the question on screen still names openrouter.ai
+    await settle();
+    expect(deps.created).toEqual([]);
+    expect(deps.panelState.endpointHosts ?? []).toEqual([]);
+    expect(byId('consent').hidden).toBe(false);
+    expect(text('consent-title')).toBe('Use llm.example.com for your questions?');
   });
 
   it('asks again when the host changes', async () => {

@@ -7,7 +7,7 @@ import { splitWinArgs } from './nano-plan.ts';
 import { planWin } from './win-plan.ts';
 
 const { script, folder, evalArgs, dryRun } = splitWinArgs(process.argv.slice(2));
-const user = process.env.WEBAIASSIST_WIN_USER ?? 'Andrei';
+const user = process.env.WEBAIASSIST_WIN_USER ?? process.env.USER ?? 'user';
 const plan = planWin({
   source: `${process.cwd()}/`,
   target: `/mnt/c/Users/${user}/${folder}/`,

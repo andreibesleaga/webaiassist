@@ -6,7 +6,7 @@
 > - It adds a side panel where a local AI model uses the page's WebMCP tools, through four model paths: graphics card, processor, Chrome's built-in model and a chat endpoint.
 > - Every tool call goes through a confirmation (Allow once or Deny). The manifest has five install permissions and no install-time host access.
 > - Measured on one laptop graphics card (AMD gcn-5): Qwen3 0.6B picked the right tool in 8 of 10 test-node questions but 2 of 10 on the live node.
-> - WebMCP is a draft standard, and other graphics cards are not measured.
+> - WebMCP is a draft (a Community Group report, not a W3C Standard), and other graphics cards are not measured.
 
 All notable changes are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
@@ -19,17 +19,21 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 ### Added
 
 - **Stop ends a model that does not stop**: when a graphics-card model is still running five seconds after
-  Stop, its engine is ended (the Worker is terminated) and the panel says to press Start again. A model too
+  Stop, its engine is ended and the panel says to press Start again (a model that runs in a Worker is terminated;
+  one on the page's main thread cannot be, and the next Start waits for it). A model too
   slow for the graphics card could otherwise keep the browser's graphics process busy for minutes.
 - **The agreed remote hosts are read when the question is due**, not when the panel opened: after "Forget
-  all" or "Reset to defaults" an open panel asks again before it uses a remote chat service.
+  all" or "Reset to defaults" an open panel asks again before it uses a remote chat service, and a remote
+  model that was already started is let go before the next question.
 - **Reset to defaults keeps the host access of a site you allowed**, when the chat endpoint is on the same host.
 - **A node page without tools says what to do next**: open an item page of the site for the node's tools, or
   press Read this page to ask about the open page (the old line put both in a bracket).
+- **A forgotten site in an open tab**: the page scripts left in a tab whose site was forgotten are no longer
+  asked for its tools; the panel shows Allow again.
 - **The Activity page** has one heading and no longer shows the graph page's sentence about a node's files.
 - **Default models from the measured runs** (15 and 16 Nov 2026): Chrome's built-in model when Chrome has it
-  ready; otherwise Qwen3 0.6B on the graphics card unless its first answer was measured slow; otherwise Qwen3 1.7B
-  on the processor. Llama 3.2 3B and Gemma 4 E2B stay in the graphics-card list, each marked "slow: may stall on
+  ready; otherwise Qwen3 0.6B on the graphics card whenever the browser can use it (a slow first answer is named in
+  the reason line); otherwise Qwen3 1.7B on the processor. Llama 3.2 3B and Gemma 4 E2B stay in the graphics-card list, each marked "slow: may stall on
   a laptop graphics card" and never picked by default: on the measured graphics card both ran past five minutes on
   their first question.
 - **A page that registers its tools late**: when the first list of a page is empty, the panel lists it again
@@ -254,6 +258,6 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   main thread and not in a Worker (a graphics card the Worker cannot reach), Stop cannot end it at once.
 - The 0.6B processor model called no tool in the first measured run; the 1.7B model did, at 47 to
   116 seconds a question; Qwen3.5 2B, in its first run, called the expected tool first in four of five, at 153 to 256 seconds a question.
-- WebMCP is a draft standard.
+- WebMCP is a draft (a Community Group report), not a W3C Standard.
 
 [0.1.0]: https://github.com/andreibesleaga/webaiassist/releases/tag/v0.1.0

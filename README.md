@@ -5,7 +5,7 @@
 > - A side panel for Chrome with a small AI model that runs on your own computer. It uses the tools a web page offers through WebMCP, and asks you before each call.
 > - WebMCP is a draft, not a W3C Standard, and Chrome keeps it behind a switch you must turn on.
 > - With a model in the browser, what you type stays on your computer. There is no account and no analytics.
-> - Small models make mistakes: on one laptop the default model picked the right tool in 8 of 10 test questions, and answers took about 26 seconds.
+> - Small models make mistakes: on one laptop the default model picked the right tool in 8 of 10 test questions, and answers took about 26 seconds on the test page (about 60 on the live site).
 > - It reads what a site says about AI and about itself, and follows a site's "no AI input" signal. Controls are written against OWASP, the EU AI Act's transparency points and NIST, each with a test.
 
 A chat in your browser's side panel, with a small AI model that runs on your own computer.
@@ -244,15 +244,16 @@ the model stopped and offers to restart it or to use the processor.
 
 **Which model is selected, and the question before a download.** A model you choose is kept.
 Until you choose, the panel picks one and says why in one sentence under the list: Chrome's
-built-in model when Chrome has it ready, the graphics card when its first answer on this
-computer took 20 seconds or less, otherwise the processor model. Before the first download of any
+built-in model when Chrome has it ready, otherwise the graphics card (Qwen3 0.6B) whenever the
+browser can use it (a slow first answer is named in that sentence), otherwise Qwen3 1.7B on the processor. Before the first download of any
 model the panel shows its size and where it comes from and waits for **Download**. Options lists
 the downloaded models with their sizes and removes them, and **Forget all sites** clears every
 site at once.
 
 **Chrome's built-in model.** Chrome downloads its own model only when you choose it in the
 panel's model list or in Options. WebAIAssist picks it by itself only when Chrome already has it
-ready, and as a last resort before an endpoint. [Chrome's page](https://developer.chrome.com/docs/ai/prompt-api)
+ready. When nothing else can run it comes after an endpoint you have set up: the built-in model
+that Chrome still has to download is the last choice. [Chrome's page](https://developer.chrome.com/docs/ai/prompt-api)
 lists the hardware it needs; it also needs the official Google Chrome build, not Chromium. Its
 window is small, so the panel gives it a shorter tool list. Without WebGPU, without the
 processor path and without Chrome's model, the model list offers
@@ -363,8 +364,9 @@ one, open an issue.
 - **You, on any site with WebMCP tools:** you ask in your own words, and the site's own functions do
   the work instead of a model guessing at buttons. You see each call and its arguments before it runs.
   With a model in the browser nothing you type leaves your computer, and there is no account or fee.
-  What you pay is time: a small local model answers in 20 to 40 seconds and picks the wrong tool
-  more often than a large one ([docs/EVAL.md](docs/EVAL.md)).
+  What you pay is time: on one laptop graphics card a small local model took a median of 26 seconds
+  on the test node and 60 seconds on the live node, and about 2 minutes on the processor, and it picks the
+  wrong tool more often than a large one ([docs/EVAL.md](docs/EVAL.md)).
 - **A site owner:** your visitors' assistant uses the tools you wrote, with the limits you set, and
   follows your `ai-input` signal. You can test your tools with the developer report and the test page
   before any large assistant arrives.
@@ -395,7 +397,7 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
   Qwen3.5 2B and Llama 3.2 3B about 2.3 GB, Gemma 4 E2B about 3.4 GB.
   The first answer after a load compiles the model's GPU programs, which takes up to a minute on
   a slow GPU; the panel says so while it waits. Long prompts run in short pieces, so a slow GPU's
-  watchdog does not cut the model off.
+  watchdog does not cut the model off; a model too large for the card can still stall (the two marked slow did).
 - Small models pick tools less reliably than large ones; [docs/EVAL.md](docs/EVAL.md) records
   the measured rate.
 - The extension asks before tool calls, but it cannot check what a page's tool really does.

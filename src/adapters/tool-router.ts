@@ -115,20 +115,37 @@ export async function routeToolRequest(request: Request, deps: TabDeps): Promise
   if (request.type === 'tools/call' && request.origin === undefined) {
     return failure(request, 'Tool error: no site was given for the call.');
   }
-  if (!(await siteAllowed(request.tabId, deps.gate))) {
-    return failure(request, accessText('denied'), 'denied');
-  }
+  const site = await siteAllowed(request.tabId, deps.gate);
+  if (site === 'unreadable') return unreadable(request, request.tabId, deps);
+  if (site === 'no') return failure(request, accessText('denied'), 'denied');
   return ask(request, request.tabId, deps);
 }
 
-/** False for a tab whose site the user has not allowed (or forgot): its scripts are not asked. */
-async function siteAllowed(tabId: number, gate: SiteGate | undefined): Promise<boolean> {
-  if (gate === undefined) return true;
+/** "no" for a tab whose site the user has not allowed (or forgot): its scripts are not asked.
+ *  "unreadable" for a tab whose address the extension may not read. */
+async function siteAllowed(
+  tabId: number,
+  gate: SiteGate | undefined,
+): Promise<'yes' | 'no' | 'unreadable'> {
+  if (gate === undefined) return 'yes';
   try {
     const origin = await gate.originOf(tabId);
-    // A tab the extension may not read has no allowed site; the injection reports why.
-    return origin === undefined || (await gate.allowed(origin));
+    if (origin === undefined) return 'unreadable';
+    return (await gate.allowed(origin)) ? 'yes' : 'no';
   } catch {
-    return false;
+    return 'no';
   }
+}
+
+/** A tab the extension may not read has no allowed site. Page scripts left in it from an earlier
+ *  allowance (the site was forgotten while the tab stayed open) are not asked: only the
+ *  injection is tried, which fails without access and says why. */
+async function unreadable(request: Request, tabId: number, deps: TabDeps): Promise<Result> {
+  try {
+    await deps.inject(tabId);
+  } catch (error) {
+    const problem = accessProblem(error);
+    return failure(request, accessText(problem), problem);
+  }
+  return failure(request, accessText('denied'), 'denied');
 }

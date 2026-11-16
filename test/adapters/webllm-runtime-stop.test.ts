@@ -6,6 +6,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MODEL_STOPPED } from '../../src/adapters/model-errors';
 import {
+  ENDING_WAIT_MS,
+  STILL_STOPPING,
   STOP_GRACE_MS,
   WebLlmRuntime,
   type WebLlmChunk,
@@ -96,18 +98,15 @@ describe('Stop on a graphics-card model', () => {
     expect(runtime.where()).toBeUndefined();
   });
 
-  it('ends the engine when Stop was pressed before the reply began', async () => {
+  it('starts nothing when Stop was pressed before the reply began, and keeps the engine', async () => {
     const engine = new SlowEngine();
     const runtime = await loaded(engine);
     const abort = new AbortController();
     abort.abort();
-    const caught = runtime
-      .chat({ ...ask, signal: abort.signal })
-      .catch((error: unknown) => error as Error);
-    expect(engine.interrupted).toBe(1);
-    await vi.advanceTimersByTimeAsync(STOP_GRACE_MS + 1);
-    expect(((await caught) as Error).message).toBe(MODEL_STOPPED);
-    expect(engine.killed).toBe(1);
+    await expect(runtime.chat({ ...ask, signal: abort.signal })).rejects.toThrow(/stopped before/);
+    expect(engine.finish).toBeUndefined(); // create() was never called
+    await vi.advanceTimersByTimeAsync(STOP_GRACE_MS + 10);
+    expect(engine.killed).toBe(0);
   });
 
   it('leaves an idle engine alone when Stop comes after the reply ended', async () => {
@@ -167,6 +166,11 @@ describe('Stop on a graphics-card model', () => {
     cancel.abort(); // Cancel while it waits: the wait ends, nothing loads
     await expect(waiting).rejects.toThrow(/cancelled/);
     await expect(again).rejects.toThrow(/cancelled/); // a newer Start cancels the older one
+    // A Start that waits longer than the limit says so; it never loads beside the old engine.
+    const late = runtime.load(QWEN, () => undefined).catch((error: unknown) => error as Error);
+    await vi.advanceTimersByTimeAsync(ENDING_WAIT_MS + 10);
+    expect(((await late) as Error).message).toBe(STILL_STOPPING);
+    expect(loads).toEqual([QWEN]);
     const third = runtime.load(QWEN, () => undefined);
     unloaded?.();
     await third;

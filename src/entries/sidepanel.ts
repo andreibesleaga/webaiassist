@@ -88,28 +88,35 @@ const siteAccessDeps = {
     : {}),
 };
 
+const GRANT_WAIT_MS = 120_000;
+
 /** Chrome's own host-access request (the site was not known): when the user accepts it in the
  *  toolbar, the tab's site goes on the allowed list. A grant for another host (the chat endpoint)
  *  does not match the tab's site and is ignored. */
-function allowWhenGranted(tabId: number): void {
-  const granted = (added: chrome.permissions.Permissions): void => {
-    void chrome.tabs.get(tabId).then(
-      async (tab) => {
-        const origin = httpOrigin(tab.url);
-        if (origin === undefined || !(added.origins ?? []).some((p) => patternCovers(p, origin)))
-          return;
-        chrome.permissions.onAdded.removeListener(granted);
-        await allowedSites.add(origin);
-      },
-      () => undefined,
-    );
+function allowWhenGranted(page: { tabId: number; origin?: string }): void {
+  const stop = (): void => {
+    chrome.permissions.onAdded.removeListener(granted);
+    clearTimeout(timer);
   };
+  const granted = (added: chrome.permissions.Permissions): void => {
+    void chrome.tabs.get(page.tabId).then(async (tab) => {
+      const origin = httpOrigin(tab.url);
+      // The tab has moved to another site since the request: the request is over.
+      if (origin === undefined || (page.origin !== undefined && origin !== page.origin))
+        return stop();
+      if (!(added.origins ?? []).some((p) => patternCovers(p, origin))) return;
+      stop();
+      await allowedSites.add(origin);
+    }, stop);
+  };
+  // The request waits in Chrome's toolbar; after two minutes a later grant is not taken as its answer.
+  const timer = setTimeout(stop, GRANT_WAIT_MS);
   chrome.permissions.onAdded.addListener(granted);
 }
 
 function allowSiteOnClick(page: { tabId: number; origin?: string }) {
   return allowSite(siteAccessDeps, page).then((result) => {
-    if (result === 'requested') allowWhenGranted(page.tabId);
+    if (result === 'requested') allowWhenGranted(page);
     return result;
   });
 }

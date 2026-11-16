@@ -3,7 +3,7 @@
 > **In short**
 >
 > - This page holds the text and images for the Chrome Web Store listing. Each quote block is the content of one field.
-> - Still open: the store link, the privacy policy URL and the demo node URL, and screenshot 1 from a real run.
+> - Still open: the store link, the privacy policy URL and the demo node URL.
 > - The description says WebMCP is a draft, not a W3C Standard, that answers can be wrong, and that starting a model downloads 350 MB to 2.8 GB after you agree.
 > - Measured on one laptop graphics card, Qwen3 0.6B had the whole expected tool sequence right in 8 of 10 test-node questions and 2 of 10 live-node questions.
 > - Each run is a few questions, so the tables show a direction, not a rate. Host access is optional and never granted at install.
@@ -45,7 +45,7 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 >
 > Sites can offer tools through WebMCP, a draft that lets a page describe what it can do, such as a search or a form. WebAIAssist lists them with what the page says each does and whether it only reads. By default, for each call you see the name, the site and the exact arguments.
 >
-> It also reads what a site publishes about itself: llms.txt, a knowledge link set, robots.txt, security.txt and a few other files. The panel shows them. A site that asks for no AI input gets none of its page text or files sent. For a node of the AgenticSystemCore project, a card shows its version and graph, and you can run read-only SPARQL queries over it.
+> It also reads what a site publishes about itself: llms.txt, a knowledge link set, robots.txt, security.txt and a few other files. The panel shows them. A site that asks for no AI input gets none of its page text or files sent, unless you press Use on this tab anyway (a model in the browser only). For a node of the AgenticSystemCore project, a card shows its version and graph, and you can run read-only SPARQL queries over it.
 >
 > Before you start:
 >
@@ -191,8 +191,8 @@ huggingface.co; they are not code.
 
 **Data usage:** declare "Website content": the page text the user asks it to read and the results of
 the tools the user allows go to the model the user chose. That model is in the browser or in Chrome
-unless the user sets up a remote chat endpoint; then they go to the address the user entered. They are
-not sent to the developer. Tick all three certifications (no sale of data, no use unrelated to the single purpose, no use
+unless the user sets up a remote chat endpoint; then they go to the address the user entered, together with the questions the user types and the API key
+the user saved for that address. Nothing is sent to the developer. Tick all three certifications (no sale of data, no use unrelated to the single purpose, no use
 for creditworthiness or lending).
 
 **Website content (disclosure):** the extension reads the open page's WebMCP tools, a short list of

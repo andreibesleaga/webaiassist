@@ -83,6 +83,30 @@ async function remoteNeed(ctx: PanelController): Promise<DownloadNeed | undefine
   return { name: host, megabytes: 0, host, kind: 'remote' };
 }
 
+/** Whether a started model is an endpoint and, for a remote one, the host it talks to. */
+export function remoteOf(
+  ctx: PanelController,
+  choice: PickerChoice,
+): { remote: boolean; remoteHost?: string } {
+  const { url } = ctx.state.settings.endpoint;
+  const remote = choice.runtime === 'endpoint';
+  return remote && !isLocalEndpoint(url) ? { remote, remoteHost: endpointHost(url) } : { remote };
+}
+
+/** Before each question to a remote endpoint: false when the user no longer agrees to its host
+ *  ("Forget all" or "Reset" in Options) or changed the endpoint's address there. The model is
+ *  then let go, so nothing more is sent, and the line says to press Start. */
+export async function remoteStillAgreed(ctx: PanelController): Promise<boolean> {
+  const host = ctx.state.runtime?.remoteHost;
+  if (host === undefined) return true;
+  const { url } = ctx.state.settings.endpoint;
+  const same = !isLocalEndpoint(url) && endpointHost(url) === host;
+  if (same && (await agreedHosts(ctx)).includes(host)) return true;
+  ctx.state.runtime = undefined;
+  ctx.ui.showProgress({ fraction: 0, text: t('remoteWithdrawn', { host }) });
+  return false;
+}
+
 /** Keeps the host the user agreed to, so the question is not asked again for it. The list it
  *  adds to is read from storage again at the click: a list emptied in Options while the question
  *  was open stays empty but for this host. */
@@ -129,7 +153,7 @@ export function showConsent(ctx: PanelController, choice: PickerChoice, need: Do
   const offline = !ctx.deps.isOnline();
   const texts = consentTexts(need);
   const status = byId(doc, 'model-status');
-  ctx.state.consent = { choice, previousStatus: status.textContent ?? '' };
+  ctx.state.consent = { choice, previousStatus: status.textContent ?? '', host: need.host };
   byId(doc, 'consent-title').textContent = texts.title;
   byId(doc, 'consent-body').textContent = offline
     ? t('consentOffline', { name: need.name })
@@ -155,14 +179,24 @@ export function closeConsent(ctx: PanelController, declined: boolean): void {
   byId(doc, 'start').focus();
 }
 
+/** The user pressed the question's OK. For a remote endpoint the host is the one the question
+ *  named: when the endpoint was changed in Options while the question was open, the question is
+ *  asked again for the new host, and nothing is remembered or loaded for it unasked. */
+async function agree(ctx: PanelController, load: (choice: PickerChoice) => void): Promise<void> {
+  const consent = ctx.state.consent;
+  closeConsent(ctx, false);
+  if (!consent) return;
+  if (consent.choice.runtime === 'endpoint') {
+    const need = await remoteNeed(ctx);
+    if (need && need.host !== consent.host) return showConsent(ctx, consent.choice, need);
+    if (need) await rememberHost(ctx);
+  }
+  load(consent.choice);
+}
+
 export function bindConsent(ctx: PanelController, load: (choice: PickerChoice) => void): void {
   const doc = ctx.deps.doc;
-  byId(doc, 'consent-ok').addEventListener('click', () => {
-    const choice = ctx.state.consent?.choice;
-    closeConsent(ctx, false);
-    if (choice?.runtime === 'endpoint') void rememberHost(ctx);
-    if (choice) load(choice);
-  });
+  byId(doc, 'consent-ok').addEventListener('click', () => void agree(ctx, load));
   byId(doc, 'consent-no').addEventListener('click', () => closeConsent(ctx, true));
   byId(doc, 'consent').addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;

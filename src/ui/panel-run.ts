@@ -11,6 +11,7 @@ import { byId } from './dom';
 import { t } from './i18n';
 import { withSlowStartNotice } from './slow-start';
 import { note } from './panel-note';
+import { remoteStillAgreed } from './panel-consent';
 import type { PanelController } from './panel-controller';
 import { aiBlocked, refreshPage } from './panel-page';
 import { dismissFirstRun } from './panel-notices';
@@ -148,6 +149,7 @@ function endNotes(ctx: PanelController, stopped: boolean): void {
 async function send(ctx: PanelController, text: string): Promise<void> {
   const { deps, ui } = ctx;
   if (!ctx.state.runtime) return ui.show({ kind: 'error', text: t('noModel') });
+  if (!(await remoteStillAgreed(ctx))) return ui.show({ kind: 'error', text: t('noModel') });
   const tabId = await deps.targetTab();
   if (tabId === undefined) return ui.show({ kind: 'error', text: t('noTab') });
   await refreshPage(ctx, tabId);

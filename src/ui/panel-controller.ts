@@ -97,12 +97,18 @@ export interface PanelState {
   persisted: StoredPanelState;
   choices: PickerChoice[];
   /** The question before a first download, while it is shown. */
-  consent?: { readonly choice: PickerChoice; readonly previousStatus: string };
+  consent?: {
+    readonly choice: PickerChoice;
+    readonly previousStatus: string;
+    readonly host: string;
+  };
   runtime?: {
     readonly model: ModelRuntime;
     readonly label: string;
     /** The model is an endpoint the user chose: the chat goes to that address. */
     readonly remote?: boolean;
+    /** The host of a remote endpoint, as the user agreed to it (src/ui/panel-consent.ts). */
+    readonly remoteHost?: string;
   };
   page?: {
     readonly tabId: number;
