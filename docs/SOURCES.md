@@ -1,5 +1,13 @@
 # Sources
 
+> **In short**
+>
+> - These are the sources read for the design, each with the date it was fetched. Facts that change often are re-checked before each release.
+> - The WebMCP specification is a Draft Community Group Report (13 Nov 2026 when re-read). It is not a W3C Standard.
+> - The section "Not verified" lists what could not be confirmed, such as the MCP annotation property names and the full set of Prompt API availability values.
+> - Web page fetches were summarised by a small model, so recheck quoted wording against the source before you cite it in a paper or a store listing.
+> - A search on 16 Nov 2026 found no other tool with a model inside the browser that also calls the page's WebMCP tools. A search cannot prove that none exists.
+
 Primary sources read for the design, with the date each was fetched. Facts that change often are re-checked before each release.
 
 ## 1. WebMCP specification and repository
@@ -244,7 +252,7 @@ read from `node_modules` and `npm view` on 14 Nov 2026.
 | ----------------------- | ------- | ---------- | ----------------------------------------------------------------------------------------------------------------- |
 | `@mlc-ai/web-llm`       | 0.2.86  | Apache-2.0 | The graphics-card models (section 4)                                                                              |
 | `@wllama/wllama`        | 3.8.1   | MIT        | The processor models (section 15)                                                                                 |
-| `@w3c/webmcp-polyfill`  | 0.1.0   | MIT        | Compat mode (section 9)                                                                                           |
+| `@w3c/webmcp-polyfill`  | 0.1.0   | Apache-2.0 | Compat mode (section 9)                                                                                           |
 | `@cfworker/json-schema` | 4.1.1   | MIT        | Checks tool arguments against the tool's schema in the extension, without generating code (published 31 Jan 2025) |
 | `ajv`                   | 8.20.0  | MIT        | The same check in Node and in tests, and the build-time message validators (section 7)                            |
 | `idb`                   | 8.0.4   | ISC        | A small promise wrapper over IndexedDB for the chat memory (published 6 Oct 2026)                                 |
@@ -416,7 +424,7 @@ Every status below was read from the page named, on 14 Nov 2026.
 | llms.txt                                        | "The /llms.txt file, v2"; a convention of its own site                                                                                                                   | <https://llmstxt.org/>                                                                                 |
 | Open Graph protocol                             | A convention of its own site (page reached; no status stated)                                                                                                            | <https://ogp.me/>                                                                                      |
 | A2A Protocol specification                      | Page reached; its status was not assessed                                                                                                                                | <https://a2a-protocol.org/latest/specification/>                                                       |
-| draft-besleaga-agentic-knowledge-wellknown      | Active Internet-Draft (individual), revision 01, 14 Oct 2026, no stream                                                                                                  | <https://datatracker.ietf.org/doc/draft-besleaga-agentic-knowledge-wellknown/>                         |
+| draft-besleaga-agentic-knowledge-wellknown      | Active Internet-Draft (individual), revision 02, 15 Nov 2026, no stream (read again 16 Nov 2026)                                                                         | <https://datatracker.ietf.org/doc/draft-besleaga-agentic-knowledge-wellknown/>                         |
 | draft-besleaga-sustainability-wellknown         | Active Internet-Draft, revision 12, 28 Oct 2026, Independent Submission, ISE state "Response to Review Needed"                                                           | <https://datatracker.ietf.org/doc/draft-besleaga-sustainability-wellknown/>                            |
 | Content Signals                                 | A policy of its own site (contentsignals.org); not a standard of any body. The page's text could not be read in full                                                     | <https://contentsignals.org/>                                                                          |
 | Model licences                                  | See [MODEL-LICENCES.md](MODEL-LICENCES.md)                                                                                                                               | `https://huggingface.co/api/models/<repository>` (each repository named there)                         |
@@ -434,3 +442,32 @@ the text of the Llama 3.2 Community License (behind a login).
 | OWASP Top 10 for LLM Applications 2025 (LLM01 to LLM10) | `https://genai.owasp.org/llm-top-10/`, read on 14 Nov 2026; titles as listed there.                                                                                                                                                                                                                                                                                                                          |
 | OWASP Top 10 for Agentic Applications 2026              | `https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/`, read on 14 Nov 2026: published 9 Dec 2025; the page itself does not show the ten items (they are in its PDF). The titles ASI01, ASI02 and ASI09 in TOOL-REVIEW.md come from a secondary summary (cycode.com/blog/owasp-top-10-agentic-applications, found by search on 14 Nov 2026); re-read the PDF before the release. |
 | WebMCP Explorer rule families                           | `https://github.com/CorsenAI/webmcp-explorer` README, read on 14 Nov 2026: "thirteen rule families (WMCP-SEC-001 to 013)"; the rule texts were not read.                                                                                                                                                                                                                                                     |
+
+## 25. Other tools that use a page's WebMCP tools (searched 16 Nov 2026)
+
+A web search and a reading of each project's own page on 16 Nov 2026, for the section "What is
+different" of the README. A search cannot prove that something does not exist; the README says "found
+none", never "first" or "only". "Read" means the project's page was read that day; "seen" means only a
+search result or a page of someone else.
+
+| Tool                                           | Where                                                                                                      | What its page says (16 Nov 2026)                                                                                                               |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| WebMCP Extension (example agent, Chrome Labs)  | `https://github.com/GoogleChromeLabs/webmcp-extension`                                                     | Read. Apache-2.0. Chrome's built-in model, or a model behind a local server. Calls page tools; asks by the page's hints. Not for production.   |
+| Model Context Tool Inspector                   | `https://github.com/beaufortfrancois/model-context-tool-inspector`                                         | Seen. Lists and runs a page's tools by hand or with a hosted model.                                                                            |
+| WebMCP Explorer                                | `https://github.com/CorsenAI/webmcp-explorer`                                                              | Read. Apache-2.0. An inspector with thirteen rule families on tool definitions and report export; its agent part uses a provider you bring.    |
+| webmcp-local-agent (two projects of that name) | `https://github.com/sylwia-lask/webmcp-local-agent`, `https://github.com/molidestroyer/webmcp-local-agent` | Read. Side-panel agents on Chrome's built-in model or Ollama; one asks for consequential tools only, one has an optional "confirm every tool". |
+| webmcp-agent-chrome-plugin                     | `https://github.com/buyangnie/webmcp-agent-chrome-plugin`                                                  | Read. An OpenAI-style endpoint; write tools need approval.                                                                                     |
+| WebBrain                                       | `https://github.com/webbrain-one/webbrain`                                                                 | Read. GPL-3.0-or-later. Local or hosted models; mainly drives the page itself.                                                                 |
+| MCP-B                                          | `https://github.com/MiguelsPizza/WebMCP`                                                                   | Read. Its extension is no longer open source; needs a hosted model's key.                                                                      |
+| WebLLM Assistant                               | `https://github.com/mlc-ai/web-llm-assistant`                                                              | Read. Apache-2.0. A model in the browser on WebGPU; no page tools.                                                                             |
+| Page Assist, Nanobrowser                       | their GitHub pages                                                                                         | Seen. Local or hosted models; no use of a page's WebMCP tools found.                                                                           |
+| Gemini in Chrome                               | `https://developer.chrome.com/blog/chrome-at-io26`                                                         | Read. "Gemini in Chrome will soon support WebMCP APIs." A hosted model.                                                                        |
+
+Found in none of the tools above, on that day: a model that runs inside the browser itself (WebGPU or
+WebAssembly) together with calls to the page's WebMCP tools; reading the site's own policy and
+description files (`robots.txt` Content-Signal, `llms.txt`, `security.txt`, TDMRep, API catalog, agent
+card, knowledge link set) as part of the assistant; a mapping of the assistant's controls to the EU AI
+Act's transparency points and to NIST AI RMF. Found in others too, so not claimed as different: open
+source, a side panel, a question before a call, checks of tool definitions for hidden characters and
+changed definitions (WebMCP Explorer), a local trace or log, Chrome's built-in model, Ollama. Not
+checked: the closed assistants of browsers and model companies, beyond the one sentence quoted above.

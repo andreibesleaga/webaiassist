@@ -7,7 +7,7 @@ import { chooseDefault, whyFor } from '../../src/ui/default-model';
 import type { PickerEnv } from '../../src/ui/model-picker';
 
 const QWEN = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
-const CPU = 'cpu:qwen3-0.6b-q4_k_m';
+const CPU = 'cpu:qwen3-1.7b-q4_k_m';
 const base: PickerEnv = { promptApi: false, scripted: false, webgpu: true, cpu: true };
 const withEndpoint = {
   ...DEFAULT_SETTINGS,
@@ -26,7 +26,7 @@ describe('the default model', () => {
   it('is not Chrome’s built-in model while it still has to download', () => {
     for (const builtIn of ['downloadable', 'downloading', 'unavailable', 'unknown'] as const) {
       const env = { ...base, promptApi: true, builtIn };
-      expect(chooseDefault(DEFAULT_SETTINGS, env).value).toBe(CPU);
+      expect(chooseDefault(DEFAULT_SETTINGS, env).value).toBe(QWEN);
     }
   });
 
@@ -39,18 +39,37 @@ describe('the default model', () => {
     });
   });
 
-  it('is the processor model when the graphics card is slow, unmeasured or missing', () => {
+  it('is the graphics card even when its first answer was slow, with the slow reason', () => {
     const slow = { ...base, gpuMeasure: { speed: 'slow' as const, firstAnswerMs: 40_000 } };
-    expect(chooseDefault(DEFAULT_SETTINGS, slow)).toMatchObject({ value: CPU, why: 'whyCpu' });
-    expect(chooseDefault(DEFAULT_SETTINGS, base).value).toBe(CPU);
-    expect(chooseDefault(DEFAULT_SETTINGS, { ...base, webgpu: false }).value).toBe(CPU);
+    expect(chooseDefault(DEFAULT_SETTINGS, slow)).toMatchObject({
+      value: QWEN,
+      why: 'whyGpuSlow',
+      values: { seconds: 40 },
+    });
   });
 
-  it('says how much memory the processor model uses', () => {
-    expect(chooseDefault(DEFAULT_SETTINGS, base).values).toEqual({ size: 800 });
+  it('is the graphics card when WebGPU works and nothing was measured yet', () => {
+    expect(chooseDefault(DEFAULT_SETTINGS, base)).toMatchObject({
+      value: QWEN,
+      why: 'whyGpuOnly',
+    });
+    expect(chooseDefault(DEFAULT_SETTINGS, { ...base, webgpu: undefined }).value).toBe(QWEN);
   });
 
-  it('falls back to the graphics card when the processor model cannot run here', () => {
+  it('is the processor model only when WebGPU does not work', () => {
+    const noGpu = { ...base, webgpu: false };
+    expect(chooseDefault(DEFAULT_SETTINGS, noGpu)).toMatchObject({ value: CPU, why: 'whyCpu' });
+    const slow = { ...noGpu, gpuMeasure: { speed: 'slow' as const, firstAnswerMs: 40_000 } };
+    expect(chooseDefault(DEFAULT_SETTINGS, slow).value).toBe(CPU);
+  });
+
+  it('says how much memory the processor model uses (Qwen3 1.7B)', () => {
+    expect(chooseDefault(DEFAULT_SETTINGS, { ...base, webgpu: false }).values).toEqual({
+      size: 1500,
+    });
+  });
+
+  it('stays on the graphics card when the processor model cannot run here', () => {
     const noCpu = { ...base, cpu: false };
     expect(chooseDefault(DEFAULT_SETTINGS, noCpu)).toMatchObject({
       value: QWEN,
@@ -77,19 +96,22 @@ describe('the default model', () => {
   });
 
   it('never picks the endpoint while a local model can run', () => {
-    expect(chooseDefault(withEndpoint, base).value).toBe(CPU);
+    expect(chooseDefault(withEndpoint, base).value).toBe(QWEN);
+    expect(chooseDefault(withEndpoint, { ...base, webgpu: false }).value).toBe(CPU);
   });
 });
 
 describe('why the model is selected', () => {
   it('gives the reason of the default while the settings are automatic', () => {
-    expect(whyFor(DEFAULT_SETTINGS, base, CPU)).toMatchObject({ why: 'whyCpu' });
+    expect(whyFor(DEFAULT_SETTINGS, base, QWEN)).toMatchObject({ why: 'whyGpuOnly' });
+    const noGpu = { ...base, webgpu: false };
+    expect(whyFor(DEFAULT_SETTINGS, noGpu, CPU)).toMatchObject({ why: 'whyCpu' });
   });
 
   it('says "you chose this model" for a saved choice, even when it equals the default', () => {
-    const chosen = { ...DEFAULT_SETTINGS, runtime: 'cpu' as const };
-    expect(whyFor(chosen, base, CPU).why).toBe('whyChosen');
-    expect(whyFor(DEFAULT_SETTINGS, base, QWEN).why).toBe('whyChosen');
+    const chosen = { ...DEFAULT_SETTINGS, runtime: 'webllm' as const };
+    expect(whyFor(chosen, base, QWEN).why).toBe('whyChosen');
+    expect(whyFor(DEFAULT_SETTINGS, base, CPU).why).toBe('whyChosen');
   });
 
   it('labels the test model and the set-up entry', () => {

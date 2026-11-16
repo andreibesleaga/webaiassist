@@ -24,6 +24,7 @@
     "build:smoke": "node scripts/build.mjs --smoke && node scripts/check-dist.mjs --smoke",
     "test:smoke": "npm run build:smoke && playwright test",
     "screenshots": "npm run build:smoke && WEBAIASSIST_SCREENSHOTS=1 playwright test test/smoke/screenshots.spec.ts",
+    "shots:readme": "npm run build:smoke && WEBAIASSIST_README_SHOTS=1 playwright test test/smoke/readme-shots.spec.ts",
     "test:bdd": "npm run build:smoke && bddgen -c playwright.bdd.config.ts && playwright test -c playwright.bdd.config.ts",
     "scenarios": "node scripts/scenarios.mjs",
     "check:scenarios": "node scripts/scenarios.mjs --check",

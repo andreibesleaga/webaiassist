@@ -1,5 +1,13 @@
 # Tool security review
 
+> **In short**
+>
+> - Every tool of the open page is read against nine rules on arrival. A tool with a finding is marked "check" and is always asked about.
+> - The review reads what the page wrote about the tool. It runs no page code and makes no request.
+> - A finding is a reason to look twice, not proof of harm. A clean review is not proof of safety.
+> - Some tools are "not offered to the model" but can be run by hand: hidden characters or turn markers, a field schema over 8,000 characters, or tools beyond a 24,000-character list.
+> - Gaps: an honest-looking description that lies is not seen, one rule reads names and not the page's code, and the word lists are English.
+
 Every tool of the open page is read against nine written rules when it arrives. A tool with a
 finding is marked **check** in the tools list, shows its reasons in the list, in the detail view and in
 the question before a call, and is **always asked about**, in every confirmation mode. The review

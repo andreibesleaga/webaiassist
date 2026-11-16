@@ -1,5 +1,13 @@
 # Chrome Web Store listing
 
+> **In short**
+>
+> - This page holds the text and images for the Chrome Web Store listing. Each quote block is the content of one field.
+> - Still open: the store link, the privacy policy URL and the demo node URL, and screenshot 1 from a real run.
+> - The description says WebMCP is a draft, not a W3C Standard, that answers can be wrong, and that starting a model downloads 350 MB to 2.8 GB after you agree.
+> - Measured on one laptop graphics card, Qwen3 0.6B had the whole expected tool sequence right in 8 of 10 test-node questions and 2 of 10 live-node questions.
+> - Each run is a few questions, so the tables show a direction, not a rate. Host access is optional and never granted at install.
+
 The text and images for the WebAIAssist listing. Each quote block is the content of one field:
 paste it without the leading `>` and without the angle brackets around links.
 
@@ -8,11 +16,12 @@ paste it without the leading `>` and without the angle brackets around links.
 Nothing below is guessed. These items stay open until the runs are done and recorded in
 `docs/eval/`:
 
-- [ ] **The default-model line.** The listing does not say which model starts first, because the
-      final choice is made from the final runs (graphics card, processor, Chrome's built-in model).
+- [x] **The default-model line.** Decided 16 Nov 2026 from the runs: Chrome's built-in model when it is ready,
+      otherwise Qwen3 0.6B on the graphics card, otherwise Qwen3 1.7B on the processor. The description does not
+      name a model.
 - [x] **The graphics-card numbers.** Run of 15 to 16 Nov 2026 (table below).
 - [x] **The built-in model re-run** after the last change: run of 15 Nov 2026 (table below).
-- [ ] **The data-type answer** on the Privacy tab ("Website content", see Data usage below) is confirmed in the dashboard at submission.
+- [x] **The data-type answer** on the Privacy tab: "Website content" (decided 16 Nov 2026; see Data usage below).
 - [ ] **Placeholders**: `<STORE-LINK>`, `<PRIVACY-POLICY-URL>`, `<DEMO-NODE-URL>`.
 - [ ] **Screenshot 1** from a real run (see Images).
 
@@ -67,14 +76,15 @@ called. Small models miss the right tool; the tables say how often.
 Hardware: Windows 10 (build 10.0.26300), AMD gcn-5 laptop GPU, Chromium 156.0.8078.4. Run of the
 night of 15 to 16 Nov 2026, after the tool-use change, 10 questions per node, one browser per model
 (`docs/eval/EVAL-2026-11-16-156.0.8078.4.json`; [EVAL.md](EVAL.md) says why). Command:
-`npm run eval:gpu -- --models qwen,llama,qwen35,gemma4 --prompts 10`.
+`npm run eval:gpu -- --models qwen,llama,qwen35,gemma4 --prompts 10`. Llama 3.2 3B and Gemma 4 E2B are
+marked "slow: may stall on a laptop graphics card" in the list and are never picked by default.
 
-| Model        | Test node: whole sequence right                                              | Live node: whole sequence right | Median answer, test node / live node | Median first token, test node / live node |
-| ------------ | ---------------------------------------------------------------------------- | ------------------------------- | ------------------------------------ | ----------------------------------------- |
-| Qwen3 0.6B   | 8 of 10 (a tool used: 10 of 10)                                              | 2 of 10 (a tool used: 9 of 10)  | 25.7 s / 59.6 s                      | 19.4 s / 26.9 s                           |
-| Qwen3.5 2B   | 6 of 10 (3 over the time limit)                                              | not measured                    | 155.0 s / not measured               | 138.7 s / not measured                    |
-| Llama 3.2 3B | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
-| Gemma 4 E2B  | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
+| Model                      | Test node: whole sequence right                                              | Live node: whole sequence right | Median answer, test node / live node | Median first token, test node / live node |
+| -------------------------- | ---------------------------------------------------------------------------- | ------------------------------- | ------------------------------------ | ----------------------------------------- |
+| Qwen3 0.6B                 | 8 of 10 (a tool used: 10 of 10)                                              | 2 of 10 (a tool used: 9 of 10)  | 25.7 s / 59.6 s                      | 19.4 s / 26.9 s                           |
+| Qwen3.5 2B                 | 6 of 10 (3 over the time limit)                                              | not measured                    | 155.0 s / not measured               | 138.7 s / not measured                    |
+| Llama 3.2 3B (marked slow) | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
+| Gemma 4 E2B (marked slow)  | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
 
 "Not measured" on the live node: the browser of that run could no longer open the page after the
 test-node questions.
@@ -191,9 +201,9 @@ not use them for advertising or credit decisions, and does not send them to the 
 leaves the computer, and when, is in the privacy policy and in
 [WHAT-THE-EXTENSION-READS.md](WHAT-THE-EXTENSION-READS.md).
 
-**Privacy policy URL:** `<PRIVACY-POLICY-URL>`: the public link to `docs/PRIVACY.md` in the
-repository, for example
-`https://github.com/andreibesleaga/webaiassist/blob/main/docs/PRIVACY.md`.
+**Privacy policy URL:** `<PRIVACY-POLICY-URL>`: the public page that mirrors `docs/PRIVACY.md`,
+`https://agenticsystemcore.com/webaiassist/privacy/`. It must be live before the submission; it carries the
+Limited Use statement the store asks for.
 
 ## Test instructions tab
 

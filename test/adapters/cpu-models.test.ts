@@ -8,8 +8,8 @@ import {
 } from '../../src/adapters/cpu-models';
 
 describe('CPU model registry', () => {
-  it('offers Qwen3 0.6B as the default, then Qwen3 1.7B and Qwen3.5 2B, nothing else', () => {
-    expect(defaultCpuModelId()).toBe('qwen3-0.6b-q4_k_m');
+  it('lists Qwen3 0.6B, Qwen3 1.7B and Qwen3.5 2B, nothing else, and defaults to Qwen3 1.7B', () => {
+    expect(defaultCpuModelId()).toBe('qwen3-1.7b-q4_k_m');
     expect(CPU_MODEL_IDS).toEqual(['qwen3-0.6b-q4_k_m', 'qwen3-1.7b-q4_k_m', 'qwen3.5-2b-q4_k_m']);
   });
 

@@ -1,5 +1,13 @@
 # Standards and formats
 
+> **In short**
+>
+> - This page lists every standard, draft and profile the extension reads or uses, and what it does with each. Status was read on 14 Nov 2026.
+> - The extension reads these files. It does not claim to support, conform to or certify any of them.
+> - WebMCP is a draft (Draft Community Group Report, 13 Nov 2026). It is not a W3C Standard and not on the W3C Standards Track.
+> - Status words: standard (an RFC or a W3C Recommendation), draft, the AgenticSystemCore project's own profile, and convention.
+> - It deliberately does not read VoID and DCAT files, an MCP server card or the skills index: no fixed path exists, or the address would come from a file.
+
 This page lists every standard, draft and profile that WebAIAssist reads or uses, what it does
 with each one, where in the code, and what it does not do. Status was read on 14 Nov 2026; the
 sources and dates are in [SOURCES.md](SOURCES.md). The plain-words companions are

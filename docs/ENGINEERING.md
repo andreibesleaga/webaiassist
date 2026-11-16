@@ -1,5 +1,13 @@
 # Engineering
 
+> **In short**
+>
+> - Everything runs from the repository alone (Node.js 24 and npm). The network is needed at the initial build, to fetch model libraries of about 32 MB.
+> - `npm run verify:release` runs every check in order. Green means the zip can be released.
+> - The build checks refuse an undocumented permission, `eval`, remote code, a changed model library, and a zip over 12 MiB (the 0.1.0 zip is about 11.5 MB).
+> - To release: update CHANGELOG.md, run `npm version`, run `npm run verify:release`, then push a tag `vx.y.z`. The workflow does not upload to the Chrome Web Store.
+> - Dependencies use exact pins, same major version, at least 14 days old. A major update is a recorded decision with a reason.
+
 How to build, test, release and update WebAIAssist. Everything here runs from the repository
 alone.
 
@@ -30,13 +38,14 @@ alone.
 | `npm run test:smoke`           | Builds `dist-smoke/` and runs the browser tests in `test/smoke/` (smoke and accessibility).                                                                                                                                                                                                                                               |
 | `npm run test:bdd`             | Builds `dist-smoke/` and runs the Gherkin scenarios of `features/` that are tagged `@smoke` (`test/bdd/`).                                                                                                                                                                                                                                |
 | `npm run screenshots`          | Builds `dist-smoke/` and takes four headless screenshots (scripted model, test page) into `docs/eval/screenshots/*-headless.png`. The real ones come from `npm run eval:gpu`.                                                                                                                                                             |
+| `npm run shots:readme`         | Takes the README pictures (`docs/images/*.png`) from the development build with the scripted test model and test pages (`test/smoke/readme-shots.spec.ts`). Run it when the interface changes.                                                                                                                                            |
 | `npm run scenarios`            | Rewrites the table in [SCENARIOS.md](SCENARIOS.md) from `features/`. `npm run check:scenarios` fails when it is stale.                                                                                                                                                                                                                    |
 | `npm run verify:release`       | All of the above, in that order. Green means the zip can be released.                                                                                                                                                                                                                                                                     |
 | `npm run icons`                | Renders `static/icons/icon.svg` to the four PNG sizes. Run after changing the SVG.                                                                                                                                                                                                                                                        |
 | `npm run build:smoke`          | Builds the development build `dist-smoke/`: scripted test model, fake processor engine with four test models, `?tab=` override, browser check (spike) page.                                                                                                                                                                               |
 | `npm run eval:cpu`             | Builds `dist-eval/` and runs the real processor model (llama.cpp; `--model 0.6b`, `1.7b` or `qwen35-2b`, default `0.6b`) in headless Chromium: five prompts on the stub node, then a second start from the stored copy. Needs the network once (397 MB to 1.3 GB). Writes `docs/eval/EVAL-CPU-<model>-<date>.json`. Not part of the gate. |
 | `npm run build:eval`           | Builds `dist-eval/` (the extension plus install-time access to `localhost`, `127.0.0.1` and `agenticsystemcore.com`) and checks it.                                                                                                                                                                                                       |
-| `npm run eval:gpu`             | Builds `dist-eval/` and runs the model evaluation on a computer with a GPU: visible browser windows, 20 prompts, the models of `--models` (default `qwen,llama`; also `qwen35`, `gemma4`), a report in `docs/eval/`. Not part of the gate. See [EVAL.md](EVAL.md).                                                                        |
+| `npm run eval:gpu`             | Builds `dist-eval/` and runs the model evaluation on a computer with a GPU: visible browser windows, 20 prompts, the models of `--models` (default `qwen,qwen35`; also `llama`, `gemma4`), a report in `docs/eval/`. Not part of the gate. See [EVAL.md](EVAL.md).                                                                        |
 | `npm run eval:gpu:win`         | From WSL: runs the same evaluation on the Windows side and copies the report back.                                                                                                                                                                                                                                                        |
 | `npm run eval:nano`            | Chrome's built-in model for real, in Google Chrome. Writes `docs/eval/EVAL-NANO-<date>-<version>.json`. Not part of the gate.                                                                                                                                                                                                             |
 | `npm run eval:nano:win`        | From WSL: the same on the Windows side.                                                                                                                                                                                                                                                                                                   |
@@ -65,7 +74,7 @@ for a release.
   `import()` or `importScripts()` (`scripts/check-remote-code.mjs`);
 - a model library that is missing, changed (size or SHA-256), or not pinned;
 - in the zip only: a file that is not in `dist/`, a missing file, a source map or
-  source-map comment, a version other than `package.json`, more than 12 MiB (the 0.1.0 zip is about 11.4 MB, 10.9 MiB, with the query engine's 1.5 MB WebAssembly file).
+  source-map comment, a version other than `package.json`, more than 12 MiB (the 0.1.0 zip is about 11.5 MB, 11.0 MiB, with the query engine's 1.5 MB WebAssembly file).
 
 ## Tests
 

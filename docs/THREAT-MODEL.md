@@ -1,5 +1,13 @@
 # Threat model
 
+> **In short**
+>
+> - The web page, its tools and the model output are not trusted. Every tool call goes through the confirmation gate, and the default mode asks before every call.
+> - The extension has no install-time host access, no `web_accessible_resources` and no `externally_connectable`.
+> - An independent review on 12 Nov 2026 led to 15 findings and four information items, all fixed; every test in `test/security-review/` passes.
+> - Residual risks include: a site's tool cannot be checked, a small model can be steered, the endpoint key is stored unencrypted, and weight shards are not hash-checked.
+> - Not tested here: a screen reader, browsers other than Chromium, and a real model in CI.
+
 What WebAIAssist protects, where the trust boundaries are, how each threat is handled, and
 what remains. Every control names the file that implements it and the test that proves it.
 Version 0.1.0, 13 Nov 2026.

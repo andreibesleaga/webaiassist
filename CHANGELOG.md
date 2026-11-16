@@ -1,5 +1,13 @@
 # Changelog
 
+> **In short**
+>
+> - Version 0.1.0 is not yet released; the release date is set when the tag is made.
+> - It adds a side panel where a local AI model uses the page's WebMCP tools, through four model paths: graphics card, processor, Chrome's built-in model and a chat endpoint.
+> - Every tool call goes through a confirmation (Allow once or Deny). The manifest has five install permissions and no install-time host access.
+> - Measured on one laptop graphics card (AMD gcn-5): Qwen3 0.6B picked the right tool in 8 of 10 test-node questions but 2 of 10 on the live node.
+> - WebMCP is a draft standard, and other graphics cards are not measured.
+
 All notable changes are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
@@ -10,6 +18,11 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Added
 
+- **Default models from the measured runs** (15 and 16 Nov 2026): Chrome's built-in model when Chrome has it
+  ready; otherwise Qwen3 0.6B on the graphics card unless its first answer was measured slow; otherwise Qwen3 1.7B
+  on the processor. Llama 3.2 3B and Gemma 4 E2B stay in the graphics-card list, each marked "slow: may stall on
+  a laptop graphics card" and never picked by default: on the measured graphics card both ran past five minutes on
+  their first question.
 - **A page that registers its tools late**: when the first list of a page is empty, the panel lists it again
   after one and after three seconds; the toolbar number is read again as soon as you allow or forget a site.
   Before, both could stay at "no tools" until the page changed something (seen on the first case of the
@@ -46,8 +59,7 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   keyboard use (Ctrl+Enter, Escape), light and dark themes, no library, font or image from
   outside the package.
 - **Four model paths** behind one `ModelRuntime` port:
-  - the graphics card: WebLLM (`@mlc-ai/web-llm` 0.2.86), Qwen3 0.6B, Llama 3.2 3B, Qwen3.5 2B and
-    Gemma 4 E2B (listed only when the graphics card has `shader-f16`), in a Worker
+  - the graphics card: WebLLM (`@mlc-ai/web-llm` 0.2.86), Qwen3 0.6B, Qwen3.5 2B, Llama 3.2 3B and Gemma 4 E2B, in a Worker
     of the offscreen document (or in the service worker when the offscreen document has no
     WebGPU);
   - the processor: llama.cpp in WebAssembly (`@wllama/wllama` 3.8.1), Qwen3 0.6B, Qwen3 1.7B and
@@ -225,10 +237,11 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Known limits
 
-- Chrome's built-in model was measured on 14 Nov 2026 (Chrome 157, Windows): a tool in 5 of 5 questions on the test node and 1 of 5 on the live node, 15 to 42 s an answer. The first hand test, before that, did not start it.
-- The graphics-card path was run on a laptop GPU (slow first answer; long prompts needed a
-  smaller prefill chunk); Llama 3.2 3B lost the GPU device on its first question there (the chunk
-  is now per model, not yet measured), and Qwen3.5 2B and Gemma 4 E2B are not run on a graphics card yet.
+- Chrome's built-in model was measured on 15 Nov 2026 (Chrome 157, Windows): a tool in 5 of 5 questions on each node, the whole expected sequence in 4 of 5, 18 to 36 s an answer.
+- The graphics-card path was run on one laptop GPU (AMD gcn-5) on 16 Nov 2026: Qwen3 0.6B picked the right
+  tool in 8 of 10 test-node questions but 2 of 10 on the live node; Qwen3.5 2B in 6 of 10, at 2 to 5 minutes a
+  question; Llama 3.2 3B and Gemma 4 E2B ran past five minutes on their first question and stopped the browser
+  (both are marked slow in the list). Other graphics cards are not measured.
 - The 0.6B processor model called no tool in the first measured run; the 1.7B model did, at 47 to
   116 seconds a question; Qwen3.5 2B, in its first run, called the expected tool first in four of five, at 153 to 256 seconds a question.
 - WebMCP is a draft standard.

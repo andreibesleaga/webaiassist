@@ -1,5 +1,13 @@
 # Evaluation
 
+> **In short**
+>
+> - This page records how well each model picks the right tool on an AgenticSystemCore node. CI tests use a scripted model and cannot measure it.
+> - Graphics card, 16 Nov 2026, one laptop: Qwen3 0.6B used a tool on 10 of 10 test questions, the right one on 8. On the live node the right tool on 2 of 10.
+> - Llama 3.2 3B and Gemma 4 E2B ran past the 5-minute limit on question one; both are marked slow in the list. Chrome's built-in model, 15 Nov: a tool on 10 of 10 questions, the right one on 8.
+> - Processor, after the tool-use change: Qwen3 1.7B was right on 5 of 5 prompts. Each run is five prompts, so the numbers show a direction, not a rate.
+> - Real Chrome 157, 15 Nov 2026: the conformance page ran 16 of 16 cases as expected, and the panel listed the tools on 17 of Google's 18 demo pages.
+
 How well each shipped model picks the right tool with the right arguments on an
 AgenticSystemCore node, measured by one command on a computer with a GPU. The tests in CI use a
 scripted model and cannot measure this.
@@ -10,7 +18,7 @@ scripted model and cannot measure this.
 | ----------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Graphics card           | `npm run eval:gpu` on the maintainer's laptop (AMD gcn-5) | Run of 16 Nov, 10 questions per page: Qwen3 0.6B used a tool on 10 of 10 test questions, the right one on 8, about 19 s to the first token; on the live node the right tool on 2 of 10. Qwen3.5 2B: the right tool on 6 of 10, 2 to 5 minutes per answer, 3 over the 5-minute limit. Llama 3.2 3B and Gemma 4 E2B loaded and then ran past the limit on their first question, which also stopped that browser. See the results block below. |
 | Processor and memory    | `npm run eval:cpu`, headless Chromium on 16 cores         | Three models, five prompts (three for Qwen3 1.7B): see "The processor model".                                                                                                                                                                                                                                                                                                                                                               |
-| Chrome's built-in model | `npm run eval:nano` in real Chrome 157 on Windows         | Run of 15 Nov, after the profile used for earlier builds was replaced (in it the panel showed no tools at all): a tool used on 10 of 10 questions, the right one on 8 (5 of 5 on the test node, 3 of 5 on the live node); 7 to 36 s per answer; start 14 s, later starts 3 s. Report: `docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json`.                                                                                                  |
+| Chrome's built-in model | `npm run eval:nano` in real Chrome 157 on Windows         | Run of 15 Nov, after the profile used for earlier builds was replaced (in it the panel showed no tools at all): a tool used on 10 of 10 questions, the whole expected sequence on 8 (4 of 5 on the test node, 4 of 5 on the live node); 18 to 36 s per answer; start 14 s, later starts 3 s. Report: `docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json`.                                                                                   |
 | Chat endpoint           | Unit and browser tests against a fake server              | No run against a real Ollama or LM Studio is recorded.                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Run
@@ -21,12 +29,11 @@ scripted model and cannot measure this.
    From WSL, `npm run eval:gpu:win` runs it on the Windows side, installs that Chromium there, and
    copies the report back.
 2. It builds `dist-eval/` (the extension plus install-time access to `localhost`, `127.0.0.1` and
-   `agenticsystemcore.com`), starts each model (by default Qwen3 0.6B and Llama 3.2 3B; Qwen3.5 2B
+   `agenticsystemcore.com`), starts each model (Qwen3 0.6B, then Qwen3.5 2B; add Llama 3.2 3B
    and Gemma 4 E2B with `--models`) and asks the prompts.
 3. Every prompt runs in a fresh panel, on a local stub of the ten AgenticSystemCore tools and,
    unless `--no-live`, on the live node. Each confirmation question is allowed and recorded.
-4. Options: `--models qwen,llama` (the default; the others are `qwen35` for Qwen3.5 2B and
-   `gemma4` for Gemma 4 E2B, which needs a graphics card with `shader-f16`), `--prompts 20`, `--idle 10` (minutes), `--headless`,
+4. Options: `--models qwen,qwen35` (the default; the others are `llama` and `gemma4`), `--prompts 20`, `--idle 10` (minutes), `--headless`,
    `--no-live`, `--fresh-profile` (forget cached models), `--scripted` (flow check, no GPU),
    `--no-cancel-check` (skip the Cancel-during-download check, to see its effect on the GPU alone).
 5. Output: `docs/eval/EVAL-<date>-<chrome>.json`, four screenshots in `docs/eval/screenshots/`,
@@ -84,7 +91,7 @@ answers all five prompts.
 
 ## The 4,096-token window
 
-Every listed model runs with a window of 4,096 tokens (WebLLM's record for the four graphics-card
+Every listed model runs with a window of 4,096 tokens (WebLLM's record for the graphics-card
 models, `CPU_CAPABILITIES` for the processor ones). `test/adapters/context-fit.test.ts` builds the
 request the loop sends for the live AgenticSystemCore node (the rules and node hint, its ten tools
 as the page lists them, the site files the node publishes, the question) with each model's
@@ -229,8 +236,8 @@ GPU device is lost (`device.lost` handlers in `lib/index.js`), and the call stil
 reads a freed one; the device loss itself, by the 2 s watchdog, is the reading that fits the
 13 Nov measurements (a fixed 32-token chunk was sized for the 0.6B model, a 3B model costs about
 six times as much per token), but it was not measured on this run. The prefill chunk is now one
-value per model (`src/adapters/prefill-chunk.ts`: 32 for Qwen3 0.6B, 5 for Llama 3.2 3B, 10 for
-Qwen3.5 2B, 6 for Gemma 4 E2B), scaled from the measured 32 by the weight each model reads per
+value per model (`src/adapters/prefill-chunk.ts`: 32 for Qwen3 0.6B, 10 for
+Qwen3.5 2B), scaled from the measured 32 by the weight each model reads per
 token; these are estimates to be checked with `npm run eval:gpu`. The panel now treats
 "already been disposed" as a lost device (host restart, plain banner, model line no longer
 "Ready") and a chat on an engine WebLLM no longer has as "The model stopped. Press Start to load

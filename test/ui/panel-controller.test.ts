@@ -49,8 +49,8 @@ describe('side panel controller', () => {
     const options = [...byId<HTMLSelectElement>('model').options].map((o) => o.value);
     expect(options).toEqual([
       'webllm:Qwen3-0.6B-q4f16_1-MLC',
-      'webllm:Llama-3.2-3B-Instruct-q4f16_1-MLC',
       'webllm:Qwen3.5-2B-q4f16_1-MLC',
+      'webllm:Llama-3.2-3B-Instruct-q4f16_1-MLC',
       'webllm:gemma-4-E2B-it-q4f16_1-MLC',
       'setup-endpoint',
     ]);

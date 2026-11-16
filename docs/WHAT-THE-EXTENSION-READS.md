@@ -1,5 +1,13 @@
 # What the extension reads from a site, and why
 
+> **In short**
+>
+> - WebAIAssist reads a short, fixed list of things a site publishes about itself, to show you what the site offers and to give the model a few facts.
+> - It reads them for a site you allowed, or after you click the toolbar button on that page. Nothing is read in the background or from other tabs.
+> - Requests go to the open site as a plain GET with no cookies and no referrer, and no redirect is followed.
+> - With a model in the browser or Chrome's built-in model, your questions, page text and tool results stay on your computer. A remote chat endpoint receives them.
+> - It does not read your cookies, other tabs, your history or files on your computer.
+
 WebAIAssist reads a short, fixed list of things that a site publishes about itself. It reads them to
 show you what the site offers and to give the model a few facts, so the model asks the page's
 tools instead of guessing. Each thing it reads is in the [standards table](STANDARDS.md), with its

@@ -1,5 +1,13 @@
 # Manual checks
 
+> **In short**
+>
+> - Some behaviour cannot be proved by the automated tests: it needs a real browser, a graphics card, Chrome's own model, a screen reader or a live website.
+> - Each check is a scenario of `features/` with a tag (`@gpu`, `@cpu`, `@nano`, `@manual`) that says what it needs.
+> - Run the checks on the build you will publish: `npm run build`, then load `dist/` as an unpacked extension in Chrome with a fresh profile.
+> - Record the Chrome version, the operating system and each result in the evaluation log (EVAL.md).
+> - A failed `@manual` check is a bug until shown otherwise.
+
 Some behaviour cannot be proved by the automated tests: it needs a real browser, a graphics card,
 Chrome's own model, a screen reader or a live website. Each check below is a scenario of
 `features/` with a tag that says what it needs. [SCENARIOS.md](SCENARIOS.md) lists every scenario
@@ -25,7 +33,7 @@ Needs: Chrome 126 or newer with WebGPU (`chrome://gpu` shows "WebGPU: Hardware a
 
 1. Open any page that offers WebMCP tools (the AgenticSystemCore node page, or a local page that
    calls `document.modelContext.registerTool`). Click the toolbar button, press **Allow**.
-2. In the model list choose **Qwen3 0.6B** (graphics card; the same check for **Qwen3.5 2B** and, on a card with shader-f16, **Gemma 4 E2B**). Press **Start**. Agree to the download
+2. In the model list choose **Qwen3 0.6B** (graphics card; the same check for **Qwen3.5 2B**). Press **Start**. Agree to the download
    when the panel shows its size and source.
 3. Expected: the progress bar moves; the line reads "Ready: ... Running in this browser, on your graphics card (in the offscreen
    document)". The first answer after a load can take up to a minute while the GPU programs

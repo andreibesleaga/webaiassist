@@ -1,5 +1,13 @@
 # Roadmap
 
+> **In short**
+>
+> - These are candidates for later releases. They are not promises, they have no dates, and something here may never be built.
+> - Candidates include reading more of what sites publish, a live meter of the model's context, more interface languages (English today) and a model file you choose.
+> - Also listed: re-measure every model path after each Chrome and model update, and check Edge and Brave.
+> - Not planned: web search, tools across tabs, frames of other sites, access to all sites at once, voice, a 3D graph.
+> - To suggest something, open an issue or a discussion (see SUPPORT.md).
+
 These are candidates for later releases. They are not promises and they have no dates. Something
 here may never be built. What a release contains is in [CHANGELOG.md](CHANGELOG.md).
 

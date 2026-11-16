@@ -1,5 +1,13 @@
 # Browser check (spike)
 
+> **In short**
+>
+> - The spike is a check page for a real computer with a real GPU, run before the model runtime is built.
+> - It answers three questions: where WebGPU works, whether Chrome's built-in model is available, and whether a page can register WebMCP tools and run them.
+> - It downloads no model, sends nothing anywhere, and takes about 15 minutes. It needs the development build `dist-smoke`; the release build does not contain it.
+> - Result of 12 Nov 2026 (Windows 10, AMD gcn-5, Chrome 157): WebGPU worked in the page, service worker and offscreen document; 10 of 10 stub tools were read back.
+> - The model host chosen was the offscreen document. Chrome's built-in model reported "downloadable".
+
 The spike page answers three questions on a real computer with a real GPU, before the model
 runtime is built:
 

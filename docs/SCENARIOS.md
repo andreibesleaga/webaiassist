@@ -60,12 +60,12 @@ Scenarios whose wording changed when they stopped being pending:
 | Tag | Scenarios |
 |---|---|
 | @smoke | 134 |
-| @unit | 197 |
+| @unit | 198 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 9 |
-| all | 345 |
+| all | 346 |
 | run by `npm run test:bdd` now | 134 |
 
 ### Every scenario
@@ -82,10 +82,10 @@ Scenarios whose wording changed when they stopped being pending:
 | F01.8 | Install and first run | Installing from the Chrome Web Store asks only for the permissions the listing names | @manual | `features/01-install-and-first-run.feature` | manual check |
 | F01.9 | Install and first run | The package asks for no website access at install | @unit | `test/scripts/check-zip.test.ts`, `test/security-review/dist-review.test.ts` | unit test |
 | F02.1 | Choosing a model | A ready model is named in the model line | @smoke | `features/02-choosing-a-model.feature` | npm run test:bdd |
-| F02.2 | Choosing a model | With a working graphics card and no processor model the panel selects the small bundled model | @unit | `test/ui/model-picker.test.ts` | unit test |
+| F02.2 | Choosing a model | With a working graphics card the panel selects the small bundled model, even when the processor model could run | @unit | `test/ui/model-picker.test.ts` | unit test |
 | F02.3 | Choosing a model | Without WebGPU and without the processor model the panel falls back to the endpoint, then Chrome's built-in model | @unit | `test/ui/default-model.test.ts` | unit test |
 | F02.4 | Choosing a model | The default is chosen by measurement and the panel says why | @smoke | `features/02-choosing-a-model.feature` | npm run test:bdd |
-| F02.5 | Choosing a model | The order is Chrome's built-in model, the CPU model, the graphics card, then an endpoint | @unit | `test/ui/default-model.test.ts` | unit test |
+| F02.5 | Choosing a model | The order is Chrome's built-in model, the graphics card, the processor model, then an endpoint | @unit | `test/ui/default-model.test.ts`, `test/ui/panel-model.test.ts` | unit test |
 | F02.6 | Choosing a model | The CPU and memory model answers a question on a computer without a graphics card | @smoke @cpu | `features/02-choosing-a-model.feature` | npm run test:bdd, CPU run |
 | F02.7 | Choosing a model | The graphics card model answers a question on a computer with WebGPU | @gpu | `features/02-choosing-a-model.feature` | maintainer or eval, GPU |
 | F02.8 | Choosing a model | Chrome's built-in model answers a question in Chrome | @nano | `features/02-choosing-a-model.feature` | maintainer, Chrome built-in model |
@@ -109,16 +109,17 @@ Scenarios whose wording changed when they stopped being pending:
 | F02.26 | Choosing a model | No graphics card: the error offers the processor model in one click | @smoke | `features/02-choosing-a-model.feature` | npm run test:bdd |
 | F02.27 | Choosing a model | Switching model while one is ready releases the old one and starts the new one | @unit | `test/ui/panel-switch.test.ts` | unit test |
 | F02.28 | Choosing a model | The real processor model answers on the stub node and starts again from the stored copy | @cpu | `features/02-choosing-a-model.feature` | CPU run |
-| F02.29 | Choosing a model | Qwen3.5 2B and Gemma 4 E2B are in the model list, on the graphics card | @unit | `test/ui/model-picker.test.ts`, `test/adapters/models.test.ts` | unit test |
-| F02.30 | Choosing a model | Gemma 4 E2B is hidden when the graphics card lacks shader-f16 | @unit | `test/ui/model-picker.test.ts`, `test/ui/options-page.test.ts` | unit test |
-| F02.31 | Choosing a model | The newer graphics-card models ask before their first download | @unit | `test/ui/panel-consent.test.ts` | unit test |
-| F02.32 | Choosing a model | A question on the AgenticSystemCore node fits the 4096-token window of every listed model | @unit | `test/adapters/context-fit.test.ts` | unit test |
-| F02.33 | Choosing a model | Qwen3.5 2B and Gemma 4 E2B load and answer on the graphics card | @gpu | `features/02-choosing-a-model.feature` | maintainer or eval, GPU |
-| F02.34 | Choosing a model | The real Qwen3.5 2B file answers on the stub node on the processor | @cpu | `features/02-choosing-a-model.feature` | CPU run |
-| F02.35 | Choosing a model | The model list is in two groups and every entry says where it runs | @unit | `test/ui/model-picker.test.ts`, `test/ui/panel-model-groups.test.ts` | unit test |
-| F02.36 | Choosing a model | A chat endpoint says from its address whether the chat leaves the computer | @unit | `test/ui/model-picker.test.ts`, `test/adapters/endpoint-runtime.test.ts` | unit test |
-| F02.37 | Choosing a model | After Start the model line says where the model runs | @unit | `test/ui/panel-controller.test.ts`, `test/ui/panel-cpu.test.ts`, `test/ui/panel-privacy.test.ts` | unit test |
-| F02.38 | Choosing a model | Options says for each place to run the model where it runs | @unit | `test/ui/options-models.test.ts` | unit test |
+| F02.29 | Choosing a model | Qwen3.5 2B, Llama 3.2 3B and Gemma 4 E2B are in the model list, on the graphics card | @unit | `test/ui/model-picker.test.ts`, `test/adapters/models.test.ts` | unit test |
+| F02.30 | Choosing a model | Llama 3.2 3B and Gemma 4 E2B are marked slow and are never a default | @unit | `test/adapters/models.test.ts`, `test/ui/model-picker.test.ts` | unit test |
+| F02.31 | Choosing a model | Gemma 4 E2B is hidden when the graphics card lacks shader-f16 | @unit | `test/ui/model-picker.test.ts`, `test/ui/options-page.test.ts` | unit test |
+| F02.32 | Choosing a model | The newer graphics-card models ask before their first download | @unit | `test/ui/panel-consent.test.ts` | unit test |
+| F02.33 | Choosing a model | A question on the AgenticSystemCore node fits the 4096-token window of every listed model | @unit | `test/adapters/context-fit.test.ts` | unit test |
+| F02.34 | Choosing a model | Qwen3.5 2B and Gemma 4 E2B load and answer on the graphics card | @gpu | `features/02-choosing-a-model.feature` | maintainer or eval, GPU |
+| F02.35 | Choosing a model | The real Qwen3.5 2B file answers on the stub node on the processor | @cpu | `features/02-choosing-a-model.feature` | CPU run |
+| F02.36 | Choosing a model | The model list is in two groups and every entry says where it runs | @unit | `test/ui/model-picker.test.ts`, `test/ui/panel-model-groups.test.ts` | unit test |
+| F02.37 | Choosing a model | A chat endpoint says from its address whether the chat leaves the computer | @unit | `test/ui/model-picker.test.ts`, `test/adapters/endpoint-runtime.test.ts` | unit test |
+| F02.38 | Choosing a model | After Start the model line says where the model runs | @unit | `test/ui/panel-controller.test.ts`, `test/ui/panel-cpu.test.ts`, `test/ui/panel-privacy.test.ts` | unit test |
+| F02.39 | Choosing a model | Options says for each place to run the model where it runs | @unit | `test/ui/options-models.test.ts` | unit test |
 | F03.1 | Download, consent, progress, cancel, cache and removal | Before any weights download the panel shows the size and the source and waits | @smoke | `features/03-download-consent-and-storage.feature` | npm run test:bdd |
 | F03.2 | Download, consent, progress, cancel, cache and removal | "Not now" changes nothing | @smoke | `features/03-download-consent-and-storage.feature` | npm run test:bdd |
 | F03.3 | Download, consent, progress, cancel, cache and removal | Agreeing starts the download and shows progress | @smoke | `features/03-download-consent-and-storage.feature` | npm run test:bdd |

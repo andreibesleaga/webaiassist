@@ -1,5 +1,13 @@
 # Browser support
 
+> **In short**
+>
+> - WebAIAssist is a Manifest V3 extension for Chromium-based desktop browsers. Firefox and Safari are not supported. The minimum is Chrome 126.
+> - Tested: Chrome 157 on Windows 10 by the maintainer, and headless Chromium 156 in the automated tests. Edge, Brave, Opera and Vivaldi were not tested.
+> - In the summary table, "Not documented" means no vendor page was found today. It does not mean unsupported.
+> - Model paths need: WebGPU (graphics card), Chrome 137 or later (processor), Chrome 138 or later and the hardware Chrome lists (built-in model).
+> - WebMCP in Chrome is an origin trial from Chrome 149, with a local flag for development.
+
 WebAIAssist is a Manifest V3 extension for Chromium-based desktop browsers only. Firefox and
 Safari are not supported. The extension uses `chrome.sidePanel` and an offscreen document.
 Firefox and Safari use different extension APIs, and no vendor page read for this file lists
@@ -14,9 +22,9 @@ Chrome 126 (compat mode's polyfill uses `URL.parse`).
   `agenticsystemcore.com`, the graphics-card model ran, with a first answer of about 40
   seconds (the GPU programs compile on it). Chrome's built-in model did not start in the first
   hand test. It was measured on 14 Nov 2026 in Chrome 157.0.8103.52 on Windows: the download from
-  the click took 300 s, later starts 3 to 14 s, a tool was used in 5 of 5 questions on the test node
-  and 1 of 5 on the live node, and an answer took 15 to 42 s
-  (`docs/eval/EVAL-NANO-2026-11-14-157.0.8103.52.json`, [EVAL.md](EVAL.md)).
+  the click took 300 s, later starts 3 to 14 s, and in the re-run of 15 Nov 2026 a tool
+  was used in 5 of 5 questions on the test node and in 5 of 5 on the live node, and an answer took
+  18 to 36 s (`docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json`, [EVAL.md](EVAL.md)).
 - Headless Chromium 156 (Playwright 1.64.1, `--enable-features=WebMCPTesting`), in the automated
   smoke, scenario and accessibility tests, and in `npm run eval:cpu`, which ran the real processor
   models (llama.cpp in WebAssembly, 8 threads) on Linux under WSL: [EVAL.md](EVAL.md).
@@ -121,4 +129,5 @@ Google Chrome (see [EVAL.md](EVAL.md)). Measured in Playwright's Chromium 156.0.
 than letters, digits, underscore, hyphen and dot are refused with `InvalidStateError`; input is
 not checked against `inputSchema`; an empty result comes back as "Operation succeeded"; declarative
 form tools work (`toolname`, `tooldescription`, `toolautosubmit`, `SubmitEvent.agentInvoked`).
-Chrome 157 results: not recorded yet.
+Chrome 157 results (15 Nov 2026): 16 of 16 cases as expected, in the browser alone and with the extension
+([EVAL.md](EVAL.md)).

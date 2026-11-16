@@ -26,8 +26,8 @@ describe('Options page', () => {
     expect([...select('webllm-model').options].map((o) => o.value)).toEqual([
       '',
       'Qwen3-0.6B-q4f16_1-MLC',
-      'Llama-3.2-3B-Instruct-q4f16_1-MLC',
       'Qwen3.5-2B-q4f16_1-MLC',
+      'Llama-3.2-3B-Instruct-q4f16_1-MLC',
       'gemma-4-E2B-it-q4f16_1-MLC',
     ]);
     expect(document.getElementById('webllm-other')).toBeNull();
@@ -132,8 +132,8 @@ describe('Options page', () => {
     expect(ids()).toEqual([
       '',
       'Qwen3-0.6B-q4f16_1-MLC',
-      'Llama-3.2-3B-Instruct-q4f16_1-MLC',
       'Qwen3.5-2B-q4f16_1-MLC',
+      'Llama-3.2-3B-Instruct-q4f16_1-MLC',
     ]);
     loadPage('options.html');
     await startOptions({ ...fake(), shaderF16: true });

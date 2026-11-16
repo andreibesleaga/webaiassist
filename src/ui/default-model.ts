@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // Which model the panel selects when the user has not chosen one, and the one sentence that says
-// why. The order: Chrome's built-in model when it is ready; the graphics card when a stored
-// measurement says it is not slow; the processor model; the graphics card, unmeasured, when
-// the processor cannot run here; the endpoint; Chrome's built-in model still to download; the
-// endpoint set-up. A model the user chose always wins (model-picker.ts), so it never gets here.
+// why. The order, from the measured runs of 15 and 16 Nov 2026 (docs/EVAL.md): Chrome's built-in
+// model when it is ready; the graphics card (Qwen3 0.6B) whenever WebGPU works here, even when its
+// first answer was slow (that answer includes preparing the model; on the measured laptop the card
+// still answered about five times sooner than the processor model); the processor model (Qwen3
+// 1.7B); the endpoint; Chrome's built-in model still to download; the endpoint set-up. A model the user chose always wins (model-picker.ts), so it never gets here.
 import { endpointHost } from './endpoint-host';
 import { defaultCpuModelId, findCpuModel } from '../adapters/cpu-models';
 import { defaultModelId } from '../adapters/models';
@@ -29,9 +30,16 @@ function cpuChoice(env: PickerEnv): DefaultChoice {
   return { value: cpuValue(), why: 'whyCpu', values: { size: model?.memoryMb ?? 0 } };
 }
 
+/** The graphics card, with the reason that fits what was measured on it here. */
 function gpuChoice(env: PickerEnv): DefaultChoice {
-  const seconds = Math.round((env.gpuMeasure?.firstAnswerMs ?? 0) / 1000);
-  return { value: gpuValue(), why: 'whyGpu', values: { seconds } };
+  const measure = env.gpuMeasure;
+  if (measure === undefined) return { value: gpuValue(), why: 'whyGpuOnly' };
+  const seconds = Math.round(measure.firstAnswerMs / 1000);
+  return {
+    value: gpuValue(),
+    why: measure.speed === 'fast' ? 'whyGpu' : 'whyGpuSlow',
+    values: { seconds },
+  };
 }
 
 /** What is left when neither a ready built-in model, a quick graphics card nor the processor
@@ -50,9 +58,8 @@ export function chooseDefault(settings: Settings, env: PickerEnv): DefaultChoice
   if (env.promptApi && env.builtIn === 'available') {
     return { value: 'prompt-api', why: 'whyBuiltIn' };
   }
-  if (gpuWorks && env.gpuMeasure?.speed === 'fast') return gpuChoice(env);
+  if (gpuWorks) return gpuChoice(env);
   if (env.cpu === true) return cpuChoice(env);
-  if (gpuWorks) return { value: gpuValue(), why: 'whyGpuOnly' };
   return lastResort(settings, env);
 }
 

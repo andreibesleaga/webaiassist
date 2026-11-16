@@ -74,7 +74,7 @@ export const CPU_MODEL_IDS: readonly string[] = CPU_MODELS.map((m) => m.id);
 
 /** The model "Start" loads on the processor when the user has not picked one. */
 export function defaultCpuModelId(): string {
-  return SMALL.id;
+  return LARGE.id;
 }
 
 /** A listed model by id; `extra` is for builds that add test models (the smoke-test build). */

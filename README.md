@@ -1,5 +1,13 @@
 # WebAIAssist
 
+> **In short**
+>
+> - A side panel for Chrome with a small AI model that runs on your own computer. It uses the tools a web page offers through WebMCP, and asks you before each call.
+> - WebMCP is a draft, not a W3C Standard, and Chrome keeps it behind a switch you must turn on.
+> - With a model in the browser, what you type stays on your computer. There is no account and no analytics.
+> - Small models make mistakes: on one laptop the default model picked the right tool in 8 of 10 test questions, and answers took about 26 seconds.
+> - It reads what a site says about AI and about itself, and follows a site's "no AI input" signal. Controls are written against OWASP, the EU AI Act's transparency points and NIST, each with a test.
+
 A chat in your browser's side panel, with a small AI model that runs on your own computer.
 It can use the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/),
 and asks you before each one runs.
@@ -15,6 +23,19 @@ by the same author. It works with AgenticSystemCore nodes and with sites that of
 
 **WebMCP is off in Chrome until you turn it on.** Open `chrome://flags/#enable-webmcp-testing`, set
 **WebMCP for testing** to Enabled and relaunch Chrome. Without the switch, sites' tools do not appear.
+
+## What it looks like
+
+These pictures come from the automated browser tests (`npm run shots:readme`): the scripted test model
+and test pages that stand for a node, so they show the interface, not a real model's answers.
+
+| The tools a page offers                                                                                   | The question before a call                                                                                                | The answer, with the tool result                                                                                               |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| ![The side panel lists five tools of the page, each marked reads or changes](docs/images/panel-tools.png) | ![A dialog asks "Run the tool propose?" with the site, a warning and the exact arguments](docs/images/panel-question.png) | ![The conversation shows the call, the result marked as from the page, and the answer marked AI](docs/images/panel-answer.png) |
+
+| The tool review                                                                                 | The graph of a node                                                                  | A query over the graph                                                           | The activity log                                                                             |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| ![Tools with a finding are marked check, with the reason in words](docs/images/tool-review.png) | ![The explorer tab draws the node's knowledge graph](docs/images/explorer-graph.png) | ![A read-only SPARQL query and its result table](docs/images/explorer-query.png) | ![One line for each question: tool calls, tokens, price, time](docs/images/activity-log.png) |
 
 ## Works with AgenticSystemCore 1.1.0
 
@@ -62,7 +83,7 @@ Pick one in the panel or in Options. The panel picks one for you, and says why i
 
 | Where it runs                               | What runs it                                                                               | What leaves the computer                                                                                                                                            |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| In the browser, on the graphics card        | WebLLM on WebGPU: Qwen3 0.6B, Llama 3.2 3B, Qwen3.5 2B or Gemma 4 E2B                      | Only the download of the model files, once, from `huggingface.co`. Your questions, the page text and the results stay.                                              |
+| In the browser, on the graphics card        | WebLLM on WebGPU: Qwen3 0.6B or Qwen3.5 2B; Llama 3.2 3B and Gemma 4 E2B, marked slow      | Only the download of the model files, once, from `huggingface.co`. Your questions, the page text and the results stay.                                              |
 | In the browser, on the processor and memory | llama.cpp in WebAssembly: Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B (Chrome 137 or newer)       | The same: the model download only.                                                                                                                                  |
 | Chrome's built-in model                     | Chrome's own model (Gemini Nano), under Google's terms                                     | Nothing from this extension. Chrome downloads and runs the model.                                                                                                   |
 | Your own server on this computer            | An address on `localhost` or `127.0.0.1`: Ollama, LM Studio or another OpenAI-style server | The conversation goes to that local address. It does not leave the computer.                                                                                        |
@@ -199,15 +220,18 @@ called one each time; after the tool-use change the 0.6B model called a tool in 
 the 1.7B model in 5 of 5 ([docs/EVAL.md](docs/EVAL.md)). The downloaded file is checked against a recorded SHA-256 and deleted if it
 differs; a second Start uses the stored copy with no download.
 
-**Qwen3.5 2B and Gemma 4 E2B.** Qwen3.5 2B is in the list twice: on the graphics card (about 1.1 GB
+**Qwen3.5 2B.** Qwen3.5 2B is in the list twice: on the graphics card (about 1.1 GB
 download, about 2.3 GB of graphics memory) and on the processor (1.3 GB download, about 1.7 GB of
 memory). On the processor it loaded and answered all five measured questions, about twice as
 slowly as Qwen3 1.7B (3 to 4 tokens a second, 2.5 to 4 minutes a question). In the first run it called
 the expected tool first in four of the five; after the tool-use change, in three of the five
-([docs/EVAL.md](docs/EVAL.md)). Gemma 4 E2B runs on the graphics card
-only (2.8 GB download, about 3.4 GB of graphics memory) and is listed only when the graphics card
-reports the WebGPU feature `shader-f16`; neither the graphics-card run of Qwen3.5 2B nor that of
-Gemma 4 E2B is measured yet. Both are Apache-2.0. Neither is ever picked by itself. A graphics
+([docs/EVAL.md](docs/EVAL.md)). On the graphics card it picked the right tool in 6 of 10
+questions, at 2 to 5 minutes a question (run of 16 Nov 2026). It is Apache-2.0 and never picked by
+itself. Llama 3.2 3B and Gemma 4 E2B are in the graphics-card list, each marked "slow: may stall on a
+laptop graphics card": on the measured graphics card both ran past five minutes on their first
+question and stopped the browser. Neither is ever picked by itself. Gemma 4 E2B (2.8 GB download,
+about 3.4 GB of graphics memory, Apache-2.0) is listed only when the graphics card reports the
+WebGPU feature `shader-f16`. A graphics
 card with little memory or a slow one can lose its device on a larger model; the panel then says
 the model stopped and offers to restart it or to use the processor.
 
@@ -283,6 +307,65 @@ the reason "not offered to the model" and can still be run by hand; the whole to
 is capped at 24,000 characters, and tools beyond the cap are listed as not offered. A tool run by hand is
 written to the activity log.
 
+## Standards and frameworks for AI on websites
+
+One table: each standard, draft or framework that says how an AI assistant should meet a website, and
+what WebAIAssist does with it. "Does" means behaviour you can check in the code and the tests named. It
+is not a statement that any body has assessed the extension, and for the law and the frameworks it is a
+list of points addressed, not a compliance assessment. Status and sources: [docs/STANDARDS.md](docs/STANDARDS.md),
+[docs/SOURCES.md](docs/SOURCES.md).
+
+| Area                           | Standard, draft or framework                                                                                                                          | Status                                                                                                   | What WebAIAssist does                                                                                                                                                                                  | Where to check                                                                                                                               |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| A page's tools                 | WebMCP, `document.modelContext`                                                                                                                       | Draft Community Group Report, 13 Nov 2026 (W3C Web Machine Learning Community Group); not a W3C Standard | Lists the tools the open page registers; calls one only on a site you allowed and after your answer; 16-case test page run in Chrome 157                                                               | [docs/WHAT-IS-WEBMCP.md](docs/WHAT-IS-WEBMCP.md), `conformance/`, [docs/EVAL.md](docs/EVAL.md)                                               |
+| A site's wishes about AI       | `robots.txt` (RFC 9309) with a `Content-Signal` line; TDM Reservation Protocol                                                                        | RFC 9309 is a Proposed Standard; Content-Signal and TDMRep are conventions                               | Reads them; when a site says `ai-input=no`, its page text and files are not given to the model, and the panel says so                                                                                  | [docs/WHAT-THE-EXTENSION-READS.md](docs/WHAT-THE-EXTENSION-READS.md), `test/core/site-facts.test.ts`, `features/10-site-information.feature` |
+| A site's description of itself | Linkset (RFC 9264), Web Linking (RFC 8288), well-known URIs (RFC 8615), API catalog (RFC 9727), `security.txt` (RFC 9116), `llms.txt`, A2A agent card | RFCs: Proposed Standard, except RFC 9116 (Informational); `llms.txt` and the agent card are conventions  | Reads up to nine fixed public files of a site you allowed, shows what it found, and gives the model short facts from them, marked as data from the site                                                | [docs/STANDARDS.md](docs/STANDARDS.md), `src/core/site-files.ts`                                                                             |
+| Integrity of what is read      | Digest Fields (RFC 9530), SHA-256 through the Web Cryptography API                                                                                    | Proposed Standard; W3C Recommendation                                                                    | A node's graph files are used only when their bytes match the digest the node's link set declares                                                                                                      | `src/adapters/graph-fetch-shim.ts`, `test/smoke/explorer-safety.spec.ts`                                                                     |
+| Knowledge published for agents | AgenticSystemCore 1.1.0; Internet-Draft `draft-besleaga-agentic-knowledge-wellknown-02`                                                               | The project's own specification; an individual Internet-Draft (15 Nov 2026), by the same author          | Recognises a node by its link set, shows its version, tools and graph, and offers its ten tools to the model                                                                                           | "Works with AgenticSystemCore" above, [docs/STANDARDS.md](docs/STANDARDS.md)                                                                 |
+| Linked data                    | JSON-LD 1.1, RDF 1.1 N-Quads and Turtle, SPARQL 1.1 Query                                                                                             | W3C Recommendations                                                                                      | Draws a node's graph and runs read-only SELECT and ASK queries in the browser; an update is refused                                                                                                    | `src/query/`, `test/smoke/query.spec.ts`                                                                                                     |
+| Sustainability data of a site  | Internet-Draft `draft-besleaga-sustainability-wellknown-12`                                                                                           | Internet-Draft, Independent Submission stream (28 Oct 2026), by the same author                          | Reads `/.well-known/sustainability-data` when a site publishes it and shows it                                                                                                                         | [docs/STANDARDS.md](docs/STANDARDS.md)                                                                                                       |
+| Where the model runs           | WebGPU, WebAssembly, the Prompt API                                                                                                                   | W3C Candidate Recommendation Drafts; a Community Group draft                                             | Runs the model in the browser, or uses Chrome's own model, so the chat can stay on your computer                                                                                                       | "Where the model runs" above, [docs/EVAL.md](docs/EVAL.md)                                                                                   |
+| Security of AI applications    | OWASP Top 10 for LLM Applications 2025; OWASP Top 10 for Agentic Applications 2026                                                                    | Community lists                                                                                          | Nine written rules read every tool definition; page text is fenced as data; each call is checked and asked about; sizes and steps are bounded. The gaps are listed next to each item                   | [docs/TOOL-REVIEW.md](docs/TOOL-REVIEW.md), [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md)                                                     |
+| Transparency to people         | EU AI Act, Regulation (EU) 2024/1689, Article 50 (points addressed)                                                                                   | EU law                                                                                                   | The panel says answers come from an AI model; an exported chat is marked as AI-generated in a machine-readable block; who provides and who deploys is written down, with the uses that are not offered | [docs/GOVERNANCE.md](docs/GOVERNANCE.md), `test/core/export.test.ts`                                                                         |
+| Risk management                | NIST AI Risk Management Framework 1.0 and the Generative AI Profile (NIST AI 600-1) (points addressed)                                                | Voluntary frameworks                                                                                     | Purpose and limits stated; behaviour measured per model path; risks, controls, tests and residual risks listed; Stop, Forget and Clear for the person                                                  | [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md), [docs/EVAL.md](docs/EVAL.md), [docs/SCENARIOS.md](docs/SCENARIOS.md)                           |
+| Browser store rules            | Chrome Web Store programme policies (Manifest V3)                                                                                                     | Store policy                                                                                             | Five permissions, no access to any site at install, no remote code (checked on every build), a privacy page that lists every host                                                                      | [docs/PRIVACY.md](docs/PRIVACY.md), `scripts/check-dist.mjs`                                                                                 |
+| Accessibility                  | WCAG 2.2, level AA (target)                                                                                                                           | W3C Recommendation                                                                                       | Keyboard use, names, contrast and 200 percent zoom are tested in the built extension with axe-core                                                                                                     | [docs/A11Y.md](docs/A11Y.md)                                                                                                                 |
+
+[docs/SCENARIOS.md](docs/SCENARIOS.md) links each requirement row (OWASP, NIST, EU, store) to the scenarios that test it.
+
+## What is different
+
+Other tools use a page's WebMCP tools too; several are open source, and Chrome Labs publishes an example
+agent. A search on 16 Nov 2026 (the list and its limits are in [docs/SOURCES.md](docs/SOURCES.md),
+section 25) found none that also does these three things:
+
+- **Runs the model inside the browser itself** (on the graphics card or the processor) and calls the
+  page's tools with it, with no server to install and no key. The others found use Chrome's built-in
+  model, a local server such as Ollama, or a hosted model.
+- **Reads what the site says about AI and about itself** (`robots.txt` Content-Signal, `llms.txt`,
+  `security.txt`, the API catalog, a knowledge link set) and acts on it: a site that asks for no AI
+  input does not have its text given to the model.
+- **Writes its controls against public lists and frameworks** (the two OWASP lists, the EU AI Act's
+  transparency points, NIST AI RMF), with the test that proves each one and the gaps left open.
+
+It is not the first WebMCP assistant and does not claim to be. A search can miss a tool; if you know
+one, open an issue.
+
+## What you gain
+
+- **You, on any site with WebMCP tools:** you ask in your own words, and the site's own functions do
+  the work instead of a model guessing at buttons. You see each call and its arguments before it runs.
+  With a model in the browser nothing you type leaves your computer, and there is no account or fee.
+  What you pay is time: a small local model answers in 20 to 40 seconds and picks the wrong tool
+  more often than a large one ([docs/EVAL.md](docs/EVAL.md)).
+- **A site owner:** your visitors' assistant uses the tools you wrote, with the limits you set, and
+  follows your `ai-input` signal. You can test your tools with the developer report and the test page
+  before any large assistant arrives.
+- **A developer or a standards group:** one open, tested client that shows how these standards work
+  together in a browser today, with a conformance page, measured runs and the failures written down.
+- **An organisation that must show how it controls AI:** every control has a test, the residual risks
+  are listed, and the activity log records each question and tool call on the person's own computer.
+
 ## Privacy
 
 With the model in the browser or Chrome's built-in model, your questions, the page text and
@@ -301,9 +384,8 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
 - Answers can be wrong: they come from an AI model. Check anything that matters.
 - Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows). The download, started from the click, took 300 s; later starts took 3 to 14 s. After the tool-use change (15 Nov 2026) it used a tool in 5 of 5 questions on the test node and in 5 of 5 on the live node, the whole expected sequence in 4 of 5 on each, and an answer took 18 to 36 s (report: docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json). It stays optional. Small models choose tools less reliably than large ones.
 - A page has tools only if its own scripts register them through WebMCP.
-- The model in the browser needs WebGPU. Llama 3.2 3B and Qwen3.5 2B need about 2.3 GB of
-  graphics memory, Gemma 4 E2B about 3.4 GB; Gemma 4 E2B is listed only when the graphics card
-  reports the WebGPU feature `shader-f16`, and it is not offered on the processor.
+- The model in the browser needs WebGPU. Qwen3 0.6B needs about 1.4 GB of graphics memory,
+  Qwen3.5 2B and Llama 3.2 3B about 2.3 GB, Gemma 4 E2B about 3.4 GB.
   The first answer after a load compiles the model's GPU programs, which takes up to a minute on
   a slow GPU; the panel says so while it waits. Long prompts run in short pieces, so a slow GPU's
   watchdog does not cut the model off.

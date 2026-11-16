@@ -162,10 +162,11 @@ describe('Options page: models and privacy', () => {
       expect(rows()).toHaveLength(7);
     });
 
-    it('lists the two newer graphics-card models, each with its size, so they can be removed', async () => {
+    it('lists the three larger graphics-card models, each with its size, so they can be removed', async () => {
       await startOptions(fake());
-      expect(rows().slice(2, 4)).toEqual([
+      expect(rows().slice(1, 4)).toEqual([
         'Qwen3.5 2B on the graphics card: 1072 MB',
+        'Llama 3.2 3B on the graphics card: 1817 MB',
         'Gemma 4 E2B on the graphics card: 2830 MB',
       ]);
       expect(rows()[6]).toBe('Qwen3.5 2B on the processor: 1281 MB');

@@ -5,7 +5,7 @@ import { MODEL_IDS, parseEvalArgs } from '../../scripts/eval/args.ts';
 describe('eval command line', () => {
   it('defaults to both models, all prompts, 10 idle minutes, headed Chrome', () => {
     expect(parseEvalArgs([])).toEqual({
-      models: ['qwen', 'llama'],
+      models: ['qwen', 'qwen35'],
       prompts: 20,
       idleMinutes: 10,
       scripted: false,
@@ -26,8 +26,8 @@ describe('eval command line', () => {
     expect(args).toMatchObject({ models: ['qwen'], prompts: 3, idleMinutes: 1 });
   });
 
-  it('takes the two newer graphics-card models, and the default stays qwen and llama', () => {
-    expect(parseEvalArgs([]).models).toEqual(['qwen', 'llama']);
+  it('takes the two newer graphics-card models, and the default stays qwen and qwen35', () => {
+    expect(parseEvalArgs([]).models).toEqual(['qwen', 'qwen35']);
     expect(parseEvalArgs(['--models', 'qwen35,gemma4']).models).toEqual(['qwen35', 'gemma4']);
     expect(MODEL_IDS.qwen35).toBe('Qwen3.5-2B-q4f16_1-MLC');
     expect(MODEL_IDS.gemma4).toBe('gemma-4-E2B-it-q4f16_1-MLC');

@@ -1,5 +1,13 @@
 # Architecture
 
+> **In short**
+>
+> - WebAIAssist is hexagonal: a core with the agent loop and its rules, ports (TypeScript interfaces) around it, and adapters that use browser APIs or libraries.
+> - The core uses no browser API and imports no adapter; a compile check and an ESLint rule enforce this in `npm run verify`.
+> - Four model paths sit behind one `ModelRuntime` port: graphics card, processor, Chrome's built-in model and a chat endpoint.
+> - Its way of acting is a tool the page registers itself. Each call goes through the confirmation gate, and everything from the page is untrusted data.
+> - Install permissions are `sidePanel`, `offscreen`, `storage`, `activeTab` and `scripting`. Access to a site is asked for one site at a time.
+
 WebAIAssist is hexagonal: a core with the agent loop and its rules, ports (TypeScript interfaces)
 around it, and adapters that implement the ports with browser APIs or libraries.
 
@@ -210,16 +218,17 @@ the host when the panel closes. While a model loads, the panel shows Cancel: it 
 The model the panel selects is the one the user chose, which is kept in the Options
 (`runtime` other than `auto`); until then the panel picks a default and says why in one sentence
 under the list (`#model-why`; `src/ui/default-model.ts`). The order is: Chrome's built-in model
-when Chrome says it is available (not while it still has to download); the graphics card when a
-stored measurement says its first answer was not slow; the processor model; the graphics card,
-unmeasured, where the processor model cannot run (Chrome before 137); a configured endpoint;
+when Chrome says it is available (not while it still has to download); the graphics card (Qwen3
+0.6B) whenever WebGPU works; the processor model (Qwen3 1.7B) where it does not; a configured endpoint;
 Chrome's built-in model still to download; the choice **Set up a chat endpoint**, for which Start
 opens Options and loads nothing. The measurement is the wait from the first question after a
 load to the first token (`src/ui/first-token-timer.ts`), stored with the adapter's name in
 `chrome.storage.local` (`src/adapters/stored-panel-state.ts`); more than 20 seconds is slow
 (`src/adapters/gpu-speed.ts`: the maintainer's laptop took about 40 s on 13 Nov 2026, the first
-answer compiles the GPU programs). So the graphics card becomes the default only after the user
-has tried it once and it was quick; a measurement made on another adapter is ignored. Settings
+answer compiles the GPU programs). The measurement only chooses the sentence under the list: in
+the runs of 15 and 16 Nov 2026 (docs/EVAL.md) Qwen3 0.6B on the laptop's graphics card answered in
+about 26 s and Qwen3 1.7B on the processor in about 137 s, so a slow first answer does not move the
+default to the processor. A measurement made on another adapter is ignored. Settings
 saved before 13 Nov 2026 (version 1) that name Chrome's built-in model go back to the default
 once, and the stored default of version 2 (`webllm` with no model named) reads as automatic
 (`src/adapters/settings.ts`).
@@ -249,10 +258,10 @@ package. The weights are data; they download from one fixed revision of each mod
 Face repository, and WebLLM checks the model's `mlc-chat-config.json` and `tokenizer.json` against
 SHA-256 values pinned per revision. Other models run through a chat endpoint.
 
-The weights download once (about 350 MB for Qwen3 0.6B, 1.8 GB for Llama 3.2 3B, 1.1 GB for
-Qwen3.5 2B, 2.8 GB for Gemma 4 E2B) into WebLLM's
+The weights download once (about 350 MB for Qwen3 0.6B, 1.1 GB for Qwen3.5 2B, 1.8 GB for Llama 3.2 3B,
+2.8 GB for Gemma 4 E2B) into WebLLM's
 Cache Storage. The extension does not ask for `unlimitedStorage`: the smoke test measured a
-storage quota of 10 GiB for the extension in Chromium on 12 Nov 2026, enough for the first two models; the four together are about 6 GB, which fits the same quota.
+storage quota of 10 GiB for the extension in Chromium on 12 Nov 2026, enough for the four models (about 6 GB together).
 On a nearly full disk the quota is smaller and the download can fail; the error is shown.
 
 ### The processor model (llama.cpp in WebAssembly)

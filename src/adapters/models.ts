@@ -30,37 +30,38 @@ const WEBLLM_MODELS: readonly ModelChoice[] = [
     runtime: 'webllm',
   },
   {
-    id: LARGE,
-    label: `Llama 3.2 3B (better answers; ${ON_GPU}; needs about 2.3 GB of GPU memory)`,
-    runtime: 'webllm',
-  },
-  {
     id: QWEN35,
     label: `Qwen3.5 2B (newer, for tools; ${ON_GPU}; 1.1 GB download; needs about 2.3 GB of GPU memory; Apache-2.0)`,
     runtime: 'webllm',
   },
   {
+    id: LARGE,
+    label: `Llama 3.2 3B (slow: may stall on a laptop graphics card; ${ON_GPU}; needs about 2.3 GB of GPU memory)`,
+    runtime: 'webllm',
+  },
+  {
     id: GEMMA,
-    label: `Gemma 4 E2B (Google's newer model; ${ON_GPU}; 2.8 GB download; needs about 3.4 GB of GPU memory; Apache-2.0)`,
+    label: `Gemma 4 E2B (slow: may stall on a laptop graphics card; ${ON_GPU}; 2.8 GB download; needs about 3.4 GB of GPU memory; Apache-2.0)`,
     runtime: 'webllm',
     requiredFeature: 'shader-f16',
   },
 ];
 
 /** Bytes the weights, tokenizer and config of each graphics-card model download: the sum of the
- *  files of the pinned Hugging Face revisions, read from its tree API on 14 Nov 2026. The first
- *  two are the sum of every file of the revision; the two newer ones are exactly the files WebLLM
- *  fetches (weight shards, tensor-cache.json, mlc-chat-config.json, tokenizer.json, and for
- *  Gemma mlc-model-manifest.json). */
+ *  files of the pinned Hugging Face revisions, read from its tree API on 14 Nov 2026. Qwen3 0.6B
+ *  and Llama 3.2 3B are the sum of every file of the revision; Qwen3.5 2B and Gemma 4 E2B
+ *  are exactly the files WebLLM fetches (weight shards, tensor-cache.json, mlc-chat-config.json,
+ *  tokenizer.json, and for Gemma mlc-model-manifest.json). */
 export const WEBLLM_DOWNLOADS: Readonly<Record<string, number>> = {
   [SMALL]: 351_517_143,
-  [LARGE]: 1_816_811_105,
   [QWEN35]: 1_072_298_012,
+  [LARGE]: 1_816_811_105,
   [GEMMA]: 2_830_391_017,
 };
 
-/** The model "Start" loads when the user has not picked one: the small bundled model, on
- *  every GPU. The 3B model downloads only when the user chooses it. */
+/** The graphics-card model "Start" loads when the user has not picked one: the smallest, on
+ *  every GPU (measured best on the graphics card, 16 Nov 2026). The other three download only
+ *  when the user chooses them; Llama 3.2 3B and Gemma 4 E2B are marked slow and never a default. */
 export function defaultModelId(): string {
   return SMALL;
 }

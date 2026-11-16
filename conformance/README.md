@@ -1,5 +1,12 @@
 # WebMCP conformance page
 
+> **In short**
+>
+> - This is a plain static page with sixteen cases (c01 to c16) that exercise a browser's WebMCP interface on `document.modelContext`.
+> - It sends nothing anywhere, holds no analytics and does not depend on any browser extension.
+> - Serve the folder with any static server and open `index.html`. A result is `pass`, `fail` or `unsupported`; `unsupported` means the browser lacks that part and is not a failure.
+> - Chrome 157 needs `--enable-features=WebMCP`; Chromium 156 accepts `--enable-features=WebMCPTesting`.
+
 A plain static page that exercises the WebMCP interface of a browser on `document.modelContext`.
 It sends nothing anywhere, holds no analytics and is independent of any browser extension. Every
 address in it is relative, so the folder works at the root of a test server and under a sub-path

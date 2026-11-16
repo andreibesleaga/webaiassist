@@ -188,7 +188,7 @@ describe('failures shown in the banner', () => {
     click('start');
     await settle();
     expect(banner()).toBe(
-      'The browser has no space to store the model (397 MB). Remove downloaded models in Options, or free disk space, then press Start.',
+      'The browser has no space to store the model (1107 MB). Remove downloaded models in Options, or free disk space, then press Start.',
     );
     click('open-storage');
     expect(deps.optionsOpened).toBe(1);

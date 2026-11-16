@@ -1,5 +1,13 @@
 # Security policy
 
+> **In short**
+>
+> - To report a vulnerability, open the repository's Security tab and choose Report a vulnerability. Do not open a public issue.
+> - Say what you found, how to reproduce it, the Chrome version and the extension version.
+> - Security fixes go to the newest release.
+> - In scope: a page making the extension call a tool without a required confirmation, page or chat content leaving the computer, or code loaded from outside the package.
+> - Problems in a website's own WebMCP tools belong to that website.
+
 ## Reporting a vulnerability
 
 Report it privately through GitHub: open the repository's **Security** tab and choose

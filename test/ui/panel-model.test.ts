@@ -13,7 +13,7 @@ async function settle(): Promise<void> {
   for (let i = 0; i < 10; i += 1) await tick();
 }
 
-const CPU = 'cpu:qwen3-0.6b-q4_k_m';
+const CPU = 'cpu:qwen3-1.7b-q4_k_m';
 const QWEN = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
 const model = (): HTMLSelectElement => byId<HTMLSelectElement>('model');
 const text = (id: string): string => byId(id).textContent ?? '';
@@ -28,10 +28,18 @@ describe('why the model is selected', () => {
     loadPage('sidepanel.html');
   });
 
-  it('shows one reason for the default model', async () => {
+  it('shows one reason for the default model: the processor model only without WebGPU', async () => {
     await startPanel(withCpu(fakeDeps([])));
     expect(model().value).toBe(CPU);
-    expect(text('model-why')).toMatch(/^Why: this works on every computer\. .*about 800 MB/);
+    expect(text('model-why')).toMatch(/^Why: this works on every computer\. .*about 1500 MB/);
+  });
+
+  it('selects the graphics card when WebGPU works and nothing was measured', async () => {
+    const deps = fakeDeps([]);
+    deps.env = { promptApi: false, scripted: false, webgpu: true, cpu: true };
+    await startPanel(deps);
+    expect(model().value).toBe(QWEN);
+    expect(text('model-why')).toMatch(/^Why: the browser can use your graphics card\./);
   });
 
   it('says "you chose this model" once the user picks one, and keeps the choice', async () => {
@@ -57,10 +65,10 @@ describe('why the model is selected', () => {
     expect(text('model-why')).toMatch(/^Why: Chrome’s own model is available here/);
   });
 
-  it('selects the graphics card when its stored first answer was not slow, and the processor when it was', async () => {
-    for (const [ms, expected] of [
-      [12_000, QWEN],
-      [40_000, CPU],
+  it('selects the graphics card whether its stored first answer was slow or not, and says which', async () => {
+    for (const [ms, reason] of [
+      [12_000, /^Why: your graphics card passed the check: its first answer took 12 seconds/],
+      [40_000, /^Why: .*Its first answer here took 40 seconds.*processor model is in the list/],
     ] as const) {
       loadPage('sidepanel.html');
       const deps = fakeDeps([]);
@@ -73,7 +81,8 @@ describe('why the model is selected', () => {
       };
       deps.panelState = { firstRunDone: true, gpu: { key: 'amd/gcn-5', firstAnswerMs: ms } };
       await startPanel(deps);
-      expect(model().value).toBe(expected);
+      expect(model().value).toBe(QWEN);
+      expect(text('model-why')).toMatch(reason);
     }
   });
 
@@ -82,7 +91,8 @@ describe('why the model is selected', () => {
     deps.env = { promptApi: false, scripted: false, webgpu: true, cpu: true, gpuKey: 'nvidia/ada' };
     deps.panelState = { firstRunDone: true, gpu: { key: 'amd/gcn-5', firstAnswerMs: 1_000 } };
     await startPanel(deps);
-    expect(model().value).toBe(CPU);
+    expect(model().value).toBe(QWEN);
+    expect(text('model-why')).toMatch(/^Why: the browser can use your graphics card\./);
   });
 });
 
@@ -136,7 +146,7 @@ describe('the notices', () => {
     await startPanel(deps);
     expect(byId('first-run').hidden).toBe(false);
     expect(document.activeElement?.id).toBe('first-run-title');
-    expect(text('first-run-model')).toMatch(/^We start with Qwen3 0\.6B on the processor\. Why: /);
+    expect(text('first-run-model')).toMatch(/^We start with Qwen3 1\.7B on the processor\. Why: /);
     expect(text('first-run')).toMatch(
       /Your questions, the page text and the answers stay on this computer/,
     );

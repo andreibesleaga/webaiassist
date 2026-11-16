@@ -31,7 +31,7 @@ export const MODEL_IDS: Readonly<Record<ModelKey, string>> = {
 };
 
 const OPTIONS = {
-  models: { type: 'string', default: 'qwen,llama' },
+  models: { type: 'string', default: 'qwen,qwen35' },
   prompts: { type: 'string', default: '20' },
   idle: { type: 'string', default: '10' },
   scripted: { type: 'boolean', default: false },

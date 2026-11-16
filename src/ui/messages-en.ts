@@ -57,7 +57,9 @@ export const EN = {
   whyGpu:
     'Why: your graphics card passed the check: its first answer took {seconds} seconds, so it is not slow.',
   whyGpuOnly:
-    'Why: the graphics card is the only local choice here. Its speed is measured on the first answer; that one can take up to a minute.',
+    'Why: the browser can use your graphics card. The first answer can take up to a minute while the model is prepared.',
+  whyGpuSlow:
+    'Why: the browser can use your graphics card. Its first answer here took {seconds} seconds, which includes preparing the model; later answers are quicker. The processor model is in the list if you prefer it.',
   whyEndpoint: 'Why: you set a chat endpoint in Options; your chat goes to {host} only.',
   whyBuiltInLast:
     'Why: Chrome’s own model is the only local choice here. Chrome downloads it when you press Start.',

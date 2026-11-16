@@ -1,5 +1,13 @@
 # Privacy
 
+> **In short**
+>
+> - WebAIAssist has no account, no analytics, no crash reports and no server of its own.
+> - With a model in the browser or Chrome's built-in model, no page text, chat or tool result leaves your computer.
+> - With a chat endpoint, the whole conversation goes to the address you set, with your API key if set. A remote service may charge; the panel asks once per host.
+> - Starting a model in the browser requests model files from Hugging Face. Nothing about you or the chat is sent, but the host sees your IP address.
+> - The activity log stays in this browser, up to 8 MiB. Question text and results are stored just when you switch on Include content (off at the start).
+
 WebAIAssist has no account, no analytics, no crash reports and no server of its own.
 
 ## What leaves your computer
@@ -143,7 +151,8 @@ the endpoint API key wherever it appears, even in text you typed.
   typed it, and so is a key you paste there. A service's error text is cut to 200 characters and has the key
   and bearer-shaped strings removed before it is shown.
 - **What is read back.** The reply text, and the token counts and price the service reports for
-  the call (not stored and not shown in this release; nothing is sent anywhere).
+  the call. They are kept in the activity log in this browser and shown in its Activity view; nothing
+  is sent anywhere.
 
 ## The graph explorer tab (14 Nov 2026)
 
@@ -214,6 +223,15 @@ allowed, uses no new permission, and is stored nowhere.
 
 A tool you run by hand from its detail view goes through the same questions as a call by the model, and is
 written to the activity log as one entry marked "Run by hand (no model)", under the same rules as a question.
+
+## Chrome Web Store: Limited Use
+
+The use of information received from Google APIs will adhere to the Chrome Web Store User Data Policy,
+including the Limited Use requirements.
+
+In plain words: WebAIAssist uses what it reads (the open page's tools, the site's public files, page text
+you ask it to read) only to answer your question. It goes only to the model you chose. Nothing is sent to
+the developer, sold, used for advertising or for credit decisions, and no person reads it.
 
 ## Conformance page and demo pages
 

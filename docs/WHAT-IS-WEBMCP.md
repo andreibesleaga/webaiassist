@@ -1,5 +1,13 @@
 # What is WebMCP
 
+> **In short**
+>
+> - WebMCP lets a web page tell an AI assistant what it can do, as a list of tools such as a search or a form.
+> - WebMCP is a draft. It is not a W3C Standard and it can change.
+> - In Chrome it is off until you turn on `chrome://flags/#enable-webmcp-testing`. Without the switch, sites' tools do not appear in the panel.
+> - Before each call you see the tool, the site and the exact arguments. The call does not run until you press Allow once.
+> - The extension cannot check what a tool does. It is not an MCP client and it is not from Google.
+
 WebMCP lets a web page tell an AI assistant what it can do. The page lists "tools": a search, a
 form, a calculation. The assistant picks one, the page runs it, and the result goes back to the
 assistant.

@@ -15,8 +15,8 @@ Feature: Choosing a model
 
   # test: test/ui/model-picker.test.ts
   @unit
-  Scenario: With a working graphics card and no processor model the panel selects the small bundled model
-    Given this computer has a working WebGPU adapter and cannot run the processor model
+  Scenario: With a working graphics card the panel selects the small bundled model, even when the processor model could run
+    Given this computer has a working WebGPU adapter
     Then the model list selects the small bundled model
     And Chrome's built-in model and the endpoint are not selected by themselves
 
@@ -36,15 +36,19 @@ Feature: Choosing a model
     Then the "Why" line under the model list gives one reason for the default model
     And choosing another model changes the line to "Why: you chose this model."
 
-  # test: test/ui/default-model.test.ts
+  # test: test/ui/default-model.test.ts, test/ui/panel-model.test.ts
   @unit
-  Scenario: The order is Chrome's built-in model, the CPU model, the graphics card, then an endpoint
+  Scenario: The order is Chrome's built-in model, the graphics card, the processor model, then an endpoint
     Given Chrome reports its built-in model as available
     Then it is the default
     Given Chrome's built-in model is absent and the graphics card passes the warm-up check
     Then the graphics card model is the default
-    Given Chrome's built-in model is absent and the graphics card is slow or missing
-    Then the CPU model is the default
+    Given Chrome's built-in model is absent and the graphics card was measured slow
+    Then the graphics card model is still the default, and the "Why" line gives the measured seconds and names the processor model as an option
+    Given Chrome's built-in model is absent and the graphics card was never measured
+    Then the graphics card model is the default
+    Given Chrome's built-in model is absent and this computer has no usable WebGPU
+    Then the processor model Qwen3 1.7B is the default
 
   @smoke @cpu
   Scenario: The CPU and memory model answers a question on a computer without a graphics card
@@ -265,11 +269,19 @@ Feature: Choosing a model
 
   # test: test/ui/model-picker.test.ts, test/adapters/models.test.ts
   @unit
-  Scenario: Qwen3.5 2B and Gemma 4 E2B are in the model list, on the graphics card
+  Scenario: Qwen3.5 2B, Llama 3.2 3B and Gemma 4 E2B are in the model list, on the graphics card
     Given this computer has a working WebGPU adapter that reports "shader-f16"
-    Then the model list has "Qwen3.5 2B" and "Gemma 4 E2B" after the two first graphics-card models
+    Then the model list has "Qwen3 0.6B", "Qwen3.5 2B", "Llama 3.2 3B" and "Gemma 4 E2B" on the graphics card, in that order
     And "Qwen3.5 2B" is also listed for the processor
-    And neither is selected by itself: the default stays the small bundled model
+    And none of the other three is selected by itself: the default stays the small bundled model
+
+  # test: test/adapters/models.test.ts, test/ui/model-picker.test.ts
+  @unit
+  Scenario: Llama 3.2 3B and Gemma 4 E2B are marked slow and are never a default
+    Given this computer has a working WebGPU adapter that reports "shader-f16"
+    Then the labels of "Llama 3.2 3B" and "Gemma 4 E2B" in the model list say "slow: may stall on a laptop graphics card"
+    And the labels of "Qwen3 0.6B" and "Qwen3.5 2B" do not say it
+    And neither of the two is the default model on any computer
 
   # test: test/ui/model-picker.test.ts, test/ui/options-page.test.ts
   @unit

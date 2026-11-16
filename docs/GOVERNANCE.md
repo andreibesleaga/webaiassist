@@ -1,5 +1,13 @@
 # Governance
 
+> **In short**
+>
+> - The maintainer builds and publishes the extension. The person who installs it is the deployer: they choose the model, allow each site and answer every confirmation question.
+> - Site owners are responsible for their own WebMCP tools. The extension cannot check what a tool does.
+> - Not offered, and not built or tested for: biometric identification, emotion recognition, scoring or ranking people, and decisions on jobs, credit, housing, education, benefits or law enforcement.
+> - The model can be wrong and the page it reads can be hostile. Nothing here replaces a person's decision in a high-stakes case.
+> - The panel says answers come from an AI model and can be wrong, exports are marked AI-generated, and the default mode asks before every tool call.
+
 Who is responsible for what, and which uses are not offered.
 
 ## Roles

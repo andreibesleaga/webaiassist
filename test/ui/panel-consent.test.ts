@@ -10,7 +10,7 @@ async function settle(): Promise<void> {
   for (let i = 0; i < 10; i += 1) await tick();
 }
 
-const CPU = 'cpu:qwen3-0.6b-q4_k_m';
+const CPU = 'cpu:qwen3-1.7b-q4_k_m';
 const QWEN = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
 const model = (): HTMLSelectElement => byId<HTMLSelectElement>('model');
 const text = (id: string): string => byId(id).textContent ?? '';
@@ -33,10 +33,10 @@ describe('the question before a first download', () => {
 
   it('shows the size and the source and waits: nothing is created or downloaded', () => {
     expect(byId('consent').hidden).toBe(false);
-    expect(text('consent-title')).toBe('Download Qwen3 0.6B on the processor?');
-    expect(text('consent-body')).toMatch(/397 MB, once\. From huggingface\.co/);
+    expect(text('consent-title')).toBe('Download Qwen3 1.7B on the processor?');
+    expect(text('consent-body')).toMatch(/1107 MB, once\. From huggingface\.co/);
     expect(text('consent-body')).toMatch(/Stored in this browser/);
-    expect(text('model-status')).toMatch(/must download 397 MB once/);
+    expect(text('model-status')).toMatch(/must download 1107 MB once/);
     expect(byId<HTMLButtonElement>('start').disabled).toBe(true);
     expect(deps.created).toEqual([]);
     expect(document.activeElement?.id).toBe('consent-ok');
@@ -76,7 +76,7 @@ describe('the question before a first download', () => {
   it('is not shown for a model that is already stored', async () => {
     loadPage('sidepanel.html');
     deps.store.stored = [
-      { runtime: 'cpu', id: 'qwen3-0.6b-q4_k_m', name: 'Qwen3 0.6B', bytes: 396_705_472 },
+      { runtime: 'cpu', id: 'qwen3-1.7b-q4_k_m', name: 'Qwen3 1.7B', bytes: 1_107_409_472 },
     ];
     await startPanel(deps);
     click('start');
@@ -161,7 +161,7 @@ describe('the question for other kinds of download', () => {
     click('start');
     await settle();
     expect(text('consent-body')).toBe(
-      'Qwen3 0.6B on the processor is not on this computer and you are offline. Connect and press Start.',
+      'Qwen3 1.7B on the processor is not on this computer and you are offline. Connect and press Start.',
     );
     expect(byId('consent-ok').hidden).toBe(true);
     expect(deps.created).toEqual([]);
