@@ -26,6 +26,7 @@ import { visible } from '../core/tool-card';
 import { byId } from '../ui/dom';
 import { applyI18n, t } from '../ui/i18n';
 import { bindLinkOpener, openInNewTab } from '../ui/explorer/link-opener';
+import { SessionSiteGrants } from '../adapters/session-site-grants';
 import { activityTab, type ActivityDeps } from '../ui/explorer/activity-tab';
 import { startShell } from '../ui/explorer/shell';
 import { EXPLORER_TABS, type ExplorerContext } from '../ui/explorer/tabs';
@@ -60,6 +61,7 @@ function activityDeps(target?: ExplorerTarget): ActivityDeps {
   return {
     log: lazyActivityLog,
     bridge,
+    grants: new SessionSiteGrants(chrome.storage.session),
     nowIso: () => new Date().toISOString(),
     download,
     ...(target ? { target } : {}),

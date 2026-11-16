@@ -67,11 +67,11 @@ test('a tool is run by hand from its detail view, after the question', async () 
 });
 
 test('the toolbar number counts the tools of an allowed site only', async () => {
-  const { page, tabId } = await openReviewPage(session);
+  const { tabId } = await openReviewPage(session);
   const text = () =>
     session.worker.evaluate((id) => chrome.action.getBadgeText({ tabId: id }), tabId);
-  await page.reload();
-  await expect.poll(text).toMatch(/^1[01]$/);
+  // No reload: the number appears on the first load (the worker reads the tab again after it loads).
+  await expect.poll(text, { timeout: 8_000 }).toMatch(/^1[01]$/);
   const local = await openReviewPage(session, session.localOrigin);
   const localText = await session.worker.evaluate(
     (id) => chrome.action.getBadgeText({ tabId: id }),

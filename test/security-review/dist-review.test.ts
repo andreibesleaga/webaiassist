@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Independent security review, 12 Nov 2026: checks on the built package (dist/ and the
 // zip), the model-library pins and store-review points. Run after `npm run build` and
-// `npm run zip`; skipped when dist/ is missing. A failing test is an open finding.
+// `npm run zip` (`npm run test:dist` in the release gate, where a missing build fails); skipped
+// when dist/ is missing in a plain `vitest run`. A failing test is an open finding.
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -14,6 +15,15 @@ const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist');
 const ZIP = join(ROOT, 'webaiassist-0.1.0.zip');
 const built = existsSync(join(DIST, 'manifest.json')) && existsSync(ZIP);
+/** Set by `npm run test:dist`, which the release gate runs after build and zip: then a missing
+ *  build is a failure, not a skip, so a clean CI checkout cannot pass these checks unseen. */
+const required = process.env.WEBAIASSIST_REQUIRE_DIST === '1';
+
+describe.runIf(required)('the build these checks need', () => {
+  it('dist/ and the zip are there', () => {
+    expect(built).toBe(true);
+  });
+});
 
 function files(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {

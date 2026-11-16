@@ -1,0 +1,106 @@
+{
+  "date": "2026-11-16",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true
+  },
+  "models": [
+    {
+      "key": "gemma4",
+      "id": "gemma-4-E2B-it-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 21.2,
+      "status": "Ready: Gemma 4 E2B. Running in this browser, on your graphics card (in the offscreen document)."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:55286/",
+      "tools": [],
+      "skipped": "locator.waitFor: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "live",
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "tools": [],
+      "skipped": "locator.waitFor: Timeout 30000ms exceeded."
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 300.1,
+      "error": "timed out"
+    },
+    {
+      "n": 1,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 300.1,
+      "error": "timed out"
+    }
+  ],
+  "summary": [
+    {
+      "model": "gemma4",
+      "target": "stub",
+      "prompts": 1,
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": "0 of 1",
+      "taskDone": 0,
+      "gateShown": "0 of 0",
+      "factInAnswer": "0 of 1",
+      "hallucinated": 0,
+      "errors": 1,
+      "repeated": 0,
+      "medianFirstTokenS": null
+    },
+    {
+      "model": "gemma4",
+      "target": "live",
+      "prompts": 1,
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": "0 of 1",
+      "taskDone": 0,
+      "gateShown": "0 of 0",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 0,
+      "errors": 1,
+      "repeated": 0,
+      "medianFirstTokenS": null
+    }
+  ],
+  "checks": [],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

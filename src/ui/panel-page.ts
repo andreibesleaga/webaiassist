@@ -13,7 +13,8 @@ import { t } from './i18n';
 import { renderAccess, renderCard, type CardView } from './page-card';
 import { allowLabel, errorStatus, statusOf, statusText, type PageStatus } from './page-status';
 import type { PanelController, SiteState } from './panel-controller';
-import { note } from './panel-note';
+import { dropStalePageText, note } from './panel-note';
+import { relistIfEmpty } from './panel-relist';
 import { showSiteChat, stopForSwitch } from './panel-switch';
 import { drawNodeCard } from './panel-node-card';
 import { runByHand } from './panel-manual-run';
@@ -173,16 +174,24 @@ async function listTools(
   }
 }
 
+/** "Looking at <host>…" while the same tab is listed again. */
+function showLooking(ctx: PanelController, tabId: number): void {
+  const known = ctx.state.page?.tabId === tabId ? ctx.state.page.origin : undefined;
+  if (known === undefined) return;
+  byId(ctx.deps.doc, 'page-status').textContent = t('pageLooking', { host: hostOf(known) });
+}
+
 /** Reads the tools of the open page (adding the page scripts when needed), then what the site publishes. */
-export async function refreshPage(ctx: PanelController, knownTab?: number): Promise<void> {
+export async function refreshPage(
+  ctx: PanelController,
+  knownTab?: number,
+  attempt = 0,
+): Promise<void> {
   const seq = ++ctx.state.refreshSeq;
   const tabId = knownTab ?? (await ctx.deps.targetTab());
   if (stale(ctx, seq)) return;
   if (tabId === undefined) return clearPage(ctx);
-  const known = ctx.state.page?.tabId === tabId ? ctx.state.page.origin : undefined;
-  if (known !== undefined) {
-    byId(ctx.deps.doc, 'page-status').textContent = t('pageLooking', { host: hostOf(known) });
-  }
+  showLooking(ctx, tabId);
   const result = await listTools(ctx, tabId);
   if (stale(ctx, seq)) return;
   if (!('tools' in result)) return failed(ctx, tabId, result, seq);
@@ -194,6 +203,13 @@ export async function refreshPage(ctx: PanelController, knownTab?: number): Prom
   // The site's files can take up to ten seconds: the panel does not wait here. A question waits
   // for them (panel-run.ts), so nothing is sent before the site's AI policy is known.
   ctx.state.siteLoading = loadSite(ctx, seq, tabId, result).catch(() => undefined);
+  const empty = result.tools.length === 0;
+  relistIfEmpty(
+    empty,
+    attempt,
+    () => !stale(ctx, seq),
+    (next) => refreshPage(ctx, tabId, next),
+  );
 }
 
 /** A listing that failed: the page is left as it was unless the error says the site is another one
@@ -270,15 +286,6 @@ export async function refreshTitle(ctx: PanelController): Promise<void> {
   ctx.state.page = { ...page, ...tab };
   noteSamePageChange(ctx, tab.title);
   drawPage(ctx);
-}
-
-/** Read page text stays only while the panel works on the same tab and site. */
-export function dropStalePageText(ctx: PanelController): void {
-  const read = ctx.state.pageText;
-  const page = ctx.state.page;
-  if (!read || (read.tabId === page?.tabId && read.origin === page.origin)) return;
-  ctx.state.pageText = undefined;
-  note(ctx, t('siteChanged', { origin: read.origin }));
 }
 
 /** The user said "Use on this tab anyway" for a site that asks for no AI input. */

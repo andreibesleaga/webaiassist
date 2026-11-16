@@ -26,7 +26,10 @@ export interface ExportMeta {
 
 const SECRET_KEY =
   /pass(word)?|secret|token|api[-_]?key|auth|bearer|private[-_]?key|cookie|session|credential/i;
-const REDACTED = '[redacted]';
+/** What redactArgs writes for a value whose key looks secret. */
+export const REDACTED = '[redacted]';
+/** What the activity trace writes where it removed a known secret (the API key) from a text. */
+export const REMOVED = '[removed]';
 /** Shorter values would hide ordinary words. */
 const MIN_SECRET_LENGTH = 8;
 

@@ -86,9 +86,10 @@ function forget(ctx: PanelController): void {
     .then(() => {
       // Nothing read from the site stays: the files, the facts and the override go with it.
       ctx.state.site = undefined;
-      note(ctx, t('forgotSite', { origin }));
+      // The page is read again first: the site is no longer allowed, so the card empties.
       return refreshPage(ctx);
     })
+    .then(() => note(ctx, t('forgotSite', { origin })))
     .catch((error: unknown) => note(ctx, errorText(error)));
 }
 

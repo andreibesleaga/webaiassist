@@ -1,0 +1,520 @@
+{
+  "date": "2026-11-16",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true
+  },
+  "models": [
+    {
+      "key": "qwen",
+      "id": "Qwen3-0.6B-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 4.1,
+      "status": "Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document)."
+    },
+    {
+      "key": "llama",
+      "id": "Llama-3.2-3B-Instruct-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 290.8,
+      "status": "Ready: Llama 3.2 3B. Running in this browser, on your graphics card (in the offscreen document)."
+    },
+    {
+      "key": "qwen35",
+      "id": "qwen35",
+      "ready": false,
+      "loadS": null,
+      "status": "Stopped: locator.waitFor: Timeout 30000ms exceeded."
+    },
+    {
+      "key": "gemma4",
+      "id": "gemma4",
+      "ready": false,
+      "loadS": null,
+      "status": "Stopped: locator.waitFor: Timeout 30000ms exceeded."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:55759/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    },
+    {
+      "name": "live",
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 11.6,
+      "totalS": 15.8
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 12.8,
+      "totalS": 16.6
+    },
+    {
+      "n": 3,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 13.1,
+      "totalS": 16.8
+    },
+    {
+      "n": 4,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search",
+        "propose"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 14.6,
+      "totalS": 45
+    },
+    {
+      "n": 5,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 18.5,
+      "totalS": 22.4
+    },
+    {
+      "n": 6,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 20.4,
+      "totalS": 24.4
+    },
+    {
+      "n": 7,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 22.1,
+      "totalS": 27
+    },
+    {
+      "n": 8,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 23.7,
+      "totalS": 27.1
+    },
+    {
+      "n": 9,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 25.4,
+      "totalS": 49.7
+    },
+    {
+      "n": 10,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "explain"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 26.6,
+      "totalS": 53
+    },
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 27.3,
+      "totalS": 27.3
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "propose"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 1,
+      "firstTokenS": 27.8,
+      "totalS": 81.5
+    },
+    {
+      "n": 3,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 1,
+      "firstTokenS": 26.3,
+      "totalS": 78.7
+    },
+    {
+      "n": 4,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 25.9,
+      "totalS": 52.3
+    },
+    {
+      "n": 5,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "webaiassist_query_graph"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [
+        "webaiassist_query_graph"
+      ],
+      "repeated": 1,
+      "firstTokenS": 26.9,
+      "totalS": 84.3
+    },
+    {
+      "n": 6,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "webaiassist_query_graph"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [
+        "webaiassist_query_graph"
+      ],
+      "repeated": 1,
+      "firstTokenS": 30.2,
+      "totalS": 84.1
+    },
+    {
+      "n": 7,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "webaiassist_query_graph"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [
+        "webaiassist_query_graph"
+      ],
+      "repeated": 1,
+      "firstTokenS": 26.6,
+      "totalS": 59.2
+    },
+    {
+      "n": 8,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "webaiassist_query_graph"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [
+        "webaiassist_query_graph"
+      ],
+      "repeated": 1,
+      "firstTokenS": 26.9,
+      "totalS": 60
+    },
+    {
+      "n": 9,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 25.4,
+      "totalS": 31.4
+    },
+    {
+      "n": 10,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "webaiassist_query_graph"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [
+        "webaiassist_query_graph"
+      ],
+      "repeated": 0,
+      "firstTokenS": 29,
+      "totalS": 53.9
+    },
+    {
+      "n": 1,
+      "model": "llama",
+      "target": "stub",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": null,
+      "totalS": 300,
+      "error": "timed out"
+    }
+  ],
+  "summary": [
+    {
+      "model": "qwen",
+      "target": "stub",
+      "prompts": 10,
+      "toolRight": 8,
+      "firstToolRight": 9,
+      "toolUsed": "10 of 10",
+      "taskDone": 5,
+      "gateShown": "10 of 10",
+      "factInAnswer": "6 of 10",
+      "hallucinated": 0,
+      "errors": 0,
+      "repeated": 0,
+      "medianFirstTokenS": 19.45
+    },
+    {
+      "model": "qwen",
+      "target": "live",
+      "prompts": 10,
+      "toolRight": 2,
+      "firstToolRight": 2,
+      "toolUsed": "9 of 10",
+      "taskDone": 2,
+      "gateShown": "9 of 9",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 5,
+      "errors": 0,
+      "repeated": 6,
+      "medianFirstTokenS": 26.9
+    },
+    {
+      "model": "llama",
+      "target": "stub",
+      "prompts": 1,
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": "0 of 1",
+      "taskDone": 0,
+      "gateShown": "0 of 0",
+      "factInAnswer": "0 of 1",
+      "hallucinated": 0,
+      "errors": 1,
+      "repeated": 0,
+      "medianFirstTokenS": null
+    }
+  ],
+  "checks": [
+    {
+      "name": "Cancel stops the download",
+      "result": "pass",
+      "detail": "Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

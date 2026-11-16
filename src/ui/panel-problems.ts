@@ -29,12 +29,18 @@ function closeAnd(ctx: PanelController, then: (ctx: PanelController) => void): v
   then(ctx);
 }
 
+/** The endpoint API key, so "Copy details" never carries it. */
+function secretsOf(ctx: PanelController): string[] {
+  const key = ctx.state.settings.endpoint.apiKey;
+  return key === '' ? [] : [key];
+}
+
 function copyAction(ctx: PanelController, error: unknown): BannerAction {
   return {
     id: 'copy-error',
     label: t('copyDetails'),
     run: async () => {
-      await ctx.deps.copyText(errorDetails(ctx.deps.version, error));
+      await ctx.deps.copyText(errorDetails(ctx.deps.version, error, secretsOf(ctx)));
       note(ctx, t('detailsCopied'));
     },
   };

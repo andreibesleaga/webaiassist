@@ -6,6 +6,7 @@ function deps(granted = true, hostRequests = true) {
   const requested: string[][] = [];
   const hostAccess: { tabId: number }[] = [];
   const d: SiteAccessDeps = {
+    allow: () => Promise.resolve(),
     request: (origins) => {
       requested.push(origins);
       return Promise.resolve(granted);

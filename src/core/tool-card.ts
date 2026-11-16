@@ -5,7 +5,7 @@
 // the same rule as the confirmation gate.
 import { isReservedName } from './builtin-tools';
 import { needsConfirmation } from './gate';
-import { forDevelopers } from './tool-offer';
+import { forDevelopers, notOffered, type NotOfferedReason } from './tool-offer';
 import { revealInvisible } from './sanitize';
 import type { ToolFlag, ToolInfo } from './types';
 
@@ -28,6 +28,8 @@ export interface ToolRow {
   readonly flags: readonly ToolFlag[];
   /** The page marked the tool for developers: the model is not offered it. */
   readonly forDevelopers: boolean;
+  /** Why the model is not offered this tool (tool-offer.ts); absent when it is offered. */
+  readonly notOffered?: NotOfferedReason;
   /** The tool as the page gave it, for the detail view (every text of it is shown as text). */
   readonly source: ToolInfo;
 }
@@ -59,7 +61,7 @@ function firstSentence(text: string): string {
   return end ? text.slice(0, end.index + 1) : text;
 }
 
-export function toolRow(tool: ToolInfo): ToolRow {
+export function toolRow(tool: ToolInfo, refused?: NotOfferedReason): ToolRow {
   const description = visible(tool.description);
   return {
     name: clip(visible(tool.name), NAME_CAP),
@@ -71,6 +73,7 @@ export function toolRow(tool: ToolInfo): ToolRow {
     ...(isReservedName(tool.name) ? { reserved: true } : {}),
     flags: tool.review ?? [],
     forDevelopers: forDevelopers(tool),
+    ...(refused === undefined ? {} : { notOffered: refused }),
     source: tool,
   };
 }
@@ -78,8 +81,9 @@ export function toolRow(tool: ToolInfo): ToolRow {
 /** Reads first, then changes, then by name. */
 export function toolRows(tools: readonly ToolInfo[]): ToolRow[] {
   const rank = (row: ToolRow): number => (row.effect === 'reads' ? 0 : 1);
+  const refused = notOffered(tools.filter((tool) => !forDevelopers(tool)));
   return tools
-    .map(toolRow)
+    .map((tool) => toolRow(tool, refused.get(tool.name)))
     .sort((a, b) => rank(a) - rank(b) || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
 }
 

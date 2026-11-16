@@ -18,6 +18,14 @@ import { parseMessage } from '../protocol/validate';
 export interface TabDeps {
   sendToTab(tabId: number, message: object): Promise<unknown>;
   inject(tabId: number): Promise<void>;
+  /** Whether the user allowed the site the tab shows; the panel lists and calls tools only then. */
+  readonly gate?: SiteGate;
+}
+
+export interface SiteGate {
+  /** The http(s) origin of the tab, or undefined when the extension may not read it. */
+  originOf(tabId: number): Promise<string | undefined>;
+  allowed(origin: string): Promise<boolean>;
 }
 
 type Request = ToolsListRequest | ToolsCallRequest | ToolsCancel;
@@ -107,5 +115,20 @@ export async function routeToolRequest(request: Request, deps: TabDeps): Promise
   if (request.type === 'tools/call' && request.origin === undefined) {
     return failure(request, 'Tool error: no site was given for the call.');
   }
+  if (!(await siteAllowed(request.tabId, deps.gate))) {
+    return failure(request, accessText('denied'), 'denied');
+  }
   return ask(request, request.tabId, deps);
+}
+
+/** False for a tab whose site the user has not allowed (or forgot): its scripts are not asked. */
+async function siteAllowed(tabId: number, gate: SiteGate | undefined): Promise<boolean> {
+  if (gate === undefined) return true;
+  try {
+    const origin = await gate.originOf(tabId);
+    // A tab the extension may not read has no allowed site; the injection reports why.
+    return origin === undefined || (await gate.allowed(origin));
+  } catch {
+    return false;
+  }
 }

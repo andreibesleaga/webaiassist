@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // The number on the toolbar icon: how many WebMCP tools the open page offers, shown only for a
-// site the user has allowed (a host permission the user granted). For any other page the badge is
+// site the user has allowed (a host permission the user granted, and the site on the allowed list). For any other page the badge is
 // empty and the page's tools are not even listed. The count is the number of tools the assistant
 // would be offered (core/tool-offer.ts), so a tool for developers or an unlistable one is not
 // counted. The browser calls are injected (entries/shared/badge-wiring.ts); no new permission.
@@ -8,7 +8,7 @@ import { offeredTools } from '../core/tool-offer';
 import type { ToolListing } from '../core/ports/tool-bridge';
 
 export interface BadgeDeps {
-  /** True when the user allowed WebAIAssist on this origin (permissions.contains). */
+  /** True when Chrome holds the host permission and the user allowed the site (not just an endpoint's host). */
   allowed(origin: string): Promise<boolean>;
   /** The tools of the tab's top frame, with the page's own origin. */
   list(tabId: number): Promise<ToolListing>;

@@ -5,7 +5,7 @@ It can use the tools a web page offers through [WebMCP](https://webmachinelearni
 and asks you before each one runs.
 
 WebAIAssist is the browser client of the [AgenticSystemCore](https://agenticsystemcore.com) project,
-by the same author. It works with AgenticSystemCore nodes and with any site that offers WebMCP tools.
+by the same author. It works with AgenticSystemCore nodes and with sites that offer WebMCP tools, once you allow them (see Limits).
 
 **Read first, in plain words:**
 
@@ -23,7 +23,7 @@ by the same author. It works with AgenticSystemCore nodes and with any site that
 | This extension                  | 0.1.0 (first release; not yet tagged)                                                                                                                               |
 | AgenticSystemCore specification | 1.1.0: the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 Nov 2026                                             |
 | AgenticSystemCore engine        | 1.1.0: a node page offers ten WebMCP tools; the extension's test fixture is taken from that engine                                                                  |
-| Chrome                          | Needs 124 or later; the processor models need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 14 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
+| Chrome                          | Needs 126 or later; the processor models need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 14 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
 | WebMCP draft                    | Draft Community Group Report of 13 Nov 2026, Web Machine Learning Community Group. A draft: not a W3C Standard                                                      |
 
 "Works with" says the extension can read what a node publishes and call its tools. It does not say
@@ -75,7 +75,7 @@ A model you choose yourself is kept. Details are under [Other runtimes](#other-r
 
 ## What it works with
 
-- Any website that offers WebMCP tools, once you have turned on the Chrome switch (above).
+- Sites that offer WebMCP tools, once you have turned on the Chrome switch (above) and allowed the site (see Limits).
 - AgenticSystemCore nodes: pages published with the engine offer ten tools, and the panel marks
   the site as a node.
 - Any other page, through **Read this page**: the model gets the page text to answer from.
@@ -88,15 +88,19 @@ A model you choose yourself is kept. Details are under [Other runtimes](#other-r
   question only for tools the page marks read-only.
 - The extension itself does not navigate, click, fill in forms, download files or read other
   sites for the model. The only way it acts on a page is a tool the page offers, and it has no
-  access to a site until you allow that site.
+  access to a site until you allow that site. The sites you allowed are kept as a list in
+  `chrome.storage.local`, apart from Chrome's host access: saving a chat endpoint gives the extension
+  access to that host for the chat only. The toolbar number, the automatic tool listing and the nine file
+  reads happen only on sites you allowed.
 - What a tool does is the page's code, which the extension cannot check.
 
 ## Activity log
 
 The panel keeps a log of what you asked, with the model, tokens, price (when the service reports one), times and
 the tool calls, in this browser only. Open it from **Activity log** in the panel's More area: totals per day, filters
-by site, model and day, Export JSON and CSV, and Clear. The question, tool arguments and results are not kept unless
-you switch on **Include content**. See [docs/PRIVACY.md](docs/PRIVACY.md), "The activity log".
+by site, model and day, Export JSON and CSV, and Clear. The question, tool argument values and results are not kept unless
+you switch on **Include content**; argument names and the fact that a call failed are kept. A tool you run by
+hand is logged too. See [docs/PRIVACY.md](docs/PRIVACY.md), "The activity log".
 
 ## What it reads from a site
 
@@ -125,8 +129,8 @@ and sends nothing. An update or a `SERVICE` clause is refused. On a node, the mo
 answers it, and no page tool can take its name. In the mode "ask for every call" it asks before each call, like a page tool; in the other modes it runs without a per-call question.
 
 A site that says it wants no AI input (`Content-Signal: ai-input=no` in `robots.txt`) gets no
-text sent to the model and no **Read this page**. The results of the site's own tools still go
-to the model, because you asked for them. **Use on this tab anyway** overrides this for the
+page text or site files sent to the model and no **Read this page**. Its tool list and the results of the
+tools you allow still go to the model you chose, including a remote endpoint, because you asked for them. **Use on this tab anyway** overrides this for the
 local model on that tab; it is not offered with a chat endpoint.
 
 ---
@@ -170,10 +174,13 @@ local model on that tab; it is not offered with a chat endpoint.
 - **Memory**: on or off, and **Clear memory**.
 - **Give the model short facts from what the site publishes**: on by default.
 - **Downloaded models**: the list with sizes, and removal of one or all.
-- **Forget all sites**: clears what is kept for every site at once.
+- **Forget all sites**: clears what is kept for every site at once: chats, tool counts, activity entries,
+  the list of sites you allowed, the remote endpoint hosts you agreed to, and the site access you granted
+  (not your chat endpoint's own access).
 - **Language**: English. The texts are in `src/ui/messages-en.ts` and its sibling files; the build also writes
   them as Chrome's locale file, `_locales/en/messages.json` (`scripts/locale.mjs`).
-- **Reset to defaults** restores all of them.
+- **Reset to defaults** restores all of them, clears the list of remote endpoint hosts you agreed to and
+  removes the endpoint's host access.
 
 ## Other runtimes
 
@@ -183,18 +190,21 @@ Use one when the computer has no usable graphics card, or to run a larger model.
 of memory) or **Qwen3 1.7B on the processor** (1.1 GB, about 1.5 GB) in the model list. It runs
 llama.cpp in WebAssembly inside the extension, with no graphics card, and needs Chrome 137 or
 newer (the list shows it only then). It is slower than the graphics card: on 8 threads of a 16-core
-computer the 0.6B model writes about 11 tokens a second and the 1.7B model about 6, and the first
-question takes about 40 seconds (0.6B) or 2 minutes (1.7B) because it reads the instructions and
-the tool list. Small models call the page's tools less reliably than large ones: in the first
-measured run the 0.6B model answered all five questions without calling a tool, the 1.7B model
-called one each time ([docs/EVAL.md](docs/EVAL.md)). The downloaded file is checked against a recorded SHA-256 and deleted if it
+computer the 0.6B model wrote about 11 tokens a second and the 1.7B model about 6 in the first
+runs (14 Nov 2026, before the tool-use change); the later run of the same day measured medians of
+7.9 and 4.5. The first question takes about 40 seconds (0.6B) or 2 minutes (1.7B) because it reads the
+instructions and the tool list. Small models call the page's tools less reliably than large ones: in
+the first runs the 0.6B model answered all five questions without calling a tool and the 1.7B model
+called one each time; after the tool-use change the 0.6B model called a tool in 2 of 5 questions and
+the 1.7B model in 5 of 5 ([docs/EVAL.md](docs/EVAL.md)). The downloaded file is checked against a recorded SHA-256 and deleted if it
 differs; a second Start uses the stored copy with no download.
 
 **Qwen3.5 2B and Gemma 4 E2B.** Qwen3.5 2B is in the list twice: on the graphics card (about 1.1 GB
 download, about 2.3 GB of graphics memory) and on the processor (1.3 GB download, about 1.7 GB of
 memory). On the processor it loaded and answered all five measured questions, about twice as
-slowly as Qwen3 1.7B (3 to 4 tokens a second, 2.5 to 4 minutes a question), and called a tool
-first in four of the five ([docs/EVAL.md](docs/EVAL.md)). Gemma 4 E2B runs on the graphics card
+slowly as Qwen3 1.7B (3 to 4 tokens a second, 2.5 to 4 minutes a question). In the first run it called
+the expected tool first in four of the five; after the tool-use change, in three of the five
+([docs/EVAL.md](docs/EVAL.md)). Gemma 4 E2B runs on the graphics card
 only (2.8 GB download, about 3.4 GB of graphics memory) and is listed only when the graphics card
 reports the WebGPU feature `shader-f16`; neither the graphics-card run of Qwen3.5 2B nor that of
 Gemma 4 E2B is measured yet. Both are Apache-2.0. Neither is ever picked by itself. A graphics
@@ -241,8 +251,9 @@ processor path and without Chrome's model, the model list offers
 4. Press Start. Before the first use of a remote host the panel says where the model runs, that your
    questions, the page's tool list, tool results and any page text you read go to that host, and that
    the service may charge for it, and waits for **Use this service**. A different host asks again; an
-   address on this computer never asks. A site that asks for no AI input is never sent to a remote
-   endpoint. The key stays in this browser; no app name or referrer is sent.
+   address on this computer never asks. A site that asks for no AI input has its page text and site files
+   withheld; its tool list and the results of its tools you allow still go to the model you chose, including a
+   remote endpoint. The key stays in this browser; no app name or referrer is sent.
 
 An endpoint address must use `https`, or plain `http` on `localhost` or `127.0.0.1` only.
 
@@ -266,7 +277,11 @@ list to see everything the page said about it (title, full description, the four
 to run it by hand: you are asked first, as for any call. A tool the page marks as having hard-to-undo
 consequences is asked about twice. A form tool tells you that the page waits for you to press Submit. A tool
 with the `debugging` hint is shown as **for developers** and the model is never offered it. The number on the
-toolbar icon counts the tools of a site you allowed.
+toolbar icon counts the tools of a site you allowed. A tool whose definition has text that could pass for
+the assistant's own markers, or hidden characters, or a field schema over 8,000 characters, is listed with
+the reason "not offered to the model" and can still be run by hand; the whole tool list given to the model
+is capped at 24,000 characters, and tools beyond the cap are listed as not offered. A tool run by hand is
+written to the activity log.
 
 ## Privacy
 
@@ -280,11 +295,11 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
 
 ## Limits
 
-- Chromium browsers only (Chrome 124 or later; the processor models need Chrome 137).
+- Chromium browsers only (Chrome 126 or later; the processor models need Chrome 137).
 - WebMCP is a draft, not a W3C Standard; its shape may still change. In Chrome it needs the switch
   described above, so sites' tools do not appear without it.
 - Answers can be wrong: they come from an AI model. Check anything that matters.
-- Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows). The download, started from the click, took 300 s; later starts took 3 to 14 s. The model used a tool in 5 of 5 questions on the test node and in 1 of 5 on the live node, and an answer took 15 to 42 s (report: docs/eval/EVAL-NANO-2026-11-14-157.0.8103.52.json). It stays optional. Small models choose tools less reliably than large ones.
+- Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows). The download, started from the click, took 300 s; later starts took 3 to 14 s. After the tool-use change (15 Nov 2026) it used a tool in 5 of 5 questions on the test node and in 5 of 5 on the live node, the whole expected sequence in 4 of 5 on each, and an answer took 18 to 36 s (report: docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json). It stays optional. Small models choose tools less reliably than large ones.
 - A page has tools only if its own scripts register them through WebMCP.
 - The model in the browser needs WebGPU. Llama 3.2 3B and Qwen3.5 2B need about 2.3 GB of
   graphics memory, Gemma 4 E2B about 3.4 GB; Gemma 4 E2B is listed only when the graphics card
@@ -312,7 +327,7 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
   click the toolbar button on the page. `chrome://` pages and the Chrome Web Store are closed to
   extensions.
 - **Endpoint fails or answers 403**: is Ollama or LM Studio running? Ollama needs `OLLAMA_ORIGINS`.
-- **Wrong tool, or "no valid action"**: try Llama 3.2 3B, or ask more directly.
+- **Wrong tool, or "no valid action"**: try Qwen3 1.7B on the processor, or a chat endpoint, or ask more directly.
 - **What does this browser support?** Load the development build (`npm run build:smoke`, folder
   `dist-smoke`), then **Help**, **Open the browser check** ([docs/SPIKE.md](docs/SPIKE.md)).
 
@@ -358,7 +373,7 @@ What the tests prove, and how to run each part:
 | `npm run eval:cpu`   | The real processor model in headless Chromium (downloads 397 MB once). Not part of the gate.             |
 | `npm run eval:gpu`   | The model evaluation on a computer with a GPU (see [docs/EVAL.md](docs/EVAL.md)); opens browser windows. |
 
-No test uses a real model, the live network or the real clock, except the two `eval` commands.
+No test uses a real model, the live network or the real clock, except the `eval:*` commands and `check-live-graph`.
 Scenarios tagged `@gpu`, `@nano` and `@manual` are checked by a person
 ([docs/MANUAL-CHECKS.md](docs/MANUAL-CHECKS.md)); the `@cpu` one is `npm run eval:cpu`. If the browser tests say
 "Executable doesn't exist", run `PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium`.

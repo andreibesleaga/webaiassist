@@ -24,6 +24,7 @@ describe('forgetting and the activity log', () => {
       {
         memory,
         grants: { remove: () => Promise.resolve() },
+        allowed: { remove: () => Promise.resolve() },
         compat: { unregister: () => Promise.resolve(), removeOrigins: () => Promise.resolve(true) },
       },
       A,
@@ -36,6 +37,8 @@ describe('forgetting and the activity log', () => {
     await forgetAllSites({
       memory,
       grants: { clear: () => Promise.resolve() },
+      allowed: { clear: () => Promise.resolve() },
+      endpointHosts: { clear: () => Promise.resolve() },
       compat: {
         unregisterAll: () => Promise.resolve(),
         grantedOrigins: () => Promise.resolve([]),

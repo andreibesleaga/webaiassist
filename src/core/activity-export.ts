@@ -16,7 +16,7 @@ export function activityJson(records: readonly QuestionRecord[], exportedAt: str
   return JSON.stringify(doc, null, 2);
 }
 
-const FORMULA_START = /^[=+\-@\t\r]/;
+const FORMULA_START = /^[=+\-@\t\r\n]/;
 
 /** One CSV cell: formula guard, then quotes when the text has a comma, quote or line break. */
 export function csvCell(value: string | number | boolean | undefined): string {

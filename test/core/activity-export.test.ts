@@ -43,6 +43,15 @@ const full = record({
   ],
 });
 
+describe('CSV formula guard', () => {
+  it('puts an apostrophe before every dangerous first character, the line feed included', () => {
+    for (const start of ['=', '+', '-', '@', '\t', '\r', '\n']) {
+      expect(csvCell(`${start}1`).replace(/^"/, '').startsWith(`'${start}`)).toBe(true);
+    }
+    expect(csvCell('plain')).toBe('plain');
+  });
+});
+
 describe('JSON export', () => {
   it('matches the published schema, for a full entry, a bare one and an empty log', () => {
     const validate = new Ajv2020({ strict: true }).compile(EXPORT_SCHEMA);

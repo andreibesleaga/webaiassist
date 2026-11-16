@@ -4,7 +4,7 @@
   "short_name": "WebAIAssist",
   "version": "0.1.0",
   "description": "A local AI model in your side panel that uses the WebMCP tools of the open page. Works with AgenticSystemCore nodes.",
-  "minimum_chrome_version": "124",
+  "minimum_chrome_version": "126",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",

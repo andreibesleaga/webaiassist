@@ -14,6 +14,13 @@ export interface ModelLine {
   readonly status: string;
 }
 
+/** A model whose part of the run threw (a page that never loaded, a hung browser): it is kept
+ *  in the report as not ready with the first line of the error, and the next model runs. */
+export function stoppedModel(key: string, error: unknown): ModelLine {
+  const text = error instanceof Error ? error.message : String(error);
+  return { key, id: key, ready: false, loadS: null, status: `Stopped: ${text.split('\n')[0]}` };
+}
+
 export interface CheckResult {
   readonly name: string;
   readonly result: 'pass' | 'fail' | 'skipped' | 'review';

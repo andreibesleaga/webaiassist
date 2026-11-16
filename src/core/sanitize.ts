@@ -4,8 +4,9 @@
 // `[INST]`, `<start_of_turn>`, `</tool-result>` ...) or hide text with invisible characters.
 // Only those shapes change: other characters stay as the page wrote them, so a value the
 // model copies from a tool result back into a call still matches the page's schema. Tool
-// names, descriptions and schema strings are not rewritten at all: a tool whose text holds a
-// marker or an invisible character is not offered to the model (listableTool).
+// names and the schema values the model copies are not rewritten at all: a tool whose name or
+// such a value holds a marker or an invisible character is not offered to the model
+// (listableTool); descriptions and titles inside a schema are cleaned (modelSchema).
 import type { ToolInfo } from './types';
 
 /**
@@ -33,6 +34,40 @@ const INVISIBLE: readonly (readonly [number, number])[] = [
 
 const isInvisible = (code: number): boolean =>
   INVISIBLE.some(([first, last]) => code >= first && code <= last);
+
+const PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
+const KEYCAP_BASE = /[0-9#*]/;
+const VS15 = 0xfe0e;
+const VS16 = 0xfe0f;
+const ZWJ = 0x200d;
+
+/**
+ * Emoji are written with characters that are invisible on their own: a presentation selector
+ * (U+FE0E, U+FE0F) right after an emoji or a keycap digit, and a zero-width joiner between two
+ * emoji. Those stay; they cannot spell hidden text. Anywhere else, or two in a row, they are
+ * hidden characters. `chars` is the text as code points, `i` the position of the character.
+ */
+const isEmoji = (char: string | undefined): boolean => PICTOGRAPHIC.test(char ?? '');
+
+function selectorAfterEmoji(before: string | undefined): boolean {
+  return isEmoji(before) || KEYCAP_BASE.test(before ?? '');
+}
+
+function joinerBetweenEmoji(chars: readonly string[], i: number): boolean {
+  const before = chars[i - 1];
+  const joined = isEmoji(before) || (before === '\uFE0F' && isEmoji(chars[i - 2]));
+  return joined && isEmoji(chars[i + 1]);
+}
+
+function partOfEmoji(chars: readonly string[], i: number): boolean {
+  const code = chars[i]?.codePointAt(0) ?? 0;
+  if (code === VS15 || code === VS16) return selectorAfterEmoji(chars[i - 1]);
+  return code === ZWJ && joinerBetweenEmoji(chars, i);
+}
+
+/** True for a character at `i` that hides text (see partOfEmoji for the emoji exceptions). */
+const hiddenAt = (chars: readonly string[], i: number): boolean =>
+  isInvisible(chars[i]?.codePointAt(0) ?? 0) && !partOfEmoji(chars, i);
 
 /** "<" and its full-width and small-form look-alikes; the same for "|", ">", "/" and brackets. */
 const LT = '[<\\uFF1C\\uFE64]';
@@ -69,12 +104,10 @@ function isControl(code: number): boolean {
 }
 
 function dropHidden(text: string): string {
-  let out = '';
-  for (const char of text) {
-    const code = char.codePointAt(0) ?? 0;
-    if (!isControl(code) && !isInvisible(code)) out += char;
-  }
-  return out;
+  const chars = [...text];
+  return chars
+    .filter((char, i) => !isControl(char.codePointAt(0) ?? 0) && !hiddenAt(chars, i))
+    .join('');
 }
 
 function breakMarkers(text: string): string {
@@ -100,17 +133,47 @@ export function unsafePageText(text: string): boolean {
   return visible !== text || breakMarkers(visible) !== visible;
 }
 
-/** Every string of a JSON value, object keys included. */
-function strings(value: unknown, out: string[] = []): string[] {
+/** Schema keywords whose text is prose for the reader, never a value the model copies. */
+const PROSE_KEYS = new Set(['description', 'title', '$comment']);
+/** Keywords whose value maps names (property names and the like) to sub-schemas. */
+const NAME_MAPS = new Set(['properties', 'patternProperties', '$defs', 'definitions']);
+
+type Json = unknown;
+
+/** Every string of a schema the model may copy back (keys, enum, const, default ...): not the prose. */
+const isProse = (key: string, item: Json, names: boolean): boolean =>
+  !names && PROSE_KEYS.has(key) && typeof item === 'string';
+
+function exactStrings(value: Json, out: string[] = [], names = false): string[] {
   if (typeof value === 'string') out.push(value);
-  else if (Array.isArray(value)) value.forEach((item) => strings(item, out));
+  else if (Array.isArray(value)) value.forEach((item) => exactStrings(item, out));
   else if (typeof value === 'object' && value !== null) {
-    for (const [key, item] of Object.entries(value as Record<string, unknown>)) {
+    for (const [key, item] of Object.entries(value as Record<string, Json>)) {
       out.push(key);
-      strings(item, out);
+      if (!isProse(key, item, names)) exactStrings(item, out, !names && NAME_MAPS.has(key));
     }
   }
   return out;
+}
+
+function cleanSchema(value: Json, names: boolean): Json {
+  if (Array.isArray(value)) return value.map((item) => cleanSchema(item, false));
+  if (typeof value !== 'object' || value === null) return value;
+  const entries = Object.entries(value as Record<string, Json>).map(([key, item]) => {
+    if (!names && PROSE_KEYS.has(key) && typeof item === 'string')
+      return [key, cleanPageText(item)];
+    return [key, cleanSchema(item, !names && NAME_MAPS.has(key))];
+  });
+  return Object.fromEntries(entries);
+}
+
+/**
+ * The schema as the model is given it: descriptions and titles inside it cleaned like any page
+ * text (a field description may show example markup such as `</svg>`), every value the model must
+ * copy exactly (names, enum, const, default, examples) as the page wrote it.
+ */
+export function modelSchema(schema: Json): Json {
+  return cleanSchema(schema, false);
 }
 
 /**
@@ -121,7 +184,7 @@ function strings(value: unknown, out: string[] = []): string[] {
  */
 export function listableTool(tool: ToolInfo): boolean {
   if (/[\s\p{Cc}\p{Zl}\p{Zp}]/u.test(tool.name)) return false;
-  if (strings([tool.name, tool.inputSchema ?? {}]).some(unsafePageText)) return false;
+  if (exactStrings([tool.name, tool.inputSchema ?? {}]).some(unsafePageText)) return false;
   const description = dropHidden(tool.description);
   return breakMarkers(description) === description;
 }
@@ -133,10 +196,11 @@ export function quoteName(name: string): string {
 
 /** For the UI: invisible characters shown as visible escapes such as [U+202E]. */
 export function revealInvisible(text: string): string {
-  let out = '';
-  for (const char of text) {
-    const code = char.codePointAt(0) ?? 0;
-    out += isInvisible(code) ? `[U+${code.toString(16).toUpperCase().padStart(4, '0')}]` : char;
-  }
-  return out;
+  const chars = [...text];
+  return chars
+    .map((char, i) => {
+      const code = char.codePointAt(0) ?? 0;
+      return hiddenAt(chars, i) ? `[U+${code.toString(16).toUpperCase().padStart(4, '0')}]` : char;
+    })
+    .join('');
 }

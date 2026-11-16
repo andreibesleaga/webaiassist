@@ -31,14 +31,14 @@ const oneLine = (text: string, cap = FIELD_CAP): string =>
   text.replace(/\s+/g, ' ').trim().slice(0, cap);
 
 /** An error text without addresses and keys, on one line, cut short. */
-export function cleanError(text: string, secrets: readonly string[]): string {
+export function cleanError(text: string, secrets: readonly string[], cap = ERROR_CAP): string {
   let out = text;
   for (const secret of secrets) {
     if (secret.length >= MIN_SECRET) out = out.split(secret).join('[key]');
   }
   out = out.replace(/\bhttps?:\/\/\S+/gi, '[address]');
   out = out.replace(/\b(?:sk|pk|key|token)[-_][A-Za-z0-9_-]{12,}/gi, '[key]');
-  return oneLine(out, ERROR_CAP);
+  return oneLine(out, cap);
 }
 
 function gpuLine(gpu: DiagnosticsFacts['gpu']): string {

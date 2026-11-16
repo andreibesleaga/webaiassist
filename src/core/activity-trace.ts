@@ -7,7 +7,7 @@
 // somewhere else (such as `webaiassist_query_graph`) calls `builtinCall` once it has finished.
 // The names in BUILTIN_TOOLS are marked "built-in" in the log.
 import { CONTENT_LIMIT } from './activity-cap';
-import { redactArgs } from './export';
+import { redactArgs, REMOVED } from './export';
 import { contextUse, utf8Length } from './activity-context';
 import type {
   ContextUse,
@@ -216,7 +216,7 @@ export class QuestionTrace {
             durationMs: done.durationMs,
             resultBytes: utf8Length(done.text),
             ok: done.ok,
-            ...(done.ok ? {} : { error: this.clean(done.text, ERROR_LIMIT) }),
+            ...(done.ok || !content ? {} : { error: this.clean(done.text, ERROR_LIMIT) }),
           }
         : {}),
       ...(content && argBytes <= CONTENT_LIMIT
@@ -280,7 +280,7 @@ export class QuestionTrace {
   private clean(text: string, limit = Infinity): string {
     let out = text;
     for (const secret of this.meta.secrets ?? []) {
-      if (secret.length >= MIN_SECRET_LENGTH) out = out.split(secret).join('[removed]');
+      if (secret.length >= MIN_SECRET_LENGTH) out = out.split(secret).join(REMOVED);
     }
     return out.slice(0, limit);
   }

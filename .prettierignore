@@ -21,3 +21,4 @@ static/explorer.html
 # Unchanged copies from other repositories and recorded live files (their PINS.json / fixtures README say where).
 third_party/
 fixtures/graph/
+.claude/

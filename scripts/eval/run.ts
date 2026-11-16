@@ -15,6 +15,7 @@ import { loadPrompts, promptsFor, type PromptFile } from './prompts.ts';
 import {
   fillEvalMd,
   renderResults,
+  stoppedModel,
   writeReport,
   type CheckResult,
   type EvalReport,
@@ -164,21 +165,42 @@ async function runModel(ctx: Ctx, key: ModelKey): Promise<void> {
   if (ctx.args.live) await runTarget(ctx, key, 'live');
 }
 
+/** One model; when its part throws, it is recorded as stopped and the run goes on. */
+async function runModelSafely(ctx: Ctx, key: ModelKey): Promise<void> {
+  try {
+    await runModel(ctx, key);
+  } catch (error) {
+    const line = stoppedModel(key, error);
+    const at = ctx.models.findIndex((model) => model.key === key);
+    if (at === -1) ctx.models.push(line);
+    console.log(`  ${line.status}`);
+  }
+}
+
 async function lastPanel(ctx: Ctx): Promise<Page> {
   const { tabId } = await ctx.session.openTarget(`${ctx.session.stubUrl}/`);
   return ctx.session.openPanelFor(tabId);
 }
 
-async function finish(ctx: Ctx, adapter: boolean): Promise<void> {
+/** The checks after the last model (requests, Options page); a hung browser skips them. */
+async function closingChecks(ctx: Ctx): Promise<{ late: CheckResult[]; chrome: string }> {
   const { args, session } = ctx;
   const panel = await lastPanel(ctx);
-  const key = args.models.at(-1) ?? 'scripted';
-  await ensureReady(panel, key, args);
+  await ensureReady(panel, args.models.at(-1) ?? 'scripted', args);
   const late = await runChecks(session, panel, args, ctx.window);
   await optionsShot(ctx);
+  return { late, chrome: await chromeVersion(session, panel) };
+}
+
+async function finish(ctx: Ctx, adapter: boolean): Promise<void> {
+  const { args, session } = ctx;
+  const closing = await closingChecks(ctx).catch((error: unknown) => {
+    console.log(`  closing checks skipped: ${stoppedModel('', error).status}`);
+    return { late: [] as CheckResult[], chrome: session.chromeVersion };
+  });
   const report: EvalReport = {
     date: new Date().toISOString().slice(0, 10),
-    chrome: await chromeVersion(session, panel),
+    chrome: closing.chrome,
     os: `${process.platform} ${release()}`,
     scripted: args.scripted,
     webgpu: { panelAdapter: adapter },
@@ -186,7 +208,7 @@ async function finish(ctx: Ctx, adapter: boolean): Promise<void> {
     targets: ctx.targets,
     rows: ctx.rows,
     summary: summarize(ctx.rows),
-    checks: [...ctx.early, ...late],
+    checks: [...ctx.early, ...closing.late],
     manual: MANUAL,
   };
   const path = writeReport(args.outDir, report);
@@ -219,7 +241,7 @@ async function main(): Promise<number> {
       console.error('No WebGPU adapter in the panel: run with --scripted for a flow check.');
       return 2;
     }
-    for (const key of args.models) await runModel(ctx, key);
+    for (const key of args.models) await runModelSafely(ctx, key);
     await finish(ctx, adapter);
     return 0;
   } catch (error) {

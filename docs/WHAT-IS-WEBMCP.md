@@ -80,7 +80,7 @@ What a tool really does is the page's own code. The extension cannot check it.
 
 WebAIAssist is the browser client of the AgenticSystemCore project, by the same author. Pages
 published with the AgenticSystemCore engine offer ten WebMCP tools, and the panel marks such a
-site as a node. WebAIAssist works with any site that offers WebMCP tools.
+site as a node. WebAIAssist works with sites that offer WebMCP tools, once you allow them (see Limits in the README).
 
 ## Next
 

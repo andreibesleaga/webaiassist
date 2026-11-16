@@ -6,12 +6,12 @@ scripted model and cannot measure this.
 
 ## What is measured for each model path
 
-| Path                    | Measured by                                       | State on 14 Nov 2026                                                                                                                                                                                                                                                                                |
-| ----------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Graphics card           | `npm run eval:gpu` on the maintainer's laptop     | Run of 14 Nov: Qwen3 0.6B answered; Llama 3.2 3B loaded but lost the GPU device on its first question (see "When the model fails on a GPU"). Qwen3.5 2B and Gemma 4 E2B are not run yet: `npm run eval:gpu -- --models qwen35,gemma4`.                                                              |
-| Processor and memory    | `npm run eval:cpu`, headless Chromium on 16 cores | Three models, five prompts (three for Qwen3 1.7B): see "The processor model".                                                                                                                                                                                                                       |
-| Chrome's built-in model | By hand ([MANUAL-CHECKS.md](MANUAL-CHECKS.md))    | Measured on 14 Nov 2026, real Chrome 157 on Windows: the download from the click took 300 s, later starts 3 to 14 s; the model used a tool in 5 of 5 questions on the test node and in 1 of 5 on the live node; 15 to 42 s per answer. Report: `docs/eval/EVAL-NANO-2026-11-14-157.0.8103.52.json`. |
-| Chat endpoint           | Unit and browser tests against a fake server      | No run against a real Ollama or LM Studio is recorded.                                                                                                                                                                                                                                              |
+| Path                    | Measured by                                               | State on 16 Nov 2026                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Graphics card           | `npm run eval:gpu` on the maintainer's laptop (AMD gcn-5) | Run of 16 Nov, 10 questions per page: Qwen3 0.6B used a tool on 10 of 10 test questions, the right one on 8, about 19 s to the first token; on the live node the right tool on 2 of 10. Qwen3.5 2B: the right tool on 6 of 10, 2 to 5 minutes per answer, 3 over the 5-minute limit. Llama 3.2 3B and Gemma 4 E2B loaded and then ran past the limit on their first question, which also stopped that browser. See the results block below. |
+| Processor and memory    | `npm run eval:cpu`, headless Chromium on 16 cores         | Three models, five prompts (three for Qwen3 1.7B): see "The processor model".                                                                                                                                                                                                                                                                                                                                                               |
+| Chrome's built-in model | `npm run eval:nano` in real Chrome 157 on Windows         | Run of 15 Nov, after the profile used for earlier builds was replaced (in it the panel showed no tools at all): a tool used on 10 of 10 questions, the right one on 8 (5 of 5 on the test node, 3 of 5 on the live node); 7 to 36 s per answer; start 14 s, later starts 3 s. Report: `docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json`.                                                                                                  |
+| Chat endpoint           | Unit and browser tests against a fake server              | No run against a real Ollama or LM Studio is recorded.                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Run
 
@@ -174,29 +174,42 @@ and `...-P1-AFTER-...json`. One run of five prompts each: the numbers show a dir
 
 <!-- eval-results:start -->
 
-Last run: 2026-11-14, Chrome 156.0.8078.4, win32 10.0.26300; WebGPU adapter: yes; report `docs\eval\EVAL-2026-11-14-156.0.8078.4.json`.
+Last run: 2026-11-16, Chrome 156.0.8078.4, win32 10.0.26300; WebGPU adapter: yes; report `docs/eval/EVAL-2026-11-16-156.0.8078.4.json`.
 
-| Model | Target | Prompts | Tool right | Gate shown | Fact in answer | Hallucinated | Errors | Repeated calls | Median first token (s) |
-| ----- | ------ | ------- | ---------- | ---------- | -------------- | ------------ | ------ | -------------- | ---------------------- |
-| qwen  | stub   | 5       | 2          | 3 of 3     | 3 of 5         | 0            | 1      | 0              | 8.8                    |
-| qwen  | live   | 5       | 0          | 3 of 3     | 0 of 0         | 0            | 1      | 2              | 21.7                   |
-| llama | stub   | 5       | 0          | 0 of 0     | 0 of 5         | 0            | 5      | 0              | 3.7                    |
-| llama | live   | 5       | 0          | 0 of 0     | 0 of 0         | 0            | 5      | 0              | -                      |
+| Model  | Target | Prompts | Tool right | First tool right | Tool used | Task done | Gate shown | Fact in answer | Hallucinated | Errors | Repeated calls | Median first token (s) |
+| ------ | ------ | ------- | ---------- | ---------------- | --------- | --------- | ---------- | -------------- | ------------ | ------ | -------------- | ---------------------- |
+| qwen   | stub   | 10      | 8          | 9                | 10 of 10  | 5         | 10 of 10   | 6 of 10        | 0            | 0      | 0              | 19.45                  |
+| qwen   | live   | 10      | 2          | 2                | 9 of 10   | 2         | 9 of 9     | 0 of 0         | 5            | 0      | 6              | 26.9                   |
+| llama  | stub   | 1       | 0          | 0                | 0 of 1    | 0         | 0 of 0     | 0 of 1         | 0            | 1      | 0              | -                      |
+| qwen35 | stub   | 10      | 6          | 6                | 10 of 10  | 6         | 10 of 10   | 7 of 10        | 0            | 3      | 0              | 138.65                 |
+| qwen35 | live   | 1       | 1          | 1                | 1 of 1    | 0         | 1 of 1     | 0 of 0         | 0            | 1      | 0              | 170.4                  |
+| gemma4 | stub   | 1       | 0          | 0                | 0 of 1    | 0         | 0 of 0     | 0 of 1         | 0            | 1      | 0              | -                      |
+| gemma4 | live   | 1       | 0          | 0                | 0 of 1    | 0         | 0 of 0     | 0 of 0         | 0            | 1      | 0              | -                      |
 
-| Model | Ready | Start (s) | Model line after Start                                                                                     |
-| ----- | ----- | --------- | ---------------------------------------------------------------------------------------------------------- |
-| qwen  | yes   | 4.6       | Ready: Qwen3 0.6B (small and fast; needs about 1.4 GB of GPU memory), running in the offscreen document.   |
-| llama | yes   | 16.5      | Ready: Llama 3.2 3B (better answers; needs about 2.3 GB of GPU memory), running in the offscreen document. |
+| Model  | Ready | Start (s) | Model line after Start                                                                           |
+| ------ | ----- | --------- | ------------------------------------------------------------------------------------------------ |
+| qwen   | yes   | 4.1       | Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document).   |
+| llama  | yes   | 290.8     | Ready: Llama 3.2 3B. Running in this browser, on your graphics card (in the offscreen document). |
+| qwen35 | yes   | 10.9      | Ready: Qwen3.5 2B. Running in this browser, on your graphics card (in the offscreen document).   |
+| gemma4 | yes   | 21.2      | Ready: Gemma 4 E2B. Running in this browser, on your graphics card (in the offscreen document).  |
 
-| Check                               | Result  | Detail                                                                                                                                                                   |
-| ----------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Cancel stops the download           | pass    | Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0                                                                                             |
-| storage.local.setAccessLevel        | pass    | resolved in the service worker                                                                                                                                           |
-| Hosts contacted on first Start      | review  | 7 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start |
-| Idle 2 min, then a question         | fail    | no answer after the idle wait                                                                                                                                            |
-| Corrupted cached library is refused | skipped | no cached .wasm (scripted or library served from the package)                                                                                                            |
+| Check                               | Result  | Detail                                                                                                                                                                    |
+| ----------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cancel stops the download           | pass    | Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0                                                                                              |
+| storage.local.setAccessLevel        | pass    | resolved in the service worker                                                                                                                                            |
+| Hosts contacted on first Start      | review  | 10 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start |
+| Idle 10 min, then a question        | fail    | no answer after the idle wait                                                                                                                                             |
+| Corrupted cached library is refused | skipped | no cached .wasm (scripted or library served from the package)                                                                                                             |
 
 <!-- eval-results:end -->
+
+The block above merges three runs of the night of 15 to 16 Nov 2026, one browser each, because a model
+that runs past the time limit leaves its browser unable to open the next page: Qwen3 0.6B and Llama
+3.2 3B (`EVAL-GPU-2026-11-16-qwen-llama.json`), Qwen3.5 2B (`EVAL-GPU-2026-11-16-qwen35.json`), Gemma 4
+E2B (`EVAL-GPU-2026-11-16-gemma4.json`); merged in `EVAL-2026-11-16-156.0.8078.4.json`. A row with 1
+question is a model whose browser stopped after its first question. The check "Idle 10 min, then a
+question" ran with Qwen3.5 2B, which needs 2 to 5 minutes per answer, so its "fail" is that model's
+time limit, not a finding about the idle path; it was not re-run with a faster model.
 
 ## When the model fails on a GPU
 
@@ -263,4 +276,16 @@ The report is `docs/eval/EVAL-CONFORMANCE-<date>-<chrome version>.json`. The sui
 Playwright's Chromium: `npx playwright test test/smoke/conformance-browser.spec.ts
 test/smoke/conformance.spec.ts`. The Chromium and Chrome results are compared by hand.
 
-No real-Chrome run is recorded yet: it needs the maintainer's Windows computer.
+Real-Chrome run, 15 Nov 2026, Chrome 157.0.8103.52 on Windows
+(`docs/eval/EVAL-CONFORMANCE-2026-11-15-157.0.8103.52.json`):
+
+- In the browser alone: 16 of 16 cases as expected.
+- With the extension: 16 of 16 cases, every step as expected. An earlier run the same day had case 1
+  list no tools at first; the panel now lists a page again when its first list is empty.
+- Google's 18 demo pages: all 18 register tools. The panel lists every tool on 17. On `page-agent` it
+  lists none, because that page's tools are in a frame of another origin, and the extension never
+  lists a frame's tools. A read-only tool that needs no argument ran through the question on 4 pages
+  (`smart-home`, `pixel-art-studio`, `proxx-lite`, `spreadsheet`); nothing else was called.
+- The earlier run the same day missed tools on two pages: `add_topping` and `remove_topping` (an emoji
+  with its presentation character in an enum) and `draw_svg` (example SVG markup in a field
+  description). Both are offered now (see "Tools not offered to the model" in TOOL-REVIEW.md).

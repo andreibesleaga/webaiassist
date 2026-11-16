@@ -34,9 +34,17 @@ export function canonicalJson(value: unknown): string {
 }
 
 const fingerprint = (tool: ToolInfo): string =>
-  canonicalJson([tool.name, tool.description, tool.inputSchema, tool.annotations]);
+  canonicalJson([
+    tool.name,
+    tool.title,
+    tool.description,
+    tool.inputSchema,
+    tool.annotations,
+    tool.form,
+  ]);
 
-/** True when `current` has the same name, description, schema and annotations as `seen`. */
+/** True when `current` has the same name, title, description, schema, annotations and form
+ *  promise as `seen`: the question showed all of them. */
 export function sameTool(seen: ToolInfo, current: ToolInfo | undefined): boolean {
   return current !== undefined && fingerprint(seen) === fingerprint(current);
 }

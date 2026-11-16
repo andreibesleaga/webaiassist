@@ -22,7 +22,7 @@ Feature: The tools list
   @smoke
   Scenario: A tool whose description carries hidden or instruction-like text is not offered
     Given a page registers a tool whose description contains a turn marker
-    Then the tools list does not show that tool
+    Then the tools list shows that tool as not offered to the model, with the reason
     And the model is not told about it
 
   # test: test/core/sanitize.test.ts, test/security-review/core-review.test.ts

@@ -123,9 +123,12 @@ pending now, and a test keeps it so; see [MANUAL-CHECKS.md](MANUAL-CHECKS.md)). 
 - `.github/workflows/test.yml`: on each push to `main` and each pull request. Installs, audits
   the runtime dependencies (`npm audit --omit=dev`), caches the Playwright browser and the model
   libraries, installs Chromium, runs `npm run verify:release`. No GPU.
-- `.github/workflows/release.yml`: on a tag `v*`. Checks that the tag equals the version in
-  `package.json`, runs `npm run verify:release`, and creates the GitHub release with the
-  CHANGELOG section as its text and the zip and its `.sha256` file attached. It does not upload
+- `.github/workflows/release.yml`: on a tag `v*`, two jobs. `build` (read access only) checks
+  that the tag equals the version in `package.json`, runs `npm run verify:release` and keeps the
+  zip, its `.sha256` file and the release notes as an artifact. `publish` (write access, runs no
+  installed code) attests the zip's build provenance and creates the GitHub release with the
+  CHANGELOG section as its text and both files attached. Check a downloaded zip with
+  `gh attestation verify webaiassist-x.y.z.zip -R andreibesleaga/webaiassist`. It does not upload
   to the Chrome Web Store.
 - Every action is pinned to a full commit SHA with its version in a comment;
   `test/scripts/workflows.test.ts` enforces this and the permissions.
@@ -140,7 +143,8 @@ pending now, and a test keeps it so; see [MANUAL-CHECKS.md](MANUAL-CHECKS.md)). 
 1. Update `CHANGELOG.md`: the items of the release sit under `## [x.y.z] - not yet released`; put the release date there (`## [x.y.z] - YYYY-MM-DD`), and open the next version's section above it for later changes.
 2. Run `npm version x.y.z --no-git-tag-version`: it sets the version in `package.json` and
    `package-lock.json`; the build copies it into the manifest.
-3. Run `npm run verify:release` on a clean checkout.
+3. Run `npm run verify:release` on a clean checkout. It runs `npm run test:dist` after the build
+   and the zip, so the checks of the built package always run.
 4. Commit, then push a tag `vx.y.z`. `release.yml` creates the GitHub release with the zip.
 5. Upload the same zip to the Chrome Web Store. The listing text and the permission reasons are in
    [STORE-LISTING.md](STORE-LISTING.md); the dashboard steps are kept by the maintainer, outside this repository.

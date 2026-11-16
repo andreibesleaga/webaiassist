@@ -11,6 +11,8 @@ import { sitePattern } from './compat-mode';
 
 export interface SiteAccessDeps {
   request(origins: string[]): Promise<boolean>;
+  /** Puts the origin on the user's allowed list (the host permission alone does not allow a site). */
+  allow(origin: string): Promise<void>;
   addHostAccessRequest?: (request: { tabId: number }) => Promise<void>;
 }
 
@@ -22,7 +24,10 @@ export function allowSite(
 ): Promise<AllowResult> {
   if (page.origin !== undefined) {
     const pattern = sitePattern(page.origin);
-    return deps.request([pattern]).then((granted) => (granted ? 'granted' : 'denied'));
+    return deps.request([pattern]).then(async (granted) => {
+      if (granted) await deps.allow(page.origin as string);
+      return granted ? 'granted' : 'denied';
+    });
   }
   if (deps.addHostAccessRequest) {
     return deps.addHostAccessRequest({ tabId: page.tabId }).then(() => 'requested');

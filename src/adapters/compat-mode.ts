@@ -16,6 +16,8 @@ export interface CompatScript {
 
 export interface CompatDeps {
   request(origins: string[]): Promise<boolean>;
+  /** Puts the origin on the user's allowed list. */
+  allow(origin: string): Promise<void>;
   register(script: CompatScript): Promise<void>;
   isRegistered(id: string): Promise<boolean>;
   reload(tabId: number): Promise<void>;
@@ -51,6 +53,7 @@ export async function enableCompat(
   const match = sitePattern(page.origin);
   // The permission request must be the first await inside the click handler.
   if (!(await deps.request([match]))) return 'denied';
+  await deps.allow(page.origin);
   const id = compatScriptId(page.origin);
   if (await deps.isRegistered(id)) return 'already';
   await deps.register({

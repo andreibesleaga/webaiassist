@@ -77,9 +77,8 @@ async function badgeOf(world: World, tabId: number): Promise<string> {
 Then("the toolbar number of the page's tab is the count of its tools", async ({ world }) => {
   const tabId = world.tabId;
   if (tabId === undefined) throw new Error('open a page first');
-  // The page is loaded again so the toolbar number is read once the page's tools are registered.
-  await world.page?.reload();
-  await expect.poll(() => badgeOf(world, tabId)).toMatch(/^1[01]$/);
+  // No reload: the number appears on the first load (the worker reads the tab again after it loads).
+  await expect.poll(() => badgeOf(world, tabId), { timeout: 8_000 }).toMatch(/^1[01]$/);
 });
 
 Then('the toolbar number of the same page at localhost is empty', async ({ world }) => {

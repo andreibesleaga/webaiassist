@@ -63,7 +63,9 @@ export const ACTIVITY_EN = {
   activityClearYes: 'Remove all',
   activityClearNo: 'Keep',
   activityRerun: 'Run again',
-  activityRerunAsk: 'Run {name} again on {host}? It sends these arguments: {args}',
+  activityRerunAsk: 'Run the tool {name} again?',
+  activityRerunSite:
+    'Not run: this site is not allowed in this session. Allow it in the side panel first (ask a question there that uses the site’s tools), then try again.',
   activityRerunAllow: 'Allow',
   activityRerunDeny: 'Deny',
   activityRerunDenied: 'Not run: you denied it.',

@@ -43,6 +43,7 @@ describe('held: compat mode cannot be turned on without the user’s grant', () 
       registered,
       reloaded,
       request: () => Promise.resolve(granted),
+      allow: () => Promise.resolve(),
       register: (script: CompatScript) => {
         registered.push(script);
         return Promise.resolve();

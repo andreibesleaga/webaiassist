@@ -2,7 +2,10 @@
 // The failures the panel meets while a model loads or answers, sorted into the few the user
 // can act on. The runtimes send errors through a port as plain text, so most kinds are told by
 // their words; "no graphics acceleration" is raised in the panel itself and has its own class.
+import { cleanError } from '../core/diagnostics';
 import { DEVICE_LOST, MODEL_STOPPED } from '../adapters/model-errors';
+
+const DETAILS_CAP = 500;
 
 export type ProblemKind =
   'no-gpu' | 'device-lost' | 'model-stopped' | 'no-space' | 'endpoint-refused' | 'unexpected';
@@ -28,8 +31,13 @@ export function classifyProblem(error: unknown): ProblemKind {
   return 'unexpected';
 }
 
-/** What "Copy details" copies: the version and the message, cut short; never page content
- *  (the panel's own errors carry none, and a tool's text is not an error of this kind). */
-export function errorDetails(version: string, error: unknown): string {
-  return `WebAIAssist ${version}\n${problemText(error).slice(0, 500)}`;
+/** What "Copy details" copies: the version and the message, without web addresses and keys
+ *  (cleanError), cut short; never page content (the panel's own errors carry none, and a tool's
+ *  text is not an error of this kind). */
+export function errorDetails(
+  version: string,
+  error: unknown,
+  secrets: readonly string[] = [],
+): string {
+  return `WebAIAssist ${version}\n${cleanError(problemText(error), secrets, DETAILS_CAP)}`;
 }

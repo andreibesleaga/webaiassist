@@ -8,11 +8,15 @@
 export interface ActionTab {
   readonly id?: number;
   readonly windowId: number;
+  /** Readable under the activeTab grant of this click. */
+  readonly url?: string;
 }
 
 export interface ActionDeps {
   openPanel(windowId: number): Promise<void>;
   inject(tabId: number): Promise<void>;
+  /** The click is the user allowing WebAIAssist on this page's site: it goes on the allowed list. */
+  allow(url: string | undefined): Promise<void>;
   /** A tools/changed notice from the service worker; it fails when no panel is open. */
   notifyPanel(): Promise<unknown>;
   warn(text: string, error: unknown): void;
@@ -23,7 +27,8 @@ export function onActionClick(deps: ActionDeps, tab: ActionTab): Promise<void> {
     .openPanel(tab.windowId)
     .catch((error: unknown) => deps.warn('WebAIAssist: could not open the side panel', error));
   if (tab.id === undefined) return opened;
-  const injected = deps.inject(tab.id).then(
+  // The scripts go in at once (the grant only lasts for this click); the site is listed alongside.
+  const injected = Promise.all([deps.inject(tab.id), deps.allow(tab.url)]).then(
     // No panel open yet is fine: the panel reads the page when it starts.
     () => deps.notifyPanel().catch(() => undefined),
     (error: unknown) => deps.warn('WebAIAssist: could not add the page scripts', error),

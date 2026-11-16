@@ -14,6 +14,7 @@ function deps(options: { inject?: Error; open?: Error; notify?: Error } = {}) {
       calls.push(`inject ${tabId}`);
       return options.inject ? Promise.reject(options.inject) : Promise.resolve();
     },
+    allow: () => Promise.resolve(),
     notifyPanel: () => {
       calls.push('notify');
       return options.notify ? Promise.reject(options.notify) : Promise.resolve();

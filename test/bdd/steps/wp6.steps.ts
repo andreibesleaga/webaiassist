@@ -138,11 +138,17 @@ Given('a page registers a tool whose description contains a turn marker', async 
   await expect(world.requirePanel().locator('#page-status')).toContainText('WebMCP tool');
 });
 
-Then('the tools list does not show that tool', async ({ world }) => {
-  const rows = world.requirePanel().locator('#tools-rows');
-  await expect(rows).toContainText('fine');
-  await expect(rows).not.toContainText('evil');
-});
+Then(
+  'the tools list shows that tool as not offered to the model, with the reason',
+  async ({ world }) => {
+    const rows = world.requirePanel().locator('#tools-rows');
+    await expect(rows).toContainText('fine');
+    const evil = rows.locator('li[data-tool="evil"]');
+    await expect(evil.locator('.mark.not-offered')).toHaveText('not offered to the model');
+    await expect(evil).toContainText('could pass for the assistant’s own markers');
+    await expect(rows.locator('li[data-tool="fine"] .mark.not-offered')).toHaveCount(0);
+  },
+);
 
 Then('the model is not told about it', async ({ world }) => {
   await scriptedReady(world);

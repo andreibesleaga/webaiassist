@@ -4,7 +4,9 @@
 // frame when nobody answers yet, and forwards the request: src/adapters/tool-router.ts.
 // The toolbar click (service-worker.ts) adds the scripts through the same injector.
 import { bridgeInjector } from '../../adapters/tab-injection';
+import { httpOrigin } from '../../adapters/allowed-sites';
 import { routeToolRequest, type TabDeps } from '../../adapters/tool-router';
+import { siteIsAllowed } from './allowed-sites';
 import { parseMessage } from '../../protocol/validate';
 import { fromExtensionPage } from './sender';
 
@@ -19,9 +21,13 @@ export const injectBridge = bridgeInjector(async (tabId, file, world) => {
   });
 });
 
-const TAB_DEPS: TabDeps = {
+export const TAB_DEPS: TabDeps = {
   sendToTab: (tabId, message) => chrome.tabs.sendMessage(tabId, message, { frameId: 0 }),
   inject: injectBridge,
+  gate: {
+    originOf: async (tabId) => httpOrigin((await chrome.tabs.get(tabId)).url),
+    allowed: siteIsAllowed,
+  },
 };
 
 export function startToolRouting(): void {

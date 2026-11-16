@@ -6,6 +6,7 @@
 import { activityCsv, activityJson } from '../../core/activity-export';
 import { choices, filterRecords, type Filter } from '../../core/activity-summary';
 import type { ActivityLog, QuestionRecord } from '../../core/ports/activity-log';
+import type { SiteGrants } from '../../core/ports/site-grants';
 import type { ToolBridge } from '../../core/ports/tool-bridge';
 import { element } from '../dom';
 import type { ExplorerTarget } from '../explorer-url';
@@ -18,6 +19,8 @@ export interface ActivityDeps {
   readonly log: ActivityLog;
   /** What a past call is run through; without it, and without `target`, nothing is run again. */
   readonly bridge?: ToolBridge;
+  /** The sites allowed in this session (the side panel asks); a re-run never runs on any other. */
+  readonly grants?: Pick<SiteGrants, 'has'>;
   /** The tab and site the page was opened for (the panel's page); re-runs go there only. */
   readonly target?: ExplorerTarget;
   nowIso(): string;

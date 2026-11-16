@@ -165,13 +165,23 @@ describe('tool calls', () => {
     expect(tools[0]?.durationMs).toBeUndefined();
   });
 
-  it('a failed call keeps its error text, cut', () => {
-    const { t } = trace();
+  it('a failed call keeps its error text, cut, only with content on', () => {
+    const { t } = trace({ includeContent: true });
     t.toolStarted('x', {});
     t.toolFinished('x', false, `Tool error: ${'e'.repeat(1000)}`);
     const tool = t.build({ status: 'answered', steps: 1 }).tools[0];
     expect(tool?.ok).toBe(false);
     expect(tool?.error?.length).toBeLessThanOrEqual(300);
+  });
+
+  it('with content off, a failed call is kept as failed without its error text', () => {
+    const { t } = trace();
+    t.toolStarted('x', { query: 'my medical search' });
+    t.toolFinished('x', false, 'Tool error: no results for my medical search');
+    const record = t.build({ status: 'answered', steps: 1 });
+    expect(record.tools[0]).toMatchObject({ ok: false, argNames: ['query'] });
+    expect(record.tools[0]?.error).toBeUndefined();
+    expect(JSON.stringify(record)).not.toContain('medical');
   });
 
   it('marks the built-in tool and has a hook for a built-in call that makes no event', () => {

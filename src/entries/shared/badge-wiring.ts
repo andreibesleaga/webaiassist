@@ -1,20 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
 // Service-worker wiring of the toolbar number (src/adapters/tool-badge.ts): refresh it when a tab
 // finishes loading, when the user switches tab, when the page's top frame says its tools changed,
-// and clear it when a site's access is taken away. It uses `chrome.action`, `chrome.permissions.contains`
+// when the list of allowed sites changes, and clear it when a site's access is taken away. It uses `chrome.action`, `chrome.permissions.contains`
 // and the tool listing the worker already has; it needs no permission of its own.
 import { MessagingToolBridge } from '../../adapters/messaging-tool-bridge';
 import { sitePattern } from '../../adapters/compat-mode';
 import { refreshBadge, type BadgeDeps } from '../../adapters/tool-badge';
 import { routeToolRequest } from '../../adapters/tool-router';
+import { ALLOWED_SITES_KEY } from '../../adapters/allowed-sites';
+import { siteIsAllowed } from './allowed-sites';
 import { parseMessage } from '../../protocol/validate';
-import { injectBridge } from './tool-routing';
-
-const TAB_DEPS = {
-  sendToTab: (tabId: number, message: object) =>
-    chrome.tabs.sendMessage(tabId, message, { frameId: 0 }),
-  inject: injectBridge,
-};
+import { TAB_DEPS } from './tool-routing';
 
 const lister = new MessagingToolBridge(
   (message) => routeToolRequest(message as Parameters<typeof routeToolRequest>[0], TAB_DEPS),
@@ -22,7 +18,10 @@ const lister = new MessagingToolBridge(
 );
 
 const DEPS: BadgeDeps = {
-  allowed: (origin) => chrome.permissions.contains({ origins: [sitePattern(origin)] }),
+  // Both: Chrome holds the host permission, and the user allowed the site (an endpoint's host is not one).
+  allowed: async (origin) =>
+    (await chrome.permissions.contains({ origins: [sitePattern(origin)] })) &&
+    (await siteIsAllowed(origin)),
   list: (tabId) => lister.list(tabId),
   set: (tabId, text) => chrome.action.setBadgeText({ tabId, text }),
 };
@@ -71,4 +70,9 @@ export function startBadge(): void {
   // Tabs that were open before the extension started or was updated.
   chrome.runtime.onInstalled.addListener(clearAll);
   chrome.runtime.onStartup.addListener(clearAll);
+  // The user allowed a site (or forgot one): the open tabs are read again at once, so the number
+  // does not wait for the next page load.
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && ALLOWED_SITES_KEY in changes) clearAll();
+  });
 }

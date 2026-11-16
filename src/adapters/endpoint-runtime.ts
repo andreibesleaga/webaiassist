@@ -4,7 +4,8 @@
 // no usable GPU. The conversation goes only to that address: redirects are refused (one
 // could carry the chat to another host, or from https to http). Plain HTTP is accepted only
 // on this computer (localhost, 127.0.0.1); anything else must be HTTPS, and an address with
-// a user name or password is refused. A reply is capped at 1 MB; connecting times out.
+// a user name or password is refused. A reply is capped at 1 MB; connecting times out after
+// 15 seconds, and a reply (or its headers) that sends nothing for 60 seconds is stopped.
 import type {
   ChatRequest,
   LoadProgress,
@@ -14,6 +15,9 @@ import type {
 } from '../core/ports/model-runtime';
 import type { CancelSignal } from '../core/types';
 import { asAbortSignal, toRuntimeMessages } from './chat-messages';
+import { IdleWatch, IDLE_MS, serviceMessage, sseEvents, type StreamEvent } from './endpoint-stream';
+
+export { MAX_REPLY_BYTES } from './endpoint-stream';
 
 export interface EndpointConfig {
   /** Base URL that ends before /chat/completions, for example http://localhost:11434/v1. */
@@ -30,9 +34,9 @@ export type FetchLike = (url: string, init: RequestInit) => Promise<Response>;
 /** Each has an optional host permission in the manifest (http://localhost/*, http://127.0.0.1/*). */
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1']);
 const TEMPERATURE = 0.2;
-export const MAX_REPLY_BYTES = 1024 * 1024;
 export const LOAD_TIMEOUT_MS = 15_000;
 const DEFAULT_CONTEXT_TOKENS = 8192;
+const IDLE_TEXT = `The endpoint sent nothing for ${IDLE_MS / 1000} seconds; the reply was stopped.`;
 
 /** The address is on this computer (localhost or 127.0.0.1, any port): the chat does not leave it. */
 export function isLocalEndpoint(url: string): boolean {
@@ -65,88 +69,6 @@ const timedOut = (signal: AbortSignal | null | undefined): boolean =>
 const errorText = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
 
-interface StreamEvent {
-  readonly content: string;
-  readonly usage?: ModelUsage;
-  /** The service's own error text, from an error event inside the stream. */
-  readonly failure?: string;
-}
-
-/** The parsed data: events of a chat-completions event stream (ended by [DONE]). */
-async function* sseEvents(body: ReadableStream<Uint8Array>): AsyncIterable<StreamEvent> {
-  const reader = body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-  let bytes = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) return;
-    bytes += value.byteLength;
-    if (bytes > MAX_REPLY_BYTES) {
-      await reader.cancel().catch(() => undefined);
-      throw new Error('The endpoint reply is larger than 1 MB; it was stopped.');
-    }
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() ?? '';
-    for (const line of lines) {
-      const event = readLine(line.trim());
-      if (event === null) return;
-      yield event;
-    }
-  }
-}
-
-const count = (value: unknown): number | undefined =>
-  typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
-
-/** The counts and the price of a `usage` object; undefined when it holds none of them. */
-function readUsage(value: unknown): ModelUsage | undefined {
-  const raw = (typeof value === 'object' && value !== null ? value : {}) as Record<string, unknown>;
-  const promptTokens = count(raw.prompt_tokens);
-  const completionTokens = count(raw.completion_tokens);
-  const costUsd = count(raw.cost);
-  const usage = {
-    ...(promptTokens === undefined ? {} : { promptTokens }),
-    ...(completionTokens === undefined ? {} : { completionTokens }),
-    ...(costUsd === undefined ? {} : { costUsd }),
-  };
-  return Object.keys(usage).length > 0 ? usage : undefined;
-}
-
-const NOTHING: StreamEvent = { content: '' };
-
-type Chunk = {
-  choices?: { delta?: { content?: unknown } }[];
-  usage?: unknown;
-  error?: { message?: unknown };
-};
-
-const textOf = (value: unknown): string => (typeof value === 'string' ? value : '');
-
-/** The event of one parsed chunk: its text, its usage, and its error message when it holds one. */
-function eventOf(raw: Chunk): StreamEvent {
-  const usage = readUsage(raw.usage);
-  const failure = raw.error === undefined ? undefined : textOf(raw.error.message) || 'error';
-  return {
-    content: textOf(raw.choices?.[0]?.delta?.content),
-    ...(usage ? { usage } : {}),
-    ...(failure === undefined ? {} : { failure }),
-  };
-}
-
-/** One line as an event; null at [DONE]; an empty event for anything else. */
-function readLine(line: string): StreamEvent | null {
-  if (!line.startsWith('data:')) return NOTHING;
-  const data = line.slice(5).trim();
-  if (data === '[DONE]') return null;
-  try {
-    return eventOf(JSON.parse(data) as Chunk);
-  } catch {
-    return NOTHING;
-  }
-}
-
 /** Ollama refuses origins it does not list, and lists no extension origin by default. */
 const FORBIDDEN_HINT =
   ' Ollama refuses extensions unless it is started with OLLAMA_ORIGINS=chrome-extension://*.';
@@ -162,18 +84,6 @@ export function scrubServiceText(text: string, apiKey: string | undefined): stri
   const hidden = apiKey && apiKey.length >= MIN_KEY_CHARS ? text.split(apiKey).join('[key]') : text;
   const clean = hidden.replace(TOKEN_LIKE, '[key]').replace(/\s+/g, ' ').trim();
   return clean.length > SERVICE_TEXT_CHARS ? `${clean.slice(0, SERVICE_TEXT_CHARS)}…` : clean;
-}
-
-/** The message of a JSON error body (`{"error":{"message":…}}`), read from at most 2 KB. */
-async function serviceMessage(response: Response): Promise<string | undefined> {
-  try {
-    const text = (await response.text()).slice(0, 2048);
-    const raw = JSON.parse(text) as { error?: { message?: unknown } | string };
-    const message = typeof raw.error === 'string' ? raw.error : raw.error?.message;
-    return typeof message === 'string' ? message : undefined;
-  } catch {
-    return undefined;
-  }
 }
 
 export class EndpointRuntime implements ModelRuntime {
@@ -203,13 +113,20 @@ export class EndpointRuntime implements ModelRuntime {
   async chat(request: ChatRequest): Promise<string> {
     if (!this.connected) throw new Error('The endpoint is not connected. Press Start first.');
     const signal = asAbortSignal(request.signal);
-    const response = await this.send('/chat/completions', {
-      method: 'POST',
-      body: JSON.stringify(this.body(request)),
-      ...(signal ? { signal } : {}),
-    });
-    if (!response.ok || !response.body) throw await this.refusal(response);
-    return this.read(response.body, request, signal);
+    const idle = new IdleWatch(IDLE_MS);
+    try {
+      const response = await this.send('/chat/completions', {
+        method: 'POST',
+        body: JSON.stringify(this.body(request)),
+        signal: signal ? AbortSignal.any([signal, idle.signal]) : idle.signal,
+      });
+      if (!response.ok || !response.body) throw await this.refusal(response);
+      return await this.read(response.body, request, signal, idle);
+    } catch (error) {
+      throw idle.fired ? new Error(IDLE_TEXT) : error;
+    } finally {
+      idle.stop();
+    }
   }
 
   unload(): Promise<void> {
@@ -243,13 +160,15 @@ export class EndpointRuntime implements ModelRuntime {
     body: ReadableStream<Uint8Array>,
     request: ChatRequest,
     signal: AbortSignal | undefined,
+    idle: IdleWatch,
   ): Promise<string> {
     const reply = { text: '', usage: undefined as ModelUsage | undefined };
     try {
-      for await (const event of sseEvents(body)) this.take(event, reply, request);
+      for await (const event of sseEvents(body, idle)) this.take(event, reply, request);
     } catch (error) {
       if (signal?.aborted !== true) throw error;
     }
+    if (idle.fired) throw new Error(IDLE_TEXT);
     if (reply.usage) request.onUsage?.(reply.usage);
     return reply.text;
   }

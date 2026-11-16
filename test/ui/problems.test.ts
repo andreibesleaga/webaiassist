@@ -40,4 +40,13 @@ describe('errorDetails', () => {
       'WebAIAssist 0.1.0\n'.length + 500,
     );
   });
+
+  it('removes web addresses and the API key from the message', () => {
+    const key = 'sk-or-v1-0123456789abcdef';
+    const error = new Error(`could not reach https://api.example.com/v1?api_key=${key}: ${key}`);
+    const copied = errorDetails('0.1.0', error, [key]);
+    expect(copied).not.toContain(key);
+    expect(copied).not.toContain('api.example.com');
+    expect(copied).toContain('[address]');
+  });
 });

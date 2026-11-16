@@ -10,11 +10,9 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 
 - [ ] **The default-model line.** The listing does not say which model starts first, because the
       final choice is made from the final runs (graphics card, processor, Chrome's built-in model).
-- [ ] **The graphics-card numbers.** The table "In the browser, on the graphics card" has only one
-      model measured (Qwen3 0.6B, before the tool-use change). Llama 3.2 3B lost the graphics device
-      on its first question. Qwen3.5 2B and Gemma 4 E2B have not run on a graphics card. Command:
-      `npm run eval:gpu -- --models qwen,llama,qwen35,gemma4` (from WSL: `npm run eval:gpu:win`).
-- [ ] **The built-in model re-run** after the last change: `npm run eval:nano`.
+- [x] **The graphics-card numbers.** Run of 15 to 16 Nov 2026 (table below).
+- [x] **The built-in model re-run** after the last change: run of 15 Nov 2026 (table below).
+- [ ] **The data-type answer** on the Privacy tab ("Website content", see Data usage below) is confirmed in the dashboard at submission.
 - [ ] **Placeholders**: `<STORE-LINK>`, `<PRIVACY-POLICY-URL>`, `<DEMO-NODE-URL>`.
 - [ ] **Screenshot 1** from a real run (see Images).
 
@@ -32,13 +30,13 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 
 **Description:**
 
-> WebAIAssist puts an AI inside your browser's side panel, with no server to install, and lets it use the tools a web page offers. Before any call runs, you see what it will do and press Allow once or Deny.
+> WebAIAssist puts an AI inside your browser's side panel, with no server to install, and lets it use the tools a web page offers. By default, before any call runs, you see what it will do and press Allow once or Deny.
 >
-> The AI runs on your computer: on the graphics card, on the processor, or as Chrome's own built-in one. What you type stays here, unless you set up a chat server yourself; then it goes to that address and nowhere else.
+> The AI runs on your computer: on the graphics card, on the processor, or as Chrome's own built-in one. What you type stays in this browser, except the arguments of a tool call you allow, which go to the page that offers the tool, and the chat when you set up a chat server.
 >
-> Sites can offer tools through WebMCP, a draft that lets a page describe what it can do, such as a search or a form. WebAIAssist lists them with what each does and whether it only reads. For each call you see the name, the site and the exact arguments.
+> Sites can offer tools through WebMCP, a draft that lets a page describe what it can do, such as a search or a form. WebAIAssist lists them with what the page says each does and whether it only reads. By default, for each call you see the name, the site and the exact arguments.
 >
-> It also reads what a site publishes about itself: llms.txt, a knowledge link set, robots.txt, security.txt and a few other files. The panel shows them. A site that asks for no AI input gets no text sent. For a node of the AgenticSystemCore project, a card shows its version and graph, and you can run read-only SPARQL queries over it.
+> It also reads what a site publishes about itself: llms.txt, a knowledge link set, robots.txt, security.txt and a few other files. The panel shows them. A site that asks for no AI input gets none of its page text or files sent. For a node of the AgenticSystemCore project, a card shows its version and graph, and you can run read-only SPARQL queries over it.
 >
 > Before you start:
 >
@@ -51,8 +49,8 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 >
 > Works with AgenticSystemCore, by the same author. Open source, Apache-2.0: <https://github.com/andreibesleaga/webaiassist>
 
-**Word counts of the description.** 293 words. After function words are left out, the most used
-words are: site 5, tools 3, WebMCP 3, AI 3, Chrome 3, WebAIAssist 3, server 2, panel 2. The word
+**Word counts of the description.** 318 words. After function words are left out, the most used
+words are: page 5, site 5, tools 3, call 3, WebMCP 3, AI 3, WebAIAssist 3, allow 3. The word
 "model" is used once ("models" once more; it was used 11 times in the earlier text). The test
 `test/security-review/docs-review.test.ts` fails when any word is used more than five times.
 
@@ -66,16 +64,20 @@ called. Small models miss the right tool; the tables say how often.
 
 ### In the browser, on the graphics card
 
-Hardware: Windows 10 (build 10.0.26300), AMD gcn-5 laptop GPU, Chromium 156.0.8078.4 (run of
-14 Nov 2026, `docs/eval/EVAL-2026-11-14-156.0.8078.4.json`). This run is from before the tool-use
-change. Command: `npm run eval:gpu`.
+Hardware: Windows 10 (build 10.0.26300), AMD gcn-5 laptop GPU, Chromium 156.0.8078.4. Run of the
+night of 15 to 16 Nov 2026, after the tool-use change, 10 questions per node, one browser per model
+(`docs/eval/EVAL-2026-11-16-156.0.8078.4.json`; [EVAL.md](EVAL.md) says why). Command:
+`npm run eval:gpu -- --models qwen,llama,qwen35,gemma4 --prompts 10`.
 
-| Model        | Test node: whole sequence right                               | Live node: whole sequence right   | Median answer, test node / live node | Median first token, test node / live node |
-| ------------ | ------------------------------------------------------------- | --------------------------------- | ------------------------------------ | ----------------------------------------- |
-| Qwen3 0.6B   | 2 of 5                                                        | 0 of 5                            | 17.5 s / 38.9 s                      | 8.8 s / 21.7 s                            |
-| Llama 3.2 3B | Lost the graphics device on its first question; 5 errors of 5 | Same                              | not measured                         | not measured                              |
-| Qwen3.5 2B   | to be filled after the final runs                             | to be filled after the final runs | to be filled after the final runs    | to be filled after the final runs         |
-| Gemma 4 E2B  | to be filled after the final runs                             | to be filled after the final runs | to be filled after the final runs    | to be filled after the final runs         |
+| Model        | Test node: whole sequence right                                              | Live node: whole sequence right | Median answer, test node / live node | Median first token, test node / live node |
+| ------------ | ---------------------------------------------------------------------------- | ------------------------------- | ------------------------------------ | ----------------------------------------- |
+| Qwen3 0.6B   | 8 of 10 (a tool used: 10 of 10)                                              | 2 of 10 (a tool used: 9 of 10)  | 25.7 s / 59.6 s                      | 19.4 s / 26.9 s                           |
+| Qwen3.5 2B   | 6 of 10 (3 over the time limit)                                              | not measured                    | 155.0 s / not measured               | 138.7 s / not measured                    |
+| Llama 3.2 3B | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
+| Gemma 4 E2B  | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
+
+"Not measured" on the live node: the browser of that run could no longer open the page after the
+test-node questions.
 
 ### In the browser, on the processor and memory
 
@@ -95,21 +97,22 @@ The reply speed is the median of the speeds llama.cpp reported over all steps of
 ### Chrome's built-in model
 
 Hardware: Windows 10 (build 10.0.26300), real Google Chrome 157.0.8103.52; the report does not
-record the processor, graphics card or memory. Report:
-`docs/eval/EVAL-NANO-2026-11-14-157.0.8103.52.json`. Command: `npm run eval:nano` (from WSL:
+record the processor, graphics card or memory. Run of 15 Nov 2026, after the tool-use change:
+`docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json`. Command: `npm run eval:nano` (from WSL:
 `npm run eval:nano:win`).
 
 | Node      | A tool used | Whole sequence right | Fact in the answer | Answer time                   |
 | --------- | ----------- | -------------------- | ------------------ | ----------------------------- |
-| Test node | 5 of 5      | 4 of 5               | 5 of 5             | 15.3 to 31.3 s, median 17.9 s |
-| Live node | 1 of 5      | 1 of 5               | not scored         | 17.2 to 42.0 s, median 21.8 s |
+| Test node | 5 of 5      | 4 of 5               | 3 of 5             | 17.8 to 36.0 s, median 19.0 s |
+| Live node | 5 of 5      | 4 of 5               | not scored         | 24.2 to 36.3 s, median 30.6 s |
 
-Start took 14.4 s the first time in the run and 3.1 s the second time; the first download from the
-click took 300 s ([EVAL.md](EVAL.md)).
+Start took 14 s the first time in the run and 3.1 s the second time; the first download from the
+click took 300 s in the run of 14 Nov ([EVAL.md](EVAL.md)).
 
-Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows): the
-model used a tool in 5 of 5 questions on the test node and in 1 of 5 on the live node, and an answer
-took 15 to 42 s. It stays optional.
+Chrome's built-in model test: measured on a real computer on 15 Nov 2026 (Chrome 157, Windows): the
+model used a tool in 5 of 5 questions on the test node and in 5 of 5 on the live node, the whole
+expected sequence in 4 of 5 on each,
+and an answer took 18 to 36 s. It stays optional.
 
 ### Your own server, or a remote service (chat endpoint)
 
@@ -165,19 +168,19 @@ ones from a real run.
 | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sidePanel`                                                                      | The chat is shown in the browser side panel.                                                                                                                                                                                                                                                                                                                                                                                  |
 | `offscreen`                                                                      | One hidden extension page starts a Worker that runs the local AI model (with WebGPU, or on the processor with WebAssembly), so the model keeps running when the panel closes (reason `WORKERS`).                                                                                                                                                                                                                              |
-| `storage`                                                                        | Keeps the Options in `chrome.storage.local`, and the sites the user allowed in this browser session in `chrome.storage.session`.                                                                                                                                                                                                                                                                                              |
+| `storage`                                                                        | Keeps the Options and the list of sites the user allowed in `chrome.storage.local`, and the sites allowed in this browser session in `chrome.storage.session`.                                                                                                                                                                                                                                                                |
 | `activeTab`                                                                      | After the user clicks the toolbar button, the extension reads the open tab's WebMCP tools, or its text when the user presses "Read this page".                                                                                                                                                                                                                                                                                |
 | `scripting`                                                                      | Adds the two small scripts that list and call the page's WebMCP tools, reads the page text on request, and registers the polyfill in compat mode; and, for a site the user allowed, reads that site's own public files (`llms.txt`, `robots.txt`, `security.txt` and a few well-known files) with a plain same-origin GET and no cookies, and the page's own title and structured data. No new permission is needed for this. |
-| Optional host access (`https://*/*`, `http://localhost/*`, `http://127.0.0.1/*`) | Never granted at install. Asked for one site when the user presses Allow in the side panel for that site, turns on compat mode for it, or saves a chat endpoint address (for example Ollama on localhost).                                                                                                                                                                                                                    |
+| Optional host access (`https://*/*`, `http://localhost/*`, `http://127.0.0.1/*`) | Never granted at install. Asked for one site when the user presses Allow in the side panel for that site, turns on compat mode for it, or saves a chat endpoint address (for example Ollama on localhost); the endpoint's host is used for the chat only.                                                                                                                                                                     |
 
 **Remote code:** No, I am not using remote code. The JavaScript and the WebAssembly model
 libraries are all inside the package. The extension downloads model weights (data files) from
 huggingface.co; they are not code.
 
-**Data usage:** the extension collects none of the listed data types. Page content and chat are
-handled on the user's computer and are not sent to the developer or any third party. When the
-user sets a chat endpoint, the conversation goes only to the address the user entered.
-Tick all three certifications (no sale of data, no use unrelated to the single purpose, no use
+**Data usage:** declare "Website content": the page text the user asks it to read and the results of
+the tools the user allows go to the model the user chose. That model is in the browser or in Chrome
+unless the user sets up a remote chat endpoint; then they go to the address the user entered. They are
+not sent to the developer. Tick all three certifications (no sale of data, no use unrelated to the single purpose, no use
 for creditworthiness or lending).
 
 **Website content (disclosure):** the extension reads the open page's WebMCP tools, a short list of

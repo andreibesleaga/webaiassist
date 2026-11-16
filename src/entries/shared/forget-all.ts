@@ -8,6 +8,8 @@ import { forgetAllSites } from '../../adapters/forget-site';
 import { openIndexedDbMemory } from '../../adapters/indexeddb-memory';
 import { SessionSiteGrants } from '../../adapters/session-site-grants';
 import { loadSettings } from '../../adapters/settings';
+import { savePanelState } from '../../adapters/stored-panel-state';
+import { allowedSites } from './allowed-sites';
 import { withActivity } from '../../adapters/forget-activity';
 import { lazyActivityLog } from './activity-log';
 import { endpointAccess } from '../../ui/options-form';
@@ -42,6 +44,11 @@ export async function forgetAll(): Promise<void> {
       lazyActivityLog,
     ),
     grants: new SessionSiteGrants(chrome.storage.session),
+    allowed: allowedSites,
+    endpointHosts: {
+      clear: () =>
+        savePanelState(chrome.storage.local, { endpointHosts: [] }).then(() => undefined),
+    },
     compat: {
       unregisterAll,
       grantedOrigins,

@@ -2,24 +2,15 @@
 // The ChatUI port in the side panel: the transcript, the streamed draft, the download
 // progress and the two questions (run this tool? use this site's tools?).
 import type { TranscriptEntry } from '../core/export';
-import { needsConfirmation } from '../core/gate';
 import type { ChatUI, LoopEvent, ToolCallApproval } from '../core/ports/chat-ui';
 import type { LoadProgress } from '../core/ports/model-runtime';
-import { revealInvisible } from '../core/sanitize';
 import type { SiteRequest } from '../core/site-consent';
 import type { ToolInfo } from '../core/types';
-import { ConfirmDialog, type Question } from './confirm-dialog';
-import { formLines, needsSecondQuestion, reviewLines } from './confirm-parts';
+import { ConfirmDialog } from './confirm-dialog';
+import { againQuestion, needsSecondQuestion, toolQuestion } from './confirm-parts';
 import { byId, element } from './dom';
 import { t } from './i18n';
-import { sign } from './marks';
 import { renderEntry } from './transcript-view';
-
-/** "Read-only" only when the gate also treats the tool as read-only. */
-function hintText(tool: ToolInfo): string {
-  if (!needsConfirmation(tool)) return t('confirmReadOnly');
-  return tool.annotations?.readOnlyHint === true ? t('confirmConsequential') : t('confirmChanges');
-}
 
 export class PanelUI implements ChatUI {
   readonly entries: TranscriptEntry[] = [];
@@ -70,50 +61,15 @@ export class PanelUI implements ChatUI {
   async confirmToolCall(request: ToolCallApproval): Promise<boolean> {
     this.pending = request.tool.name;
     try {
-      if (!(await this.dialog.ask(this.firstQuestion(request)))) return false;
+      if (!(await this.dialog.ask(toolQuestion(this.doc, request)))) return false;
       if (needsSecondQuestion(request.tool)) {
-        if (!(await this.dialog.ask(this.secondQuestion(request.tool)))) return false;
+        if (!(await this.dialog.ask(againQuestion(this.doc, request.tool)))) return false;
       }
       this.noteForm(request.tool);
       return true;
     } finally {
       this.pending = undefined;
     }
-  }
-
-  private firstQuestion(request: ToolCallApproval): Question {
-    const doc = this.doc;
-    const json = revealInvisible(JSON.stringify(request.args, null, 2));
-    const hint = element(doc, 'p', hintText(request.tool));
-    if (needsConfirmation(request.tool)) {
-      hint.classList.add('warning');
-      hint.prepend(sign(doc));
-    }
-    return {
-      title: t('confirmTitle', { name: revealInvisible(request.tool.name) }),
-      body: [
-        element(doc, 'p', t('confirmSite', { origin: revealInvisible(request.origin) })),
-        ...reviewLines(doc, request.tool),
-        hint,
-        ...formLines(doc, request.tool),
-        element(doc, 'p', t('confirmArgs')),
-        element(doc, 'pre', json),
-      ],
-      allowLabel: t('allowOnce'),
-      denyLabel: t('deny'),
-    };
-  }
-
-  /** Asked after the first Allow for a tool the page marks as consequential. */
-  private secondQuestion(tool: ToolInfo): Question {
-    const warning = element(this.doc, 'p', t('againBody'), 'warning');
-    warning.prepend(sign(this.doc));
-    return {
-      title: t('againTitle', { name: revealInvisible(tool.name) }),
-      body: [warning],
-      allowLabel: t('againAllow'),
-      denyLabel: t('deny'),
-    };
   }
 
   /** A form tool without autosubmit: say in the transcript that the page waits for Submit. */

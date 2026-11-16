@@ -12,6 +12,13 @@ import { toolDetail, type RunByHand } from './tool-detail';
 /** What a redraw must not lose: the rows that are open, and the text typed in their boxes. */
 export type OpenRows = ReadonlyMap<string, string | undefined>;
 
+/** The reason in words, for the mark's tooltip and the line under the tool. */
+const NOT_OFFERED = {
+  marker: 'toolNotOfferedMarker',
+  'schema-size': 'toolNotOfferedSize',
+  'list-cap': 'toolNotOfferedCap',
+} as const;
+
 function mark(doc: Document, key: Parameters<typeof t>[0], className: string, title?: string) {
   const node = element(doc, 'span', t(key), `mark ${className}`);
   if (title !== undefined) node.title = title;
@@ -32,6 +39,8 @@ function extraMarks(doc: Document, row: ToolRow): HTMLElement[] {
   if (row.reserved) marks.push(mark(doc, 'toolReserved', 'reserved'));
   if (row.forDevelopers)
     marks.push(mark(doc, 'toolForDevelopers', 'developers', t('toolForDevelopersTitle')));
+  if (row.notOffered)
+    marks.push(mark(doc, 'toolNotOffered', 'not-offered', t(NOT_OFFERED[row.notOffered])));
   if (row.source.form) marks.push(mark(doc, 'toolForm', 'form', t('toolFormTitle')));
   if (row.flags.length > 0) marks.push(mark(doc, 'toolCheck', 'check', t('toolCheckTitle')));
   return marks;
@@ -48,7 +57,9 @@ function nameButton(doc: Document, row: ToolRow): HTMLButtonElement {
 }
 
 function flagLines(doc: Document, row: ToolRow): HTMLElement[] {
-  return row.flags.map((flag) => element(doc, 'span', flagReason(flag), 'why'));
+  const lines = row.flags.map((flag) => element(doc, 'span', flagReason(flag), 'why'));
+  if (row.notOffered) lines.push(element(doc, 'span', t(NOT_OFFERED[row.notOffered]), 'why'));
+  return lines;
 }
 
 export function toolItem(

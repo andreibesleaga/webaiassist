@@ -6,6 +6,13 @@ export const PARITY_EN = {
   toolCheck: 'check',
   toolCheckTitle: 'The review of the tool found something to look at. Open the tool to read why.',
   toolForDevelopers: 'for developers',
+  toolNotOffered: 'not offered to the model',
+  toolNotOfferedMarker:
+    'Not offered to the model: its name, its description or a value of its fields holds text that could pass for the assistant’s own markers, or hidden characters. You can still run it by hand.',
+  toolNotOfferedSize:
+    'Not offered to the model: its field description is over 8,000 characters. You can still run it by hand.',
+  toolNotOfferedCap:
+    'Not offered to the model: the tools before it already fill the 24,000 characters the model is given. You can still run it by hand.',
   toolForDevelopersTitle:
     'The page marks this tool for developers. The assistant is not offered it; you can still run it by hand.',
   toolForm: 'form',

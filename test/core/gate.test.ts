@@ -46,6 +46,17 @@ describe('sameTool', () => {
     expect(sameTool(a, b)).toBe(true);
   });
 
+  it('is false when the title or the form promise changed', () => {
+    const a = { ...tool('propose'), title: 'Send' };
+    expect(sameTool(a, { ...a, title: 'Send now' })).toBe(false);
+    const form = { ...a, form: { autosubmit: false, sensitive: [] } };
+    expect(sameTool(form, { ...form, form: { autosubmit: true, sensitive: [] } })).toBe(false);
+    expect(sameTool(form, { ...form, form: { autosubmit: false, sensitive: ['password'] } })).toBe(
+      false,
+    );
+    expect(sameTool(form, { ...form })).toBe(true);
+  });
+
   it('is false when the tool is gone', () => {
     expect(sameTool(tool('read'), undefined)).toBe(false);
   });

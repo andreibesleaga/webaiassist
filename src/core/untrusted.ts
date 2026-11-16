@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Tool results are data from the page. They are fenced so the model can tell them from
-// instructions, capped in length, and cleaned (sanitize.ts): every `<` is escaped, so the
-// text cannot close the fence early or write the model's own turn markers.
+// instructions, capped in length, and cleaned (sanitize.ts): every turn-marker shape (`</`,
+// `<|`, `|>`, template tags, bracket markers) is broken, so the text cannot close the fence
+// early or write the model's own turn markers.
 import { cleanPageText, quoteName } from './sanitize';
 
 export const RESULT_CAP = 4000;

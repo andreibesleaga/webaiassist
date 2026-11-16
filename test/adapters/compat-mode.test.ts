@@ -18,6 +18,10 @@ class FakeCompat implements CompatDeps {
     this.log.push(`request ${origins.join(',')}`);
     return Promise.resolve(this.grant);
   }
+  allow(origin: string): Promise<void> {
+    void origin;
+    return Promise.resolve();
+  }
   isRegistered(id: string): Promise<boolean> {
     this.log.push(`check ${id}`);
     return Promise.resolve(this.existing.includes(id));
@@ -121,6 +125,7 @@ describe('compat mode', () => {
 
 describe('compat mode: one exact site per grant', () => {
   const deps = () => ({
+    allow: () => Promise.resolve(),
     request: () => Promise.resolve(true),
     register: () => Promise.resolve(),
     isRegistered: () => Promise.resolve(false),

@@ -10,6 +10,14 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 
 ### Added
 
+- **A page that registers its tools late**: when the first list of a page is empty, the panel lists it again
+  after one and after three seconds; the toolbar number is read again as soon as you allow or forget a site.
+  Before, both could stay at "no tools" until the page changed something (seen on the first case of the
+  conformance page in Chrome 157).
+- **Build checks in the release gate**: `npm run test:dist` runs the checks of the built package and the
+  privacy host scan after the build and the zip, and fails when the build is missing, so CI no longer skips them.
+- **Release workflow in two jobs**: the build runs with read access only; the job that creates the release runs
+  no installed code and attests the zip's build provenance (`gh attestation verify`).
 - **Locale file**: the build writes `_locales/en/messages.json` from the typed English dictionary, and the
   description and the toolbar button title in the manifest come from it (`default_locale: en`), so another
   language is one more dictionary and one more folder.
@@ -170,6 +178,28 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   question "Use the tools of this site?" is now asked when a tool is first about to be used, not
   before a question that needs no tool. The evaluation scores "First tool right" and "Tool used"
   beside "Tool right".
+- **Activity log keeps less**: with "Include content" off, a failed tool call is stored as failed, without its
+  error text; argument names are always stored, argument values only with "Include content".
+- **Sites you allowed are a list**: kept in `chrome.storage.local`, apart from Chrome's host access. Saving a
+  chat endpoint gives access to that host for the chat only; the toolbar number, the automatic tool listing and
+  the nine file reads happen only on allowed sites. Forget this site and Forget all sites remove sites from the list.
+- **Forget all sites and Reset** also clear the list of remote endpoint hosts you agreed to; Reset also removes the
+  endpoint's host access.
+- **Forget this site**: the panel neither lists nor calls that site's tools until you allow it again, even in tabs
+  already open.
+- **Run again** in the Activity view asks the same question as the side panel (full arguments, hidden characters
+  shown, review findings, hints, form lines, a second question for a consequential tool) and runs only when the site
+  is allowed in this session; never with redacted or removed arguments.
+- **Tools not offered to the model are listed**: a tool with text that could pass for the assistant's own markers,
+  hidden characters, or a field schema over 8,000 characters is listed with the reason and can be run by hand; the
+  tool list given to the model is capped at 24,000 characters, and tools beyond it are listed as not offered.
+- **"Tool unchanged" check** also compares the tool's title and form flags.
+- **Chat endpoint limits**: 15 seconds for the first connection, a reply stops after 60 seconds without data, and an
+  error body is read only up to 2 KB.
+- **Copy details** removes web addresses and the API key from the error text.
+- **CSV export** puts an apostrophe before a cell that starts with `=`, `+`, `-`, `@`, a tab, a carriage return or a
+  line feed.
+- **Minimum Chrome version is 126** (compat mode's polyfill uses `URL.parse`).
 
 ### Security
 
@@ -190,8 +220,8 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   and SHA-256 before they load.
 - Export escapes Markdown, so no remote image loads from the file.
 - "Use on this tab anyway" does not hold once a remote endpoint is started.
-- Results of a site's own tools still reach the model when the site asks for no AI input; the panel
-  and `docs/PRIVACY.md` say so.
+- The tool list and the results of a site's own tools still reach the model when the site asks for no AI input
+  (its page text and files do not); the panel and `docs/PRIVACY.md` say so.
 
 ### Known limits
 
@@ -200,7 +230,7 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
   smaller prefill chunk); Llama 3.2 3B lost the GPU device on its first question there (the chunk
   is now per model, not yet measured), and Qwen3.5 2B and Gemma 4 E2B are not run on a graphics card yet.
 - The 0.6B processor model called no tool in the first measured run; the 1.7B model did, at 47 to
-  116 seconds a question; Qwen3.5 2B called a tool first in four of five, at 153 to 256 seconds a question.
+  116 seconds a question; Qwen3.5 2B, in its first run, called the expected tool first in four of five, at 153 to 256 seconds a question.
 - WebMCP is a draft standard.
 
 [0.1.0]: https://github.com/andreibesleaga/webaiassist/releases/tag/v0.1.0

@@ -8,10 +8,12 @@
 // WebGPU probe (here or in the offscreen document, which it opens), routes tool requests
 // of the panel to the page scripts (shared/tool-routing.ts), and is the fallback model
 // host when the offscreen document has no WebGPU.
+import { httpOrigin } from '../adapters/allowed-sites';
 import { onActionClick, type ActionDeps } from '../adapters/action-click';
 import { probeWebGpu } from '../adapters/webgpu-probe';
 import type { GpuProbeRequest, GpuProbeResult } from '../protocol/messages';
 import { parseMessage } from '../protocol/validate';
+import { allowedSites } from './shared/allowed-sites';
 import { startBadge } from './shared/badge-wiring';
 import { hostModels } from './shared/model-hosting';
 import { fromExtensionPage } from './shared/sender';
@@ -28,6 +30,10 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch((erro
 const ACTION_DEPS: ActionDeps = {
   openPanel: (windowId) => chrome.sidePanel.open({ windowId }),
   inject: injectBridge,
+  allow: async (url) => {
+    const origin = httpOrigin(url);
+    if (origin !== undefined) await allowedSites.add(origin);
+  },
   notifyPanel: () => chrome.runtime.sendMessage({ type: 'tools/changed' }),
   warn: (text, error) => console.warn(text, error),
 };

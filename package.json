@@ -42,7 +42,8 @@
     "icons": "node scripts/make-icons.mjs",
     "promo": "node scripts/make-promo.mjs",
     "check:zip": "node scripts/check-zip.mjs",
-    "verify:release": "npm run verify && npm run build && npm run zip && npm run check:zip && npm run test:smoke && npm run test:bdd"
+    "test:dist": "WEBAIASSIST_REQUIRE_DIST=1 vitest run test/security-review/dist-review.test.ts test/security-review/docs-review.test.ts",
+    "verify:release": "npm run verify && npm run build && npm run zip && npm run check:zip && npm run test:dist && npm run test:smoke && npm run test:bdd"
   },
   "dependencies": {
     "@cfworker/json-schema": "4.1.1",

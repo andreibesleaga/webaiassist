@@ -10,3 +10,4 @@ playwright-report/
 vendor/
 *.zip
 .features-gen/
+.claude/

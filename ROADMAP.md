@@ -12,8 +12,6 @@ here may never be built. What a release contains is in [CHANGELOG.md](CHANGELOG.
 
 ## The panel
 
-- Run a tool by hand through the same confirmation.
-- A local call log you can clear and export.
 - Tools of frames on the same site.
 - A live meter of how much of the model's context is used.
 - A chat in a full tab.
@@ -31,8 +29,8 @@ here may never be built. What a release contains is in [CHANGELOG.md](CHANGELOG.
 
 ## Not planned
 
-- Web search, tools across tabs, frames of other sites, access to all sites at once, saved replays
-  of calls, voice, a 3D graph. A bridge that lets other programs use the panel's tools: maybe later,
+- Web search, tools across tabs, frames of other sites, access to all sites at once, saved
+  recordings of a whole chat to play back, voice, a 3D graph. A bridge that lets other programs use the panel's tools: maybe later,
   maybe never.
 
 To suggest something, open an issue or a discussion: see [SUPPORT.md](SUPPORT.md).

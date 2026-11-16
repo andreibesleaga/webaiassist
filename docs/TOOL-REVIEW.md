@@ -25,7 +25,7 @@ report), `test/ui/panel-tool-marks.test.ts`, `test/ui/panel-confirm-review.test.
 | `link`                   | Web addresses, markdown links, `data:` and `javascript:` addresses.                                                                             | A description is not a place for links.                  |
 | `encoded`                | Long base64 or hex runs, percent, `\u` and numeric-entity escapes, decoder calls.                                                               | Text the reviewer cannot read.                           |
 | `read-only-contradicted` | A tool marked read-only whose name or title has a verb that changes something (`delete`, `send`, `pay` ...) or whose fields are secrets.        | The mark lowers the questions asked; it must be true.    |
-| `oversized`              | A description over 2,000 characters, a name over 64, a field schema over 8,000.                                                                 | Room to hide instructions.                               |
+| `oversized`              | A description over 2,000 characters, a name over 64, a field schema over 8,000 (that tool is also not offered to the model).                    | Room to hide instructions.                               |
 | `changed`                | A tool whose name, description, fields or hints differ from the first definition this panel saw on that site.                                   | A page that behaves well first and swaps the tool later. |
 
 The review is bounded in time and size: each text is cut at 12,000 characters, at most 300 texts are
@@ -35,8 +35,9 @@ read, and the field schema is read to a depth of 8.
 
 - The tools list and the detail view mark the tool **check** and give each reason in plain words.
 - The question before a call starts with "Look twice before you allow" and the reasons.
-- `mustAsk`: the tool is asked about even with "ask only for tools that change something", and a tool that
-  changed after it was listed is refused (it was already so).
+- `mustAsk`: the tool is asked about even with "Ask once per site per session for read-only tools", and a tool that
+  changed after it was listed is refused. The check compares name, title, description, fields, hints and
+  form flags.
 - The review is written by WebAIAssist into the tool (`review`); a page cannot send one: it is removed from
   every tool the page lists.
 - The developer report ("Copy report") lists every finding in its "Security review flags" section.
@@ -51,6 +52,22 @@ Other tool facts that belong with the review:
   password, payment and personal fields.
 - A tool of a same-origin frame is neither listed nor run, and cannot shadow a tool of the top window.
 
+## Tools not offered to the model
+
+A tool is listed on the card as "not offered to the model", with the reason, and can still be run by hand,
+when:
+
+- its name, its description, a field name or a value the model must copy exactly (`enum`, `const`, `default`, examples)
+  has text that could pass for the assistant's own markers, or hidden characters. Descriptions and
+  titles inside the field schema are cleaned like any page text instead, so example markup such as
+  `</svg>` does not stop a tool, and an emoji with its presentation character (🌶️) is not a
+  hidden character;
+- its field schema is over 8,000 characters;
+- the whole tool list given to the model would pass 24,000 characters (tools beyond the cap).
+
+The caps bound what a page can make each request cost (OWASP LLM10, unbounded consumption). Proof:
+`test/core/tool-offer-cap.test.ts`, `test/ui/panel-not-offered.test.ts`.
+
 ## Comparison with OWASP
 
 Read on 14 Nov 2026 (see [SOURCES.md](SOURCES.md), section 24). The reviews cover what a browser extension
@@ -59,13 +76,14 @@ identity and are not in the reach of this extension.
 
 OWASP Top 10 for LLM Applications 2025 ([genai.owasp.org/llm-top-10](https://genai.owasp.org/llm-top-10/)):
 
-| OWASP item                               | What WebAIAssist does                                                                                                                          | Gap                                                                           |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| LLM01 Prompt Injection                   | Rules `instructions`, `hidden-characters`, `encoded`, `names-other-tool`; all page text is fenced as untrusted data; turn markers are refused. | The rules catch known shapes; a calm, honest-looking instruction is not seen. |
-| LLM03 Supply Chain                       | `changed` flags a tool that is not the one first seen; `look-alike` flags imitation.                                                           | A first definition that is already hostile is judged by the rules only.       |
-| LLM05 Improper Output Handling           | Results are shown as text, never as HTML; the model's call is checked against the tool's own fields before it is asked.                        | Results of tools are not reviewed for instructions.                           |
-| LLM06 Excessive Agency                   | Only the open page's own tools; every call confirmed; `consequentialHint` asked twice; flagged tools always asked; no new permission.          | The page decides what its tool does; the extension cannot see inside it.      |
-| LLM02, LLM04, LLM07, LLM08, LLM09, LLM10 | Not in scope of a tool review (no training, retrieval or hidden prompt of the page; the step limit bounds consumption).                        | A flood of 150 tools is listed, not flagged.                                  |
+| OWASP item                        | What WebAIAssist does                                                                                                                          | Gap                                                                           |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| LLM01 Prompt Injection            | Rules `instructions`, `hidden-characters`, `encoded`, `names-other-tool`; all page text is fenced as untrusted data; turn markers are refused. | The rules catch known shapes; a calm, honest-looking instruction is not seen. |
+| LLM03 Supply Chain                | `changed` flags a tool that is not the one first seen; `look-alike` flags imitation.                                                           | A first definition that is already hostile is judged by the rules only.       |
+| LLM05 Improper Output Handling    | Results are shown as text, never as HTML; the model's call is checked against the tool's own fields before it is asked.                        | Results of tools are not reviewed for instructions.                           |
+| LLM06 Excessive Agency            | Only the open page's own tools; every call confirmed; `consequentialHint` asked twice; flagged tools always asked; no new permission.          | The page decides what its tool does; the extension cannot see inside it.      |
+| LLM10 Unbounded Consumption       | A tool with a field schema over 8,000 characters is not offered to the model; the tool list given to it is capped at 24,000 characters.        | The caps bound the tool list only; the step limit bounds the rest.            |
+| LLM02, LLM04, LLM07, LLM08, LLM09 | Not in scope of a tool review (no training, retrieval or hidden prompt of the page).                                                           | A flood of 150 tools is listed, not flagged.                                  |
 
 OWASP Top 10 for Agentic Applications 2026 (published 9 Dec 2025,
 [genai.owasp.org](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/)):
@@ -87,17 +105,17 @@ actions without hints, read-only claims contradicted by the source code, declara
 business fields, untrusted content, `exposedTo` lists and frames, text beyond Chrome's budgets, and changes in
 registered contracts. The individual rule texts were not read.
 
-| Explorer topic                              | In WebAIAssist                                                                                         |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Prompt-injection indicators                 | `instructions`, `names-other-tool`, `link`, `encoded`.                                                 |
-| Hidden or look-alike characters             | `hidden-characters`, `look-alike`; a tool whose name or fields carry them is dropped (`listableTool`). |
-| Consequential actions without hints         | A tool with no `readOnlyHint` counts as one that changes something and is asked about; no flag.        |
-| Read-only claims contradicted by the source | `read-only-contradicted` reads the name, title and field names only, not the page's code.              |
-| Declarative forms that submit hidden fields | Not checked; forms say they wait for Submit and warn about sensitive fields.                           |
-| Untrusted content                           | `untrustedContentHint` is shown as "page content"; all results are fenced as untrusted.                |
-| `exposedTo` lists and frames                | Frames: tools of another window than the page's own are neither listed nor run.                        |
-| Text beyond Chrome's budgets                | `oversized`.                                                                                           |
-| Changes in registered contracts             | `changed`.                                                                                             |
+| Explorer topic                              | In WebAIAssist                                                                                      |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Prompt-injection indicators                 | `instructions`, `names-other-tool`, `link`, `encoded`.                                              |
+| Hidden or look-alike characters             | `hidden-characters`, `look-alike`; a tool whose name or fields carry them is listed as not offered. |
+| Consequential actions without hints         | A tool with no `readOnlyHint` counts as one that changes something and is asked about; no flag.     |
+| Read-only claims contradicted by the source | `read-only-contradicted` reads the name, title and field names only, not the page's code.           |
+| Declarative forms that submit hidden fields | Not checked; forms say they wait for Submit and warn about sensitive fields.                        |
+| Untrusted content                           | `untrustedContentHint` is shown as "page content"; all results are fenced as untrusted.             |
+| `exposedTo` lists and frames                | Frames: tools of another window than the page's own are neither listed nor run.                     |
+| Text beyond Chrome's budgets                | `oversized`.                                                                                        |
+| Changes in registered contracts             | `changed`.                                                                                          |
 
 ## Gaps (stated plainly)
 
@@ -107,8 +125,8 @@ registered contracts. The individual rule texts were not read.
   is harmless (the conformance page has two such tools; they are asked about).
 - There is no check of meaning: an honest-looking description that lies is not seen.
 - A flood (150 tools) is listed, not flagged.
-- A tool with a turn marker or a hidden character in its **name or fields** is dropped by `listableTool`:
-  it is neither listed nor marked.
+- A tool with a turn marker or a hidden character in its **name or fields** is listed as "not offered to the
+  model" with the reason; it is not sent to the model and can be run by hand.
 - The model still sees the description of a flagged tool. Withholding the description of a tool flagged
   `instructions` from the model was not built (suggestion).
 - Results of tools are not reviewed here; they are fenced as untrusted data.

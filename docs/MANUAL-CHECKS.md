@@ -21,7 +21,7 @@ Note the Chrome version, the operating system and the result of each check in th
 
 ## `@gpu`: the graphics card model answers (F02.7)
 
-Needs: Chrome 124 or newer with WebGPU (`chrome://gpu` shows "WebGPU: Hardware accelerated").
+Needs: Chrome 126 or newer with WebGPU (`chrome://gpu` shows "WebGPU: Hardware accelerated").
 
 1. Open any page that offers WebMCP tools (the AgenticSystemCore node page, or a local page that
    calls `document.modelContext.registerTool`). Click the toolbar button, press **Allow**.

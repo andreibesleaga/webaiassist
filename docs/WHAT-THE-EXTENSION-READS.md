@@ -59,7 +59,7 @@ The exact paths, size limits and code are in [STANDARDS.md](STANDARDS.md) and
 | You set a remote chat endpoint              | Your questions, the page's tool list, tool results and any page text you read go to that host, and your API key as a header. The panel asks first, once per host. The service may charge for it and keeps what it receives under its own terms. |
 | A tool you allowed runs                     | Whatever the page's own tool code sends. The extension passes the arguments you saw.                                                                                                                                                            |
 | You tick another node in the graph explorer | Up to three published files are read from that node (an `https` site with a public name).                                                                                                                                                       |
-| A site says `ai-input=no`                   | Nothing of the site's text goes to the model. A site that asks for no AI input is never offered to a remote endpoint.                                                                                                                           |
+| A site says `ai-input=no`                   | Nothing of the site's page text or files goes to the model. Its tool list and the results of its tools you allow still go to the model you chose, including a remote endpoint.                                                                  |
 
 Results of a site's own tools still go to the model you chose, because you asked for the call.
 The full list of hosts and every stored item is in [PRIVACY.md](PRIVACY.md).

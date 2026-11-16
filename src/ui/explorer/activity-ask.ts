@@ -8,6 +8,8 @@ export interface Asking {
   readonly text: string;
   readonly yes: string;
   readonly no: string;
+  /** More lines under the text (built with textContent by the caller), e.g. the full arguments. */
+  readonly body?: readonly Node[];
 }
 
 const askers = new WeakMap<HTMLElement, (asking: Asking) => Promise<boolean>>();
@@ -32,7 +34,7 @@ export function createAsker(
     const no = element(doc, 'button', asking.no);
     yes.type = 'button';
     no.type = 'button';
-    box.append(text, yes, no);
+    box.append(text, ...(asking.body ?? []), yes, no);
     host.replaceChildren(box);
     no.focus();
     return new Promise((resolve) => {

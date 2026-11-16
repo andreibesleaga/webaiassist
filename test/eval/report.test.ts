@@ -7,6 +7,7 @@ import {
   fillEvalMd,
   renderResults,
   reportName,
+  stoppedModel,
   writeReport,
   type EvalReport,
 } from '../../scripts/eval/report.ts';
@@ -51,6 +52,20 @@ const REPORT: EvalReport = {
 };
 
 const MD = 'intro\n<!-- eval-results:start -->\nold\n<!-- eval-results:end -->\nafter\n';
+
+describe('a model that stops the run', () => {
+  it('is recorded as not ready, with the first line of the error, and the run goes on', () => {
+    const error = new Error('locator.waitFor: Timeout 30000ms exceeded.\nCall log: ...');
+    expect(stoppedModel('gemma4', error)).toEqual({
+      key: 'gemma4',
+      id: 'gemma4',
+      ready: false,
+      loadS: null,
+      status: 'Stopped: locator.waitFor: Timeout 30000ms exceeded.',
+    });
+    expect(stoppedModel('llama', 'lost').status).toBe('Stopped: lost');
+  });
+});
 
 describe('eval report', () => {
   it('names the file by date and Chrome version', () => {

@@ -17,6 +17,7 @@ export default tseslint.config(
       'playwright-report/',
       'coverage/',
       'node_modules/',
+      '.claude/',
       'src/protocol/validators.generated.js',
       'src/protocol/validators.generated.d.ts',
     ],

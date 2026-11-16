@@ -27,7 +27,11 @@ describe('expandNames', () => {
       'c01_titled',
       'c01_untitled',
     ]);
-    expect(listedOf(cases.c15 ?? { title: '', tools: [], selfStatus: [] })).not.toContain(
+    // A same-origin frame's tool is never listed; a hostile definition is listed as not offered.
+    expect(listedOf(cases.c14 ?? { title: '', tools: [], selfStatus: [] })).not.toContain(
+      'c14_inner_same',
+    );
+    expect(listedOf(cases.c15 ?? { title: '', tools: [], selfStatus: [] })).toContain(
       'c15_injected',
     );
   });

@@ -47,6 +47,7 @@ function setup(rows = [record({ id: 'a', tools: [call] })]) {
   const activity: ActivityDeps = {
     log,
     bridge,
+    grants: { has: () => Promise.resolve(true) },
     target: { tabId: 4, origin: ORIGIN },
     nowIso: () => '2026-01-20T08:00:00.000Z',
     download: (name, text, mime) => downloads.push({ name, text, mime }),

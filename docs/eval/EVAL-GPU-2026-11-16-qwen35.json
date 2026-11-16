@@ -1,0 +1,295 @@
+{
+  "date": "2026-11-16",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true
+  },
+  "models": [
+    {
+      "key": "qwen35",
+      "id": "Qwen3.5-2B-q4f16_1-MLC",
+      "ready": true,
+      "loadS": 10.9,
+      "status": "Ready: Qwen3.5 2B. Running in this browser, on your graphics card (in the offscreen document)."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:63467/",
+      "tools": [],
+      "skipped": "locator.waitFor: Timeout 30000ms exceeded."
+    },
+    {
+      "name": "live",
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "tools": [],
+      "skipped": "locator.waitFor: Timeout 30000ms exceeded."
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 86.8,
+      "totalS": 113.2
+    },
+    {
+      "n": 2,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 98.2,
+      "totalS": 119.6
+    },
+    {
+      "n": 3,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 108.8,
+      "totalS": 127.4
+    },
+    {
+      "n": 4,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 121,
+      "totalS": 139.6
+    },
+    {
+      "n": 5,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 133.9,
+      "totalS": 149.2
+    },
+    {
+      "n": 6,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 143.4,
+      "totalS": 160.8
+    },
+    {
+      "n": 7,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 158.1,
+      "totalS": 174.3
+    },
+    {
+      "n": 8,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 171.1,
+      "totalS": 300.1,
+      "error": "timed out"
+    },
+    {
+      "n": 9,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 164.3,
+      "totalS": 300.1,
+      "error": "timed out"
+    },
+    {
+      "n": 10,
+      "model": "qwen35",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 173.4,
+      "totalS": 300.1,
+      "error": "timed out"
+    },
+    {
+      "n": 1,
+      "model": "qwen35",
+      "target": "live",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 170.4,
+      "totalS": 300.1,
+      "error": "timed out"
+    }
+  ],
+  "summary": [
+    {
+      "model": "qwen35",
+      "target": "stub",
+      "prompts": 10,
+      "toolRight": 6,
+      "firstToolRight": 6,
+      "toolUsed": "10 of 10",
+      "taskDone": 6,
+      "gateShown": "10 of 10",
+      "factInAnswer": "7 of 10",
+      "hallucinated": 0,
+      "errors": 3,
+      "repeated": 0,
+      "medianFirstTokenS": 138.65
+    },
+    {
+      "model": "qwen35",
+      "target": "live",
+      "prompts": 1,
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": "1 of 1",
+      "taskDone": 0,
+      "gateShown": "1 of 1",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 0,
+      "errors": 1,
+      "repeated": 0,
+      "medianFirstTokenS": 170.4
+    }
+  ],
+  "checks": [
+    {
+      "name": "storage.local.setAccessLevel",
+      "result": "pass",
+      "detail": "resolved in the service worker"
+    },
+    {
+      "name": "Hosts contacted on first Start",
+      "result": "review",
+      "detail": "10 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start"
+    },
+    {
+      "name": "Idle 10 min, then a question",
+      "result": "fail",
+      "detail": "no answer after the idle wait"
+    },
+    {
+      "name": "Corrupted cached library is refused",
+      "result": "skipped",
+      "detail": "no cached .wasm (scripted or library served from the package)"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

@@ -16,12 +16,14 @@ import { readPageText } from '../adapters/page-reader';
 import { builtInState, hasPromptApi, type AvailabilityLike } from '../adapters/prompt-api-state';
 import { SessionSiteGrants } from '../adapters/session-site-grants';
 import { allowSite } from '../adapters/site-access';
+import { httpOrigin, patternCovers } from '../adapters/allowed-sites';
 import { loadSettings, saveSettings, SETTINGS_KEY } from '../adapters/settings';
 import { loadPanelState, savePanelState } from '../adapters/stored-panel-state';
 import type { Memory } from '../core/ports/memory';
 import { parseMessage } from '../protocol/validate';
 import { applyI18n, setLanguage } from '../ui/i18n';
 import { startPanel, type PanelDeps } from '../ui/panel-controller';
+import { allowedSites } from './shared/allowed-sites';
 import { cpuTestModels } from './shared/cpu-engine';
 import { panelGraphQuery } from './shared/graph-query-deps';
 import { createModelStore } from './shared/model-store';
@@ -79,11 +81,38 @@ async function probeGpu(): Promise<GpuProbe> {
 
 const siteAccessDeps = {
   request: (origins: string[]) => chrome.permissions.request({ origins }),
-  // Chrome 133+; the manifest allows Chrome 124, where the panel points to the toolbar button.
+  allow: (origin: string) => allowedSites.add(origin),
+  // Chrome 133+; the manifest allows Chrome 126, where the panel points to the toolbar button.
   ...(typeof chrome.permissions.addHostAccessRequest === 'function'
     ? { addHostAccessRequest: (r: { tabId: number }) => chrome.permissions.addHostAccessRequest(r) }
     : {}),
 };
+
+/** Chrome's own host-access request (the site was not known): when the user accepts it in the
+ *  toolbar, the tab's site goes on the allowed list. A grant for another host (the chat endpoint)
+ *  does not match the tab's site and is ignored. */
+function allowWhenGranted(tabId: number): void {
+  const granted = (added: chrome.permissions.Permissions): void => {
+    void chrome.tabs.get(tabId).then(
+      async (tab) => {
+        const origin = httpOrigin(tab.url);
+        if (origin === undefined || !(added.origins ?? []).some((p) => patternCovers(p, origin)))
+          return;
+        chrome.permissions.onAdded.removeListener(granted);
+        await allowedSites.add(origin);
+      },
+      () => undefined,
+    );
+  };
+  chrome.permissions.onAdded.addListener(granted);
+}
+
+function allowSiteOnClick(page: { tabId: number; origin?: string }) {
+  return allowSite(siteAccessDeps, page).then((result) => {
+    if (result === 'requested') allowWhenGranted(page.tabId);
+    return result;
+  });
+}
 
 let indexedDb: Promise<Memory> | undefined;
 
@@ -96,6 +125,7 @@ function download(fileName: string, text: string): void {
 
 const compatDeps = {
   request: (origins: string[]) => chrome.permissions.request({ origins }),
+  allow: (origin: string) => allowedSites.add(origin),
   register: (script: chrome.scripting.RegisteredContentScript) =>
     chrome.scripting.registerContentScripts([script]),
   isRegistered: async (id: string) =>
@@ -112,6 +142,7 @@ const forgetDeps = {
     lazyActivityLog,
   ),
   grants: new SessionSiteGrants(chrome.storage.session),
+  allowed: allowedSites,
   compat: {
     unregister: (ids: string[]) => chrome.scripting.unregisterContentScripts({ ids }),
     removeOrigins: (origins: string[]) => chrome.permissions.remove({ origins }),
@@ -166,7 +197,7 @@ async function buildDeps(bridge: MessagingToolBridge): Promise<PanelDeps> {
     site: siteDeps,
     activity: lazyActivityLog,
     readPage: (tabId) => readPageText(chrome.scripting, tabId),
-    allowSite: (page) => allowSite(siteAccessDeps, page),
+    allowSite: allowSiteOnClick,
     enableCompat: (page) => enableCompat(compatDeps, page),
     forgetSite: (origin) => forgetSite(forgetDeps, origin),
     createRuntime,

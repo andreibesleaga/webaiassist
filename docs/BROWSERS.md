@@ -4,7 +4,7 @@ WebAIAssist is a Manifest V3 extension for Chromium-based desktop browsers only.
 Safari are not supported. The extension uses `chrome.sidePanel` and an offscreen document.
 Firefox and Safari use different extension APIs, and no vendor page read for this file lists
 `chrome.sidePanel` for them. All pages below were read on 12 Nov 2026. Minimum version is
-Chrome 124.
+Chrome 126 (compat mode's polyfill uses `URL.parse`).
 
 ## What was tested
 
@@ -26,7 +26,7 @@ Chrome 124.
 
 | Path                    | Needs                                                                                                            |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Graphics card (WebLLM)  | WebGPU, in the offscreen document or the service worker (Chrome 124 or later).                                   |
+| Graphics card (WebLLM)  | WebGPU, in the offscreen document or the service worker (Chrome 126 or later).                                   |
 | Processor (llama.cpp)   | WebAssembly promise integration and 64-bit memory: Chrome 137 or later.                                          |
 | Chrome's built-in model | The Prompt API in the official Chrome build (Chrome 138 or later for extensions), and the hardware Chrome lists. |
 | Chat endpoint           | Any Chromium browser; Ollama needs `OLLAMA_ORIGINS=chrome-extension://*`.                                        |

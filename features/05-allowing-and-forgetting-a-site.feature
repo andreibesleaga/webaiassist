@@ -84,7 +84,9 @@ Feature: Allowing and forgetting a site
     Then the conversation shows "The tool said: one"
     When I press "Forget this site"
     Then the page note contains "WebAIAssist forgot {origin}"
-    When I ask '/tool echo {"text": "two"}'
+    And the page line says "This page — not allowed yet"
+    When I click the toolbar button
+    And I ask '/tool echo {"text": "two"}'
     Then a dialog titled "Use the tools of {origin}?" is open
 
   # test: test/adapters/forget-site.test.ts, test/ui/panel-privacy.test.ts

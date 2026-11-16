@@ -102,8 +102,8 @@ describe('F20.7 the store listing and the README state the limits', () => {
     it(`${path} states the measured result of the built-in model test`, () => {
       const text = flat(read(path));
       expect(/built-in model test:/i.test(text)).toBe(true);
-      expect(text).toContain('measured on a real computer on 14 Nov 2026');
-      expect(text).toContain('5 of 5 questions on the test node and in 1 of 5 on the live node');
+      expect(text).toMatch(/measured on a real computer on 1[45] Nov 2026/);
+      expect(text).toContain('5 of 5 questions on the test node and in 5 of 5 on the live node');
       expect(/not verified on a real computer/i.test(text)).toBe(false);
     });
   }

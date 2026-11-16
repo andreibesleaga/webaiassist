@@ -32,6 +32,16 @@ describe('GitHub workflows', () => {
     },
   );
 
+  it('release.yml builds with read access only, and the job that may write runs no install', () => {
+    const text = workflows.find((w) => w.name === 'release.yml')?.text ?? '';
+    const [, build = '', publish = ''] = text.split(/^ {2}(?:build|publish):$/m);
+    expect(build).not.toMatch(/contents: write/);
+    expect(build).toContain('npm run verify:release');
+    expect(publish).toMatch(/contents: write/);
+    expect(publish).not.toMatch(/npm (ci|install)|npx /);
+    expect(publish).toContain('actions/attest-build-provenance@');
+  });
+
   it('gives write access only to the release workflow', () => {
     const writers = workflows.filter((w) => /contents: write/.test(w.text)).map((w) => w.name);
     expect(writers).toEqual(['release.yml']);

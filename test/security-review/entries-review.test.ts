@@ -60,6 +60,7 @@ function stubChrome(): Stub {
     storage: {
       local: { setAccessLevel: stub.setAccessLevel },
       session: { setAccessLevel: stub.setAccessLevel },
+      onChanged: { addListener: () => undefined },
     },
   });
   return stub;

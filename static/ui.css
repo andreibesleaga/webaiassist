@@ -439,7 +439,8 @@ progress[value='1'] {
   color: var(--muted);
 }
 .mark.page,
-.mark.reserved {
+.mark.reserved,
+.mark.not-offered {
   color: var(--info-fg);
   background: var(--info-bg);
   border-color: transparent;

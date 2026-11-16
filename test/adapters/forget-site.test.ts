@@ -22,6 +22,7 @@ function fakes() {
           return Promise.resolve();
         },
       },
+      allowed: { remove: () => Promise.resolve() },
       compat: {
         unregister: (ids: string[]) => {
           calls.push(`unregister ${ids.join(',')}`);
@@ -73,6 +74,18 @@ describe('forgetAllSites', () => {
             return Promise.resolve();
           },
         },
+        allowed: {
+          clear: () => {
+            calls.push('clear allowed sites');
+            return Promise.resolve();
+          },
+        },
+        endpointHosts: {
+          clear: () => {
+            calls.push('clear endpoint hosts');
+            return Promise.resolve();
+          },
+        },
         compat: {
           unregisterAll: () => {
             calls.push('unregister all');
@@ -98,6 +111,8 @@ describe('forgetAllSites', () => {
     expect(await f.memory.loadChat('https://b.example')).toEqual([]);
     expect(f.calls).toEqual([
       'clear grants',
+      'clear allowed sites',
+      'clear endpoint hosts',
       'unregister all',
       'remove https://a.example/*,https://b.example/*',
     ]);
@@ -112,6 +127,11 @@ describe('forgetAllSites', () => {
   it('removes no access when there is none to remove', async () => {
     const f = all([]);
     await forgetAllSites(f.deps);
-    expect(f.calls).toEqual(['clear grants', 'unregister all']);
+    expect(f.calls).toEqual([
+      'clear grants',
+      'clear allowed sites',
+      'clear endpoint hosts',
+      'unregister all',
+    ]);
   });
 });

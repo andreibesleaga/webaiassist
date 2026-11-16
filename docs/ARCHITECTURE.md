@@ -261,7 +261,7 @@ For a computer without a usable graphics card, or with little graphics memory, t
 Qwen3 0.6B, Qwen3 1.7B and Qwen3.5 2B on the processor (`src/adapters/wllama-runtime.ts`, package
 `@wllama/wllama` 3.8.1). The choice is listed only when the browser has WebAssembly promise
 integration and 64-bit memory (Chrome 137; `src/adapters/cpu-support.ts`); the manifest minimum
-stays 124.
+is 126, because compat mode's polyfill uses `URL.parse`.
 
 - **Where.** In the offscreen document, behind its own port `model-host:cpu` (the service worker
   cannot start a Worker, so it does not host this runtime). The panel reaches it with the same

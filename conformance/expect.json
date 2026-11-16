@@ -496,6 +496,7 @@
       "listed": [
         "c15_account_deIete",
         "c15_clean",
+        "c15_injected",
         "c15_delete_account",
         "c15_long_description",
         {
