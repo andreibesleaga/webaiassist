@@ -23,7 +23,7 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 - [x] **The built-in model re-run** after the last change: run of 15 Nov 2026 (table below).
 - [x] **The data-type answer** on the Privacy tab: "Website content" (decided 16 Nov 2026; see Data usage below).
 - [ ] **Placeholders**: `<STORE-LINK>`, `<PRIVACY-POLICY-URL>`, `<DEMO-NODE-URL>`.
-- [ ] **Screenshot 1** from a real run (see Images).
+- [x] **Screenshots** from a real run of 16 Nov 2026: five files `docs/store/screenshot-*-1280x800.png` (see Images).
 
 ## Store listing tab
 
@@ -151,16 +151,18 @@ test/security-review/docs-review.test.ts`.
 
 **Images** (sizes from <https://developer.chrome.com/docs/webstore/images>, read 12 Nov 2026):
 
-| Image                       | Size       | What it shows                                                                                                              |
-| --------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Store icon                  | 128 × 128  | `static/icons/icon-128.png` (96 × 96 artwork with 16 px padding, as the store asks)                                        |
-| Screenshot 1                | 1280 × 800 | The confirmation (tool, site, arguments, Allow once and Deny) over an AgenticSystemCore node page, with the answer visible |
-| Screenshot 2                | 1280 × 800 | A node page with the side panel open: the card, a question and the answer that used a tool                                 |
-| Screenshot 3                | 1280 × 800 | The panel during the first start, with the download size and source and the progress bar                                   |
-| Screenshot 4 (optional)     | 1280 × 800 | The Options page                                                                                                           |
-| Small promo tile (optional) | 440 × 280  | The icon and the name on a plain background (`docs/store/promo-small-440x280.png`)                                         |
+| Image                       | Size       | What it shows                                                                                                                                                           |
+| --------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Store icon                  | 128 × 128  | `static/icons/icon-128.png` (96 × 96 artwork with 16 px padding, as the store asks)                                                                                     |
+| Screenshot 1                | 1280 × 800 | `docs/store/screenshot-1-node-answer-1280x800.png`: a node page with the panel open, "10 WebMCP tools", the card and an answer of Chrome's built-in model               |
+| Screenshot 2                | 1280 × 800 | `docs/store/screenshot-2-site-tools-question-1280x800.png`: the question "Use the tools of this site?" (Deny, Allow for this session) over the tool list with its marks |
+| Screenshot 3                | 1280 × 800 | `docs/store/screenshot-3-question-before-a-call-1280x800.png`: the question before a call (tool, site, arguments, Deny and Allow once)                                  |
+| Screenshot 4                | 1280 × 800 | `docs/store/screenshot-4-another-site-tool-call-1280x800.png`: a public WebMCP demo page (flight search), 4 tools and a tool call, with a chat endpoint                 |
+| Screenshot 5                | 1280 × 800 | `docs/store/screenshot-5-answer-with-sources-1280x800.png`: an answer built from the node's tools, with what the site publishes listed above it                         |
+| Small promo tile (optional) | 440 × 280  | The icon and the name on a plain background (`docs/store/promo-small-440x280.png`)                                                                                      |
 
-Capture the screenshots in a normal Chrome window at 1280 × 800, with no personal tabs, bookmarks or
+The five files are from the maintainer's hand test of 16 Nov 2026 (Chrome 157, Windows), scaled to 1280 × 800
+with the browser's tab column cut off. To retake: a normal Chrome window, no personal tabs, bookmarks or
 account picture visible. `npm run screenshots` makes headless stand-ins in `docs/eval/screenshots/`
 with the suffix `-headless`; they show the design but not a real model, so the store images are the
 ones from a real run.

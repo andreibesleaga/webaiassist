@@ -26,7 +26,14 @@ by the same author. It works with AgenticSystemCore nodes and with sites that of
 
 ## What it looks like
 
-These pictures come from the automated browser tests (`npm run shots:readme`): the scripted test model
+From a real run in Chrome 157 on Windows, 16 Nov 2026, on the live node agenticsystemcore.com and on a
+public WebMCP demo page (Chrome's built-in model in the first, a chat endpoint in the other two):
+
+| A node page: ten tools and an answer                                                                                                | The question before a call                                                                                                                                       | Another site's tools                                                                                                    |
+| ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| ![The panel names the site as an AgenticSystemCore node with 10 WebMCP tools and shows an answer](docs/images/real-node-answer.png) | ![A dialog asks "Run the tool webaiassist_query_graph?" with the site and the exact arguments, Deny and Allow once](docs/images/real-question-before-a-call.png) | ![On a flight search demo page the panel lists 4 WebMCP tools and shows a tool call](docs/images/real-another-site.png) |
+
+The next pictures come from the automated browser tests (`npm run shots:readme`): the scripted test model
 and test pages that stand for a node, so they show the interface, not a real model's answers.
 
 | The tools a page offers                                                                                   | The question before a call                                                                                                | The answer, with the tool result                                                                                               |
@@ -39,13 +46,13 @@ and test pages that stand for a node, so they show the interface, not a real mod
 
 ## Works with AgenticSystemCore 1.1.0
 
-| Part                            | Version                                                                                                                                                             |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| This extension                  | 0.1.0 (first release; not yet tagged)                                                                                                                               |
-| AgenticSystemCore specification | 1.1.0: the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 Nov 2026                                             |
-| AgenticSystemCore engine        | 1.1.0: a node page offers ten WebMCP tools; the extension's test fixture is taken from that engine                                                                  |
-| Chrome                          | Needs 126 or later; the processor models need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 14 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
-| WebMCP draft                    | Draft Community Group Report of 13 Nov 2026, Web Machine Learning Community Group. A draft: not a W3C Standard                                                      |
+| Part                            | Version                                                                                                                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| This extension                  | 0.1.0 (first release; not yet tagged)                                                                                                                                                       |
+| AgenticSystemCore specification | 1.1.0: the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 Nov 2026                                                                     |
+| AgenticSystemCore engine        | 1.1.0: a node page offers ten WebMCP tools; the extension's test fixture is taken from that engine                                                                                          |
+| Chrome                          | Needs 126 or later; the processor models need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 15 Nov 2026; hand test, 16 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
+| WebMCP draft                    | Draft Community Group Report of 13 Nov 2026, Web Machine Learning Community Group. A draft: not a W3C Standard                                                                              |
 
 "Works with" says the extension can read what a node publishes and call its tools. It does not say
 that any body or company has checked the extension, or that it meets a specification. A problem on a node? Use the
