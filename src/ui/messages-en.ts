@@ -124,7 +124,7 @@ export const EN = {
   pageNode: '{host} — says it is an AgenticSystemCore node, {count} WebMCP tools',
   pageNoTools: '{host} — no WebMCP tools (use Read this page or Add WebMCP to this site)',
   pageNodeNoTools:
-    '{host} — says it is an AgenticSystemCore node; no WebMCP tools on this page (open an item page, or use Read this page; if that does not help, use Add WebMCP to this site)',
+    '{host} — says it is an AgenticSystemCore node; no WebMCP tools on this page. To use the node’s tools, open an item page of this site. To ask about this page, press Read this page first. If no page of the site has tools, use Add WebMCP to this site.',
   pageNotAllowed: '{host} — not allowed yet',
   pageRestricted: 'This page — WebAIAssist cannot run here (chrome:// pages, the store)',
   pageFailed: '{host} — the page did not list its tools: {why}',

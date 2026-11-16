@@ -24,6 +24,8 @@ First release. The date is set when the tag is made (docs/ENGINEERING.md, "Relea
 - **The agreed remote hosts are read when the question is due**, not when the panel opened: after "Forget
   all" or "Reset to defaults" an open panel asks again before it uses a remote chat service.
 - **Reset to defaults keeps the host access of a site you allowed**, when the chat endpoint is on the same host.
+- **A node page without tools says what to do next**: open an item page of the site for the node's tools, or
+  press Read this page to ask about the open page (the old line put both in a bracket).
 - **The Activity page** has one heading and no longer shows the graph page's sentence about a node's files.
 - **Default models from the measured runs** (15 and 16 Nov 2026): Chrome's built-in model when Chrome has it
   ready; otherwise Qwen3 0.6B on the graphics card unless its first answer was measured slow; otherwise Qwen3 1.7B

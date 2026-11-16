@@ -76,5 +76,9 @@
     "typescript": "5.9.3",
     "typescript-eslint": "8.72.1",
     "vitest": "3.2.7"
+  },
+  "overrides": {
+    "js-yaml": "4.3.2",
+    "markdown-it": "14.3.3"
   }
 }

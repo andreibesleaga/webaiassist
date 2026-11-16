@@ -168,6 +168,13 @@ pending now, and a test keeps it so; see [MANUAL-CHECKS.md](MANUAL-CHECKS.md)). 
 - Dependencies: exact pins, same major version, published at least 14 days earlier. Check
   the date with `npm view <package> time --json`. A major update is a recorded decision with a
   reason. The one exception today is `@w3c/webmcp-polyfill` 0.1.0, its only version.
+- `npm audit --omit=dev` (what ships in the extension) reports nothing on 16 Nov 2026. The development
+  tools have open advisories whose fix is a major update: `vitest` 3 and its `tinypool` and
+  `@vitest/mocker` (fixed in vitest 4.1.11 and later), `markdownlint-cli2` (its `katex`), and `glob` and
+  `minimatch` under the coverage tool. They run only on a developer's computer and in CI, on this
+  repository's own files, and `vitest` is run without its server (`vitest run`). Two were fixed without a
+  major update, with `overrides` in `package.json`: `js-yaml` 4.3.2 and `markdown-it` 14.3.3. The major
+  updates are planned for the release after 0.1.0.
 - WebLLM (`@mlc-ai/web-llm`): a new version usually brings new model libraries.
   1. Find the library folder the new version uses (`modelVersion` in
      `node_modules/@mlc-ai/web-llm/lib/index.js`) and the commit of

@@ -32,6 +32,10 @@ describe('page status line', () => {
     expect(statusText(statusOf(home))).toMatch(
       /^agenticsystemcore\.com — says it is an AgenticSystemCore node; no WebMCP tools on this page/,
     );
+    // The two ways forward are named, in the order a first visitor needs them.
+    expect(statusText(statusOf(home))).toMatch(
+      /open an item page of this site.*press Read this page first/,
+    );
   });
 
   it('says why there are no tools: no WebMCP in this browser, or none registered by the page', () => {
