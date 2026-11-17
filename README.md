@@ -60,7 +60,7 @@ that any body or company has checked the extension, or that it meets a specifica
 
 ## Install
 
-From the Chrome Web Store: the listing is under review since 16 Nov 2026 and has no public address yet.
+From the Chrome Web Store: [WebAIAssist](https://chromewebstore.google.com/detail/webaiassist/mekikidmpikblfalilhckiadncbjfppi).
 
 Or load the release zip yourself:
 
