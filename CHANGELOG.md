@@ -2,7 +2,7 @@
 
 > **In short**
 >
-> - Version 0.1.0 is the first release, of 16 Nov 2026; its Chrome Web Store listing is under review.
+> - Version 0.1.0 is the first release, of 16 Nov 2026; on the [Chrome Web Store](https://chromewebstore.google.com/detail/webaiassist/mekikidmpikblfalilhckiadncbjfppi) since 17 Nov 2026.
 > - It adds a side panel where a local AI model uses the page's WebMCP tools, through four model paths: graphics card, processor, Chrome's built-in model and a chat endpoint.
 > - Every tool call goes through a confirmation (Allow once or Deny). The manifest has five install permissions and no install-time host access.
 > - Measured on one laptop graphics card (AMD gcn-5): Qwen3 0.6B picked the right tool in 8 of 10 test-node questions but 2 of 10 on the live node.

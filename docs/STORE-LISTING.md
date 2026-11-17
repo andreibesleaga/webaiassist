@@ -24,8 +24,8 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 - [x] **The data-type answer** on the Privacy tab: "Website content" (decided 16 Nov 2026; see Data usage below).
 - [x] **Privacy policy URL** `https://agenticsystemcore.com/webaiassist/privacy/` and **demo node URL**
       `https://agenticsystemcore.com/concepts/harness/`, as submitted on 16 Nov 2026.
-- [ ] **Store link**: the listing is under review (item ID `mekikidmpikblfalilhckiadncbjfppi`); the link goes into
-      the README when the listing is public.
+- [x] **Store link**: published 17 Nov 2026, version 0.1.0 (item ID `mekikidmpikblfalilhckiadncbjfppi`):
+      <https://chromewebstore.google.com/detail/webaiassist/mekikidmpikblfalilhckiadncbjfppi>; the README links it.
 - [x] **Screenshots** from a real run of 16 Nov 2026: five files `docs/store/screenshot-*-1280x800.png` (see Images).
 
 ## Store listing tab
