@@ -2,7 +2,7 @@
 
 > **In short**
 >
-> - A side panel for Chrome with a small AI model that runs on your own computer. It uses the tools a web page offers through WebMCP, and asks you before each call.
+> - A side panel for Chrome with a small AI model that runs on your own computer. It uses the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/), and asks you before each call.
 > - WebMCP is a draft, not a W3C Standard, and Chrome keeps it behind a switch you must turn on.
 > - With a model in the browser, what you type stays on your computer. There is no account and no analytics.
 > - Small models make mistakes: on one laptop the default model picked the right tool in 8 of 10 test questions, and answers took about 26 seconds on the test page (about 60 on the live site).
@@ -10,12 +10,7 @@
 
 **One AI assistant for the websites that offer WebMCP tools, running in your own browser.** It is not
 tied to one site or one model: the model runs in the browser on your graphics card or processor, or it is
-Chrome's built-in model, or a chat endpoint you choose. There is no server to install and no account.
-Every tool call is shown first and waits for your answer.
-
-A chat in your browser's side panel, with a small AI model that runs on your own computer.
-It can use the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/),
-and asks you before each one runs.
+Chrome's built-in model, or a chat endpoint you choose. There is no server to install.
 
 WebAIAssist is the browser client of the [AgenticSystemCore](https://agenticsystemcore.com) project,
 by the same author. It works with AgenticSystemCore nodes and with sites that offer WebMCP tools, once you allow them (see Limits).
