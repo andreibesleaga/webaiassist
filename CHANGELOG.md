@@ -73,6 +73,8 @@ call, Chrome's built-in model, the processor models and chat endpoints work as b
   when the saved chat is cut to its newest 200 messages at that point. A follow-up question therefore
   gets the page text you read before, from the saved chat (in 0.1.0 a page text that stood first was
   dropped from the saved chat at the next question).
+- **The store title says what the extension is**: "WebAIAssist - Browser AI for WebMCP websites and the
+  agentic knowledge web". The short name, the panel and the toolbar button still say WebAIAssist.
 - **The docs say which model path did best and how to use the faster graphics card**: README, "Which one
   did best" and "Use the faster graphics card"; [docs/EVAL.md](docs/EVAL.md), "Which path did best". The
   switch `--force_high_performance_gpu` was checked in Google Chrome 157. Options names it and says that

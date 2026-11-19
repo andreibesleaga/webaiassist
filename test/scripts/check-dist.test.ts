@@ -86,7 +86,7 @@ describe('checkManifest', () => {
     );
     expect(problems).toEqual([
       'manifest_version must be 3',
-      'name must be "WebAIAssist"',
+      'name must be "WebAIAssist" or start with "WebAIAssist - ", at most 75 characters',
       'version must be one to four dot-separated numbers',
     ]);
   });

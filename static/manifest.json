@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "WebAIAssist",
+  "name": "WebAIAssist - Browser AI for WebMCP websites and the agentic knowledge web",
   "short_name": "WebAIAssist",
   "version": "0.1.1",
   "description": "A local AI model in your side panel that uses the WebMCP tools of the open page. Works with AgenticSystemCore nodes.",
