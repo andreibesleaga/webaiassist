@@ -46,6 +46,49 @@ export function recentHistory(history: readonly ChatMessage[]): ChatMessage[] {
   return startOnUser(history.filter((m) => m.role !== 'system').slice(-MAX_HISTORY_MESSAGES));
 }
 
+/** How the saved chat is read into questions (exchangesWithTools). */
+export interface ExchangeRules {
+  /** A user-role turn the loop wrote itself (a repair or a nudge): part of the question before it. */
+  readonly ownTurn: (message: ChatMessage) => boolean;
+  /** A tool message that goes with the question after it (page text read on request). */
+  readonly leadsQuestion: (message: ChatMessage) => boolean;
+}
+
+/** The saved chat cut into questions: each starts at a question the person asked, with the page
+ *  text read for it, and holds everything until the next one. */
+function exchanges(history: readonly ChatMessage[], rules: ExchangeRules): ChatMessage[][] {
+  const groups: ChatMessage[][] = [];
+  let current: ChatMessage[] = [];
+  for (const message of history) {
+    if (message.role === 'user' && !rules.ownTurn(message)) {
+      const last = current.at(-1);
+      const lead =
+        last !== undefined && rules.leadsQuestion(last) ? [current.pop() as ChatMessage] : [];
+      if (current.length > 0) groups.push(current);
+      current = lead;
+    }
+    current.push(message);
+  }
+  if (current.length > 0) groups.push(current);
+  return groups;
+}
+
+/**
+ * The saved questions that used the page, for the model: a question is kept with everything that
+ * followed it only when a tool result (or page text read on request) is among its messages. An answer
+ * given without a tool holds nothing from the page, and small models copied such answers instead of
+ * calling a tool (measured 18 Nov 2026, docs/EVAL.md "Each question in a new chat"). Only what the
+ * model is given changes: the saved chat keeps every question (agent-loop.ts saves it whole).
+ */
+export function exchangesWithTools(
+  history: readonly ChatMessage[],
+  rules: ExchangeRules,
+): ChatMessage[] {
+  return exchanges(history, rules)
+    .filter((group) => group.some((m) => m.role === 'tool'))
+    .flat();
+}
+
 function startOnUser(messages: ChatMessage[]): ChatMessage[] {
   while (messages.length > 0 && messages[0]?.role !== 'user') messages.shift();
   return messages;

@@ -277,11 +277,11 @@ Feature: Choosing a model
 
   # test: test/adapters/models.test.ts, test/ui/model-picker.test.ts
   @unit
-  Scenario: Llama 3.2 3B and Gemma 4 E2B are marked slow and are never a default
+  Scenario: Gemma 4 E2B is marked slow, and neither it nor Llama 3.2 3B is ever a default
     Given this computer has a working WebGPU adapter that reports "shader-f16"
-    Then the labels of "Llama 3.2 3B" and "Gemma 4 E2B" in the model list say "slow: may stall on a laptop graphics card"
-    And the labels of "Qwen3 0.6B" and "Qwen3.5 2B" do not say it
-    And neither of the two is the default model on any computer
+    Then the label of "Gemma 4 E2B" in the model list says "slow: may stall on a laptop graphics card"
+    And the labels of "Qwen3 0.6B", "Qwen3 1.7B", "Qwen3.5 2B" and "Llama 3.2 3B" do not say it
+    And neither Gemma 4 E2B nor Llama 3.2 3B is the default model on any computer
 
   # test: test/ui/model-picker.test.ts, test/ui/options-page.test.ts
   @unit

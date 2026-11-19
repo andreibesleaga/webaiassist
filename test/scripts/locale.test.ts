@@ -64,6 +64,27 @@ describe('localiseManifest', () => {
     expect(texts).toEqual(TEXTS);
   });
 
+  it('points the name of the keyboard shortcut at the locale file and keeps its key', () => {
+    const withCommand = {
+      ...manifest,
+      commands: {
+        _execute_action: {
+          suggested_key: { default: 'Alt+Shift+A' },
+          description: 'Open WebAIAssist',
+        },
+      },
+    };
+    const { manifest: out, texts } = localiseManifest(withCommand);
+    expect(out.commands).toEqual({
+      _execute_action: {
+        suggested_key: { default: 'Alt+Shift+A' },
+        description: '__MSG_extCommandTitle__',
+      },
+    });
+    expect(texts).toEqual({ ...TEXTS, extCommandTitle: 'Open WebAIAssist' });
+    expect(withCommand.commands._execute_action.description).toBe('Open WebAIAssist');
+  });
+
   it('leaves the manifest it was given unchanged', () => {
     localiseManifest(manifest);
     expect(manifest.description).toBe('A local AI model.');

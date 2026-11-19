@@ -11,9 +11,8 @@ import { FakeModelRuntime } from '../../src/fakes/fake-model-runtime';
 import { FakeToolBridge } from '../../src/fakes/fake-tool-bridge';
 import { FixedClock } from '../../src/fakes/fixed-clock';
 import { InMemoryMemory } from '../../src/fakes/in-memory-memory';
-import { CPU_MODELS } from '../../src/adapters/cpu-models';
+import { LOCAL_FILES } from '../../src/adapters/cpu-models';
 import type { StoredModel, StoreLike } from '../../src/adapters/model-store';
-import { modelChoices, WEBLLM_DOWNLOADS } from '../../src/adapters/models';
 import type { StoredPanelState } from '../../src/adapters/stored-panel-state';
 import type { Outcomes } from '../../src/core/site-facts';
 import type { PageMeta } from '../../src/core/site-page';
@@ -87,20 +86,12 @@ export class MemoryGrants implements SiteGrants {
 /** A model store the tests can change: by default every model is already on this computer, so
  *  Start loads at once; a test that checks the question before a download empties `stored`. */
 export class FakeStore implements StoreLike {
-  stored: StoredModel[] = [
-    ...modelChoices({ promptApi: false }).map((m) => ({
-      runtime: 'webllm' as const,
-      id: m.id,
-      name: `${m.label.split(' (')[0]} on the graphics card`,
-      bytes: WEBLLM_DOWNLOADS[m.id] ?? 0,
-    })),
-    ...CPU_MODELS.map((m) => ({
-      runtime: 'cpu' as const,
-      id: m.id,
-      name: m.label.split(' (')[0] ?? m.id,
-      bytes: m.bytes,
-    })),
-  ];
+  stored: StoredModel[] = LOCAL_FILES.map((m) => ({
+    runtime: 'cpu' as const,
+    id: m.id,
+    name: (m.label.split(' (')[0] ?? m.id).replace(/ on the processor$/, ''),
+    bytes: m.bytes,
+  }));
   readonly removed: string[] = [];
   list(): Promise<StoredModel[]> {
     return Promise.resolve([...this.stored]);

@@ -4,7 +4,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CPU_MODELS } from '../../src/adapters/cpu-models';
+import { LOCAL_FILES } from '../../src/adapters/cpu-models';
 import { WEBLLM_MODEL_IDS } from '../../src/adapters/models';
 
 const ROOT = process.cwd();
@@ -86,7 +86,7 @@ describe('F20.6 the governance documents exist and name every dependency and mod
   it('lists every model the extension offers in the sources list', () => {
     const sources = read('docs/SOURCES.md');
     for (const id of WEBLLM_MODEL_IDS) expect(sources, id).toContain(id);
-    for (const model of CPU_MODELS) expect(sources, model.id).toContain(model.sha256);
+    for (const model of LOCAL_FILES) expect(sources, model.id).toContain(model.sha256);
   });
 });
 

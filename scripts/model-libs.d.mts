@@ -12,7 +12,6 @@ export interface EsbuildPlugin {
   readonly name: string;
   setup(build: BuildLike): void;
 }
-export declare const webLlmNoRemoteLibs: EsbuildPlugin;
 export declare const wllamaNoRemote: EsbuildPlugin;
 export declare const RUNTIMES: readonly {
   readonly package: string;
@@ -22,6 +21,5 @@ export declare const RUNTIMES: readonly {
   readonly sha256: string;
 }[];
 export declare function pinnedWasmPaths(pins?: {
-  readonly libs: readonly { readonly file: string }[];
-  readonly runtimes?: readonly { readonly file: string }[];
+  readonly runtimes: readonly { readonly file: string }[];
 }): string[];

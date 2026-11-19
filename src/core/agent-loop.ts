@@ -5,7 +5,14 @@
 import { actionSchema } from './action';
 import { checkAction, REPAIR, type Checked } from './check-action';
 import { compactBudget, buildCompactPrompt } from './compact-prompt';
-import { estimateTokens, fitToContext, recentHistory, usableContext } from './history';
+import {
+  estimateTokens,
+  exchangesWithTools,
+  type ExchangeRules,
+  fitToContext,
+  recentHistory,
+  usableContext,
+} from './history';
 import type { ChatUI } from './ports/chat-ui';
 import { buildMessages, buildSystemPrompt } from './prompt';
 import {
@@ -28,6 +35,23 @@ import { PAGE_TEXT_TOOL, fenceSavedResult, wrapUntrusted } from './untrusted';
 export type { AgentDeps } from './tool-step';
 
 export const DEFAULT_MAX_STEPS = 6;
+
+/** The start of a repair turn, before the reason the loop fills in. */
+const REPAIR_START = REPAIR.split('%s')[0] ?? REPAIR;
+const PAGE_TEXT_FENCE = `<tool-result tool="${PAGE_TEXT_TOOL}"`;
+
+/** How the saved chat splits into questions: the loop's own repair and nudge turns are not
+ *  questions, and page text read on request belongs to the question after it. */
+const SAVED_CHAT_RULES: ExchangeRules = {
+  ownTurn: (m) => m.content === NUDGE || m.content.startsWith(REPAIR_START),
+  leadsQuestion: (m) => m.role === 'tool' && m.content.startsWith(PAGE_TEXT_FENCE),
+};
+
+/** The model's part of the saved chat starts on a question. */
+function startOnUserTurn(messages: ChatMessage[]): ChatMessage[] {
+  const first = messages.findIndex((m) => m.role === 'user');
+  return first === -1 ? [] : messages.slice(first);
+}
 
 export interface AgentInput extends RunScope {
   readonly userText: string;
@@ -83,7 +107,8 @@ async function startState(deps: AgentDeps, input: AgentInput): Promise<LoopState
   state.tools = listing?.tools ?? [];
   const stats = await deps.memory.history(input.origin);
   const system = systemPrompt(deps, input, state.tools, stats);
-  const history = recentHistory(input.history ?? []).map(fenceSaved);
+  state.savedHistory = recentHistory(input.history ?? []).map(fenceSaved);
+  const history = startOnUserTurn(exchangesWithTools(state.savedHistory, SAVED_CHAT_RULES));
   state.history.count = history.length;
   state.messages.push(...buildMessages(system, history, input.userText));
   if (input.pageText !== undefined) {
@@ -252,9 +277,16 @@ async function finish(
   state: LoopState,
   outcome: { status: AgentStatus; answer?: string; error?: string },
 ): Promise<AgentResult> {
+  // The saved chat as loaded, then what this question added (after the system prompt and the part
+  // of the saved chat the model was given).
+  const added = state.messages.slice(1 + state.history.count);
+  const kept = [
+    ...(state.savedHistory ?? state.messages.slice(1, 1 + state.history.count)),
+    ...added,
+  ];
   await deps.memory.saveChat(
     input.origin,
-    state.messages.filter((m) => m.role !== 'system' && !state.transient.has(m)),
+    kept.filter((m) => m.role !== 'system' && !state.transient.has(m)),
   );
   return { ...outcome, steps: state.steps, messages: state.messages };
 }

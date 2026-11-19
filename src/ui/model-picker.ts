@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// The model list of the side panel: the four graphics-card models (Gemma 4 E2B only when the
-// graphics card has shader-f16), the processor models when
+// The model list of the side panel: the five graphics-card models (unless this browser cannot
+// run their engine), the processor models when
 // this browser can run them, Chrome's built-in model when present, the endpoint when one is set, the scripted model in the smoke-test build, and,
 // on a computer without WebGPU and nothing else to run, "Set up a chat endpoint"; with no endpoint
 // set otherwise, "Use your own server or a remote service…" (the same value, it opens Options).
@@ -16,6 +16,7 @@ import {
   PROMPT_API_ID,
   SCRIPTED_ID,
   webllmChoices,
+  type ModelChoice,
 } from '../adapters/models';
 import type { BuiltInState } from '../adapters/prompt-api-state';
 import type { Settings } from '../adapters/settings';
@@ -49,7 +50,9 @@ export interface PickerEnv {
   readonly webgpu?: boolean;
   /** False when the WebGPU adapter lacks `shader-f16`, which Gemma 4 E2B needs; unknown counts as present. */
   readonly shaderF16?: boolean;
-  /** True when this browser can run the processor models (WebAssembly JSPI and memory64). */
+  /** True when this browser can run the local engine (WebAssembly JSPI and memory64): the
+   *  processor models are listed only then. False hides the graphics-card models too, which run
+   *  on the same engine; unknown leaves them listed. */
   readonly cpu?: boolean;
   /** Test models of the smoke-test build; empty in the release build. */
   readonly extraCpuModels?: readonly CpuModel[];
@@ -123,8 +126,12 @@ function serverChoices(settings: Settings, env: PickerEnv): PickerChoice[] {
   return out;
 }
 
+/** The graphics-card models this browser can run: none when it cannot run their engine. */
+const gpuModels = (env: PickerEnv): readonly ModelChoice[] =>
+  env.cpu === false ? [] : webllmChoices(env.shaderF16);
+
 export function pickerChoices(settings: Settings, env: PickerEnv): PickerChoice[] {
-  const shipped = webllmChoices(env.shaderF16).map((m) => webllm(m.id, m.label));
+  const shipped = gpuModels(env).map((m) => webllm(m.id, m.label));
   const cpu = env.cpu === true ? [...CPU_MODELS, ...(env.extraCpuModels ?? [])].map(cpuChoice) : [];
   return [...shipped, ...cpu, ...localExtras(env), ...serverChoices(settings, env)];
 }
@@ -139,7 +146,7 @@ function cpuValue(settings: Settings, env: PickerEnv): string {
  *  graphics card without `shader-f16`). */
 function webllmValue(settings: Settings, env: PickerEnv): string | undefined {
   const id = settings.webllmModel || defaultModelId();
-  return webllmChoices(env.shaderF16).some((m) => m.id === id) ? `webllm:${id}` : undefined;
+  return gpuModels(env).some((m) => m.id === id) ? `webllm:${id}` : undefined;
 }
 
 /** The model the user chose and saved, when this computer can still run it. */

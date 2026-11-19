@@ -88,6 +88,37 @@ export async function startModel(panel: Page, timeoutMin: number): Promise<Start
 }
 
 /** The page line of the panel, e.g. "localhost:1234 — 10 WebMCP tools". */
+/** Empties what the extension remembers of every site (saved chats and tool counts), so a
+ *  question sees no earlier one. The eval's browser profile is kept between runs, and the panel
+ *  restores a site's saved chat: without this, a question on the live node saw the answers of
+ *  older runs and of other models (found on 18 Nov 2026). */
+export async function clearMemory(panel: Page): Promise<void> {
+  await panel.evaluate(async () => {
+    const known = await indexedDB.databases();
+    if (!known.some((db) => db.name === 'webaiassist')) return;
+    await new Promise<void>((resolve, reject) => {
+      const open = indexedDB.open('webaiassist');
+      open.onerror = () => reject(new Error('the memory database did not open'));
+      open.onsuccess = () => {
+        const db = open.result;
+        const names = [...db.objectStoreNames];
+        if (names.length === 0) {
+          db.close();
+          resolve();
+          return;
+        }
+        const tx = db.transaction(names, 'readwrite');
+        for (const name of names) tx.objectStore(name).clear();
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => reject(new Error('the memory database did not clear'));
+      };
+    });
+  });
+}
+
 export const pageStatus = (panel: Page): Promise<string> => text(panel, '#page-status');
 
 /** How many WebMCP tools the panel says the open page has. */

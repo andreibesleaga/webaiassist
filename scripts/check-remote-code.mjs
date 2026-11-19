@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 // The Chrome Web Store forbids remotely hosted code in Manifest V3, and counts WebAssembly
 // as code. Two checks of a build: no bundle names a place that code could be fetched from,
-// and the only .wasm files are the pinned model libraries and runtime engines, byte for byte.
+// and the only .wasm files are the pinned engine files, byte for byte.
 import { libProblems, LIBS_FOLDER, MODEL_LIBS, pinnedWasmPaths } from './model-libs.mjs';
 
 const REMOTE_CODE_RULES = [
-  [/raw\.githubusercontent\.com/, 'names the remote model-library host raw.githubusercontent.com'],
+  [
+    /raw\.githubusercontent\.com/,
+    'names raw.githubusercontent.com, a host code could be fetched from',
+  ],
   [/https?:\/\/[^"'`\s]+\.wasm\b/, 'names a remote WebAssembly file'],
   [/import\(\s*["'`]https?:/, 'imports a remote module'],
   [/importScripts\(\s*["'`]https?:/, 'loads a remote worker script'],
@@ -27,8 +30,8 @@ export function checkModelLibFiles(files, read, pins = MODEL_LIBS) {
   const expected = pinnedWasmPaths(pins);
   const problems = files
     .filter((path) => path.endsWith('.wasm') && !expected.includes(path))
-    .map((path) => `${path} is not a pinned model library`);
-  for (const lib of [...pins.libs, ...(pins.runtimes ?? [])]) {
+    .map((path) => `${path} is not a pinned engine file`);
+  for (const lib of pins.runtimes) {
     const path = `${LIBS_FOLDER}/${lib.file}`;
     problems.push(...libProblems(lib, files.includes(path) ? Buffer.from(read(path)) : undefined));
   }

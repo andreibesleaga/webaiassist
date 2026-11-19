@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-// Where the WebLLM model runs, chosen at runtime by a WebGPU probe: the offscreen document
-// first, then the extension service worker. The maintainer's measured run (12 Nov 2026,
-// Windows 10, Chrome 157, AMD gcn-5) found WebGPU with shader-f16 in both, so the
-// offscreen document is the host and the service worker the proven fallback.
+// Where a graphics-card model runs, checked at runtime by a WebGPU probe: the offscreen
+// document. The engine runs in a Worker of its own, which the service worker cannot start, so
+// the service worker is probed for the diagnostics only and never hosts a model.
 import type { GpuReport } from '../protocol/messages';
 
 export type HostTarget = 'offscreen' | 'worker';
@@ -14,7 +13,7 @@ export interface HostChoice {
   readonly notes: readonly string[];
 }
 
-const ORDER: readonly HostTarget[] = ['offscreen', 'worker'];
+const ORDER: readonly HostTarget[] = ['offscreen'];
 const NAMES: Readonly<Record<HostTarget, string>> = {
   offscreen: 'offscreen document',
   worker: 'service worker',

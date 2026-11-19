@@ -15,7 +15,15 @@ import { parseEvalArgs } from './args.ts';
 import { openStubPanel } from './cpu-run.ts';
 import { launchChrome } from './chrome-launch.ts';
 import { nanoVerdict } from './nano-plan.ts';
-import { ask, modelStatus, pageTools, pressStart, startModel, type StartResult } from './panel.ts';
+import {
+  ask,
+  clearMemory,
+  modelStatus,
+  pageTools,
+  pressStart,
+  startModel,
+  type StartResult,
+} from './panel.ts';
 import { loadPrompts, promptsFor, type EvalPrompt } from './prompts.ts';
 import { scorePrompt, type Row } from './score.ts';
 import { EVAL_DIST, startSession, type EvalSession, type Launcher } from './session.ts';
@@ -112,7 +120,9 @@ async function startNano(panel: Page): Promise<NanoStart> {
   return { ...result, texts: [...texts] };
 }
 
+/** A fresh chat: nothing remembered of any site (see clearMemory), then a reload. */
 async function freshPanel(panel: Page): Promise<void> {
+  await clearMemory(panel);
   await panel.reload();
   await panel.locator('#page-status').filter({ hasNotText: 'No page yet.' }).waitFor();
   await startNano(panel);
@@ -124,6 +134,8 @@ async function askAll(
   target: 'stub' | 'live',
 ): Promise<Row[]> {
   const rows: Row[] = [];
+  // The first question too: the profile may hold this site's chat from an older run.
+  await freshPanel(panel);
   for (const prompt of prompts) {
     const seen = await ask(panel, prompt.text, PROMPT_TIMEOUT_S);
     const row = scorePrompt(prompt, seen, { model: 'nano', target, pageTools: TOOL_NAMES });

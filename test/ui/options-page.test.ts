@@ -25,10 +25,11 @@ describe('Options page', () => {
     expect(byId('max-steps-help').textContent).toMatch(/1 to 12/);
     expect([...select('webllm-model').options].map((o) => o.value)).toEqual([
       '',
-      'Qwen3-0.6B-q4f16_1-MLC',
-      'Qwen3.5-2B-q4f16_1-MLC',
-      'Llama-3.2-3B-Instruct-q4f16_1-MLC',
-      'gemma-4-E2B-it-q4f16_1-MLC',
+      'qwen3-0.6b-q4_k_m',
+      'qwen3-1.7b-q4_k_m',
+      'qwen3.5-2b-q4_k_m',
+      'llama-3.2-3b-instruct-q4_k_m',
+      'gemma-4-e2b-it-q4_k_m',
     ]);
     expect(document.getElementById('webllm-other')).toBeNull();
   });
@@ -40,14 +41,14 @@ describe('Options page', () => {
     input('max-steps').value = '9';
     input('memory').checked = false;
     input('site-facts').checked = false;
-    choose('webllm-model', 'Llama-3.2-3B-Instruct-q4f16_1-MLC');
+    choose('webllm-model', 'llama-3.2-3b-instruct-q4_k_m');
     await save();
     expect(deps.stored).toMatchObject({
       confirmMode: 'per-site',
       maxSteps: 9,
       memory: false,
       siteFacts: false,
-      webllmModel: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
+      webllmModel: 'llama-3.2-3b-instruct-q4_k_m',
     });
     expect(byId('options-status').textContent).toBe('Saved.');
     expect(deps.requested).toEqual([]);
@@ -126,17 +127,19 @@ describe('Options page', () => {
     expect(byId('options-status').textContent).toBe('Memory cleared.');
   });
 
-  it('leaves Gemma 4 E2B out of the graphics-card list when the graphics card lacks shader-f16', async () => {
+  it('lists Gemma 4 E2B whether the graphics card has shader-f16, lacks it, or that is not known', async () => {
     const ids = (): string[] => [...select('webllm-model').options].map((o) => o.value);
-    await startOptions({ ...fake(), shaderF16: false });
-    expect(ids()).toEqual([
-      '',
-      'Qwen3-0.6B-q4f16_1-MLC',
-      'Qwen3.5-2B-q4f16_1-MLC',
-      'Llama-3.2-3B-Instruct-q4f16_1-MLC',
-    ]);
-    loadPage('options.html');
-    await startOptions({ ...fake(), shaderF16: true });
-    expect(ids()).toContain('gemma-4-E2B-it-q4f16_1-MLC');
+    for (const shaderF16 of [false, true, undefined]) {
+      loadPage('options.html');
+      await startOptions({ ...fake(), shaderF16 });
+      expect(ids()).toEqual([
+        '',
+        'qwen3-0.6b-q4_k_m',
+        'qwen3-1.7b-q4_k_m',
+        'qwen3.5-2b-q4_k_m',
+        'llama-3.2-3b-instruct-q4_k_m',
+        'gemma-4-e2b-it-q4_k_m',
+      ]);
+    }
   });
 });

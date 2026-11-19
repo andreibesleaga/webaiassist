@@ -177,9 +177,27 @@ Then('the list scrolls inside the card and the question box stays in view', asyn
   }));
   expect(card.scrolls).toBe(true);
   expect(card.overflow).toBe('auto');
-  expect(card.height).toBeLessThanOrEqual(card.viewport * 0.4 + 1);
+  expect(card.height).toBeLessThanOrEqual(card.viewport * 0.3 + 1);
   await expect(panel.locator('#question')).toBeInViewport({ ratio: 1 });
   await expect(panel.locator('#send')).toBeInViewport({ ratio: 1 });
+  // The chat is half the panel's height even with the longest card, and can be dragged taller.
+  const chat = await panel.locator('.conversation').evaluate((el) => ({
+    height: el.getBoundingClientRect().height,
+    resize: getComputedStyle(el).resize,
+    viewport: window.innerHeight,
+  }));
+  expect(chat.height).toBeGreaterThanOrEqual(chat.viewport * 0.5 - 1);
+  expect(chat.resize).toBe('vertical');
+  // The panel now scrolls as a page; the question form holds the lower edge at every position.
+  await panel.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(panel.locator('#question')).toBeInViewport({ ratio: 1 });
+  await expect(panel.locator('#send')).toBeInViewport({ ratio: 1 });
+  const covered = await panel.evaluate(() => {
+    const form = document.querySelector('#ask')?.getBoundingClientRect();
+    const talk = document.querySelector('.conversation')?.getBoundingClientRect();
+    return form !== undefined && talk !== undefined && talk.bottom > form.top + 1;
+  });
+  expect(covered, 'at the end of the page the form does not cover the chat').toBe(false);
 });
 
 // ---- a tool that may change something -------------------------------------------------------------

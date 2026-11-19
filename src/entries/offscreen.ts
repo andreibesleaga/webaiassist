@@ -2,7 +2,7 @@
 // Offscreen document: the model host (chosen from the maintainer's measured run of 12 Nov 2026,
 // docs/SPIKE.md). It has only the `runtime` extension API. It answers the WebGPU probe sent
 // by the service worker and serves the side panel's model port; the model itself runs in a
-// Worker the document starts (shared/webllm-factory.ts), the reason it is opened for.
+// Worker the engine starts (shared/wllama-engine.ts), the reason the document is opened for.
 import { probeWebGpu } from '../adapters/webgpu-probe';
 import { parseMessage } from '../protocol/validate';
 import { hostModels } from './shared/model-hosting';

@@ -124,11 +124,11 @@ Feature: Download, consent, progress, cancel, cache and removal
     And the side panel is open on that page
     Then the bundled model library has the recorded SHA-256
 
-  # test: test/security-review/dist-review.test.ts, test/adapters/webllm-app-config.test.ts
+  # test: test/security-review/dist-review.test.ts, test/adapters/cpu-models.test.ts
   @unit
   Scenario: The WebGPU model downloads only from its fixed address
     Given the WebGPU model is started
-    Then its weights, tokenizer and configuration come from the one recorded revision
+    Then its weights come from the one recorded revision, with the recorded size and SHA-256
 
   # test: test/adapters/wllama-runtime.test.ts
   @unit

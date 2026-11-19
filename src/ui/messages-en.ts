@@ -39,8 +39,6 @@ export const EN = {
   runsIn: 'Ready: {model}. Running in this browser, on your graphics card (in the {host}).',
   runsOnCpu: 'Ready: {model}. Running in this browser, on your processor and memory ({threads}).',
   runsOnCpuPlain: 'Ready: {model}. Running in this browser, on your processor and memory.',
-  runsOnMain:
-    'Ready: {model}. Running in this browser, on your graphics card (on the offscreen document’s main thread: WebGPU did not work in its Worker).',
   groupLocal: 'On this computer, in the browser',
   groupServer: 'Your own server or a remote service',
   endpointLocal: 'your own server on this computer; nothing leaves it',
@@ -68,8 +66,6 @@ export const EN = {
   consentTitle: 'Download {name}?',
   consentBody:
     '{size} MB, once. From {host} (checksum checked before use). Stored in this browser; you can remove it in Options. Wi-Fi is better if your plan is limited.',
-  consentBodyPinned:
-    '{size} MB, once. From {host}, one fixed version of the model. Stored in this browser; you can remove it in Options. Wi-Fi is better if your plan is limited.',
   consentChromeTitle: 'Let Chrome download its own model?',
   consentChromeBody:
     'Chrome downloads and stores its built-in model itself (several GB). Chrome needs 22 GB free disk. Remove it later at chrome://on-device-internals.',
@@ -213,9 +209,9 @@ export const EN = {
     'Runs in this browser, on your processor and memory. Works on every computer. Downloads about {size} MB once. Slower than a graphics card. Nothing leaves your computer.',
   runtimeWebllm: 'Graphics card',
   runtimeWebllmHelp:
-    'Runs in this browser, on your graphics card (WebGPU). Downloads a model once (350 MB to 2.8 GB). Speed depends on the card. Nothing leaves your computer.',
+    'Runs in this browser, on your graphics card (WebGPU). Downloads a model once (400 MB to 3.1 GB). Speed depends on the card. Nothing leaves your computer.',
   cpuModelLabel: 'Model on the processor',
-  cpuModelHelp: 'Automatic picks the small model; the larger one downloads only if you choose it.',
+  cpuModelHelp: 'Automatic picks Qwen3 1.7B; the other models download only if you choose them.',
   runtimePromptApi: 'Chrome’s built-in model',
   runtimePromptApiHelp:
     'Runs in Chrome on this computer; Chrome manages the model. Optional. Chrome downloads it only when you choose it here or in the panel and press Start. Needs a recent Chrome on a capable computer.',
@@ -224,7 +220,7 @@ export const EN = {
     'Your own server (Ollama, LM Studio, llama.cpp, vLLM) or any other service. An address on this computer keeps your chat on it; any other address is remote and receives your questions and the page content you use.',
   webllmModelLabel: 'Model in the browser',
   webllmModelHelp:
-    'Automatic picks the small model (Qwen3 0.6B); the 3B model downloads only if you choose it. ' +
+    'Automatic picks Qwen3 1.7B; the other models download only if you choose them. ' +
     'For other models, use a chat endpoint such as Ollama.',
   automatic: 'Automatic',
   endpointPreset: 'Endpoint preset',

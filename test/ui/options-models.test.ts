@@ -82,12 +82,11 @@ describe('Options page: models and privacy', () => {
 
     it('lists every stored model with its size and a Remove button that names it', async () => {
       await startOptions(fake());
-      expect(rows()).toHaveLength(7);
-      expect(rows()[4]).toBe('Qwen3 0.6B on the processor: 397 MB');
+      expect(rows()).toHaveLength(5);
+      expect(rows()[0]).toBe('Qwen3 0.6B: 397 MB');
+      expect(rows().join()).not.toContain('on the processor');
       const first = document.querySelector('#model-store button');
-      expect(first?.getAttribute('aria-label')).toMatch(
-        /^Remove Qwen3 0\.6B on the graphics card \(352 MB\)$/,
-      );
+      expect(first?.getAttribute('aria-label')).toMatch(/^Remove Qwen3 0\.6B \(397 MB\)$/);
       expect(byId('model-store-empty').hidden).toBe(true);
       expect(document.body.textContent).toContain('chrome://on-device-internals');
     });
@@ -95,13 +94,11 @@ describe('Options page: models and privacy', () => {
     it('removes one model and says how much space came back', async () => {
       const deps = fake();
       await startOptions(deps);
-      (document.querySelectorAll('#model-store button')[4] as HTMLButtonElement).click();
+      (document.querySelectorAll('#model-store button')[0] as HTMLButtonElement).click();
       for (let i = 0; i < 5; i += 1) await tick();
       expect(deps.store.removed).toEqual(['cpu:qwen3-0.6b-q4_k_m']);
-      expect(rows()).toHaveLength(6);
-      expect(byId('options-status').textContent).toMatch(
-        /^Removed Qwen3 0\.6B on the processor.*; 397 MB freed\.$/,
-      );
+      expect(rows()).toHaveLength(4);
+      expect(byId('options-status').textContent).toMatch(/^Removed Qwen3 0\.6B.*; 397 MB freed\.$/);
     });
 
     it('asks before it removes all, and "Keep" removes nothing', async () => {
@@ -110,7 +107,7 @@ describe('Options page: models and privacy', () => {
       click('remove-all-models');
       for (let i = 0; i < 5; i += 1) await tick();
       expect(byId('remove-confirm').hidden).toBe(false);
-      expect(byId('remove-confirm-text').textContent).toBe('Remove 7 models and free 8856 MB?');
+      expect(byId('remove-confirm-text').textContent).toBe('Remove 5 models and free 7911 MB?');
       click('remove-confirm-no');
       expect(byId('remove-confirm').hidden).toBe(true);
       expect(deps.store.removed).toEqual([]);
@@ -127,12 +124,12 @@ describe('Options page: models and privacy', () => {
       expect(rows()).toEqual([]);
       expect(byId('model-store-empty').hidden).toBe(false);
       expect(byId('remove-all-models').hidden).toBe(true);
-      expect(byId('options-status').textContent).toBe('Removed 7 models; 8856 MB freed.');
+      expect(byId('options-status').textContent).toBe('Removed 5 models; 7911 MB freed.');
     });
 
     it('says "1 model", not "1 models", when one is stored', async () => {
       const deps = fake();
-      deps.store.stored = deps.store.stored.slice(4, 5);
+      deps.store.stored = deps.store.stored.slice(0, 1);
       await startOptions(deps);
       click('remove-all-models');
       for (let i = 0; i < 5; i += 1) await tick();
@@ -159,17 +156,18 @@ describe('Options page: models and privacy', () => {
       expect(byId('options-status').textContent).toBe(
         'A model could not be removed: the file is in use',
       );
-      expect(rows()).toHaveLength(7);
+      expect(rows()).toHaveLength(5);
     });
 
-    it('lists the three larger graphics-card models, each with its size, so they can be removed', async () => {
+    it('lists a model offered on both devices once, and the two graphics-card-only models', async () => {
       await startOptions(fake());
-      expect(rows().slice(1, 4)).toEqual([
-        'Qwen3.5 2B on the graphics card: 1072 MB',
-        'Llama 3.2 3B on the graphics card: 1817 MB',
-        'Gemma 4 E2B on the graphics card: 2830 MB',
+      expect(rows()).toEqual([
+        'Qwen3 0.6B: 397 MB',
+        'Qwen3 1.7B: 1107 MB',
+        'Qwen3.5 2B: 1281 MB',
+        'Llama 3.2 3B: 2019 MB',
+        'Gemma 4 E2B: 3107 MB',
       ]);
-      expect(rows()[6]).toBe('Qwen3.5 2B on the processor: 1281 MB');
     });
   });
 

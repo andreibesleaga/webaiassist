@@ -113,7 +113,7 @@ export interface ModelLoadResult {
   id: string;
   ok: boolean;
   error?: string;
-  /** Where the model runs: offscreen-worker, offscreen-main or service-worker. */
+  /** Where the model runs: offscreen-worker (the graphics card) or cpu:<threads>. */
   where?: string;
 }
 export interface ModelStop {

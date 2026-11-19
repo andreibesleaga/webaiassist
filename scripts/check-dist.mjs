@@ -45,7 +45,6 @@ const EXTRA_FILES = [
   'ui.css',
   'content-isolated.js',
   'content-main.js',
-  'model-worker.js',
   'query-worker.js',
   'webmcp-polyfill.js',
   'explorer.html',

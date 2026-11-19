@@ -14,8 +14,8 @@ import { checkModelLibFiles, checkRemoteCode } from './check-remote-code.mjs';
 import { MODEL_LIBS } from './model-libs.mjs';
 import { zipName } from './zip.mjs';
 
-/** The 0.1.0 zip is about 11.3 MB: the four model libraries and the llama.cpp engine (five compressed .wasm files) held most of it (9.3 MiB), and the query engine (oxigraph, 1.5 MB compressed wasm, plus the explorer and query code) is a planned addition of the graph tools. The limit is 12 MiB, a margin of about 0.7 MiB; raise it only for another planned addition (a jump in size means something unplanned got in). */
-export const MAX_ZIP_BYTES = 12 * 1024 * 1024;
+/** The 0.1.1 zip is about 4.6 MB (4.3 MiB): the llama.cpp engine and the query engine (two compressed .wasm files) hold most of it. The 0.1.0 zip was about 11.5 MB, with four compiled model libraries that 0.1.1 no longer ships. The limit is 6 MiB, a margin of about 1.7 MiB; raise it only for a planned addition (a jump in size means something unplanned got in). */
+export const MAX_ZIP_BYTES = 6 * 1024 * 1024;
 
 function listProblems(paths, distFiles) {
   const problems = [];

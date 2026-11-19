@@ -5,7 +5,7 @@
 > - A side panel for Chrome with a small AI model that runs on your own computer. It uses the tools a web page offers through [WebMCP](https://webmachinelearning.github.io/webmcp/), and asks you before each call.
 > - WebMCP is a draft, not a W3C Standard, and Chrome keeps it behind a switch you must turn on.
 > - With a model in the browser, what you type stays on your computer. There is no account and no analytics.
-> - Small models make mistakes: on one laptop the default model picked the right tool in 8 of 10 test questions, and answers took about 26 seconds on the test page (about 60 on the live site).
+> - Small models make mistakes: on one laptop the default model (Qwen3 1.7B on the graphics card) used a tool for every question and picked the right one in 8 of 10 questions on a test page and in 5 of 10 on a live site. An answer took a median of 9 to 15 seconds on the laptop's NVIDIA card and 14 to 20 on its integrated AMD card.
 > - It reads what a site says about AI and about itself, and follows a site's "no AI input" signal. Controls are written against OWASP, the EU AI Act's transparency points and NIST, each with a test.
 
 **One AI assistant for the websites that offer WebMCP tools, running in your own browser.** It is not
@@ -46,13 +46,13 @@ and test pages that stand for a node, so they show the interface, not a real mod
 
 ## Works with AgenticSystemCore 1.1.0
 
-| Part                            | Version                                                                                                                                                                                     |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| This extension                  | 0.1.0 (first release, 16 Nov 2026)                                                                                                                                                          |
-| AgenticSystemCore specification | 1.1.0: the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 Nov 2026                                                                     |
-| AgenticSystemCore engine        | 1.1.0: a node page offers ten WebMCP tools; the extension's test fixture is taken from that engine                                                                                          |
-| Chrome                          | Needs 126 or later; the processor models need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 15 Nov 2026; hand test, 16 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
-| WebMCP draft                    | Draft Community Group Report of 13 Nov 2026, Web Machine Learning Community Group. A draft: not a W3C Standard                                                                              |
+| Part                            | Version                                                                                                                                                                                                                        |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| This extension                  | 0.1.1 (19 Nov 2026): one engine, llama.cpp, for every model in the browser. 0.1.0 was the first release (16 Nov 2026)                                                                                                          |
+| AgenticSystemCore specification | 1.1.0: the version the two public nodes (agenticsystemcore.com and patterns.agenticsystemcore.com) state on 14 Nov 2026                                                                                                        |
+| AgenticSystemCore engine        | 1.1.0: a node page offers ten WebMCP tools; the extension's test fixture is taken from that engine                                                                                                                             |
+| Chrome                          | Needs 126 or later; the models in the browser (graphics card and processor) need 137. Tried: Chrome 157.0.8103.52 on Windows (built-in model, 15 Nov 2026; hand test, 16 Nov 2026) and Chromium 156.0.8078.4 (automated tests) |
+| WebMCP draft                    | Draft Community Group Report of 13 Nov 2026, Web Machine Learning Community Group. A draft: not a W3C Standard                                                                                                                 |
 
 "Works with" says the extension can read what a node publishes and call its tools. It does not say
 that any body or company has checked the extension, or that it meets a specification. A problem on a node? Use the
@@ -64,7 +64,7 @@ From the Chrome Web Store: [WebAIAssist](https://chromewebstore.google.com/detai
 
 Or load the release zip yourself:
 
-1. Download `webaiassist-0.1.0.zip` from the
+1. Download `webaiassist-0.1.1.zip` from the
    [releases page](https://github.com/andreibesleaga/webaiassist/releases) and unzip it.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Choose **Load unpacked** and pick the unzipped folder.
@@ -88,13 +88,13 @@ reads or may change something), and what the site publishes for machines. With n
 
 Pick one in the panel or in Options. The panel picks one for you, and says why in a sentence.
 
-| Where it runs                               | What runs it                                                                               | What leaves the computer                                                                                                                                            |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| In the browser, on the graphics card        | WebLLM on WebGPU: Qwen3 0.6B or Qwen3.5 2B; Llama 3.2 3B and Gemma 4 E2B, marked slow      | Only the download of the model files, once, from `huggingface.co`. Your questions, the page text and the results stay.                                              |
-| In the browser, on the processor and memory | llama.cpp in WebAssembly: Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B (Chrome 137 or newer)       | The same: the model download only.                                                                                                                                  |
-| Chrome's built-in model                     | Chrome's own model (Gemini Nano), under Google's terms                                     | Nothing from this extension. Chrome downloads and runs the model.                                                                                                   |
-| Your own server on this computer            | An address on `localhost` or `127.0.0.1`: Ollama, LM Studio or another OpenAI-style server | The conversation goes to that local address. It does not leave the computer.                                                                                        |
-| A remote service                            | Any `https` OpenAI-style address, for example OpenRouter                                   | Your questions, the page's tool list, tool results, any page text you read and your API key go to that host, which may charge. The panel asks first, once per host. |
+| Where it runs                               | What runs it                                                                                                                                           | What leaves the computer                                                                                                                                            |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| In the browser, on the graphics card        | llama.cpp in WebAssembly with WebGPU: Qwen3 1.7B (the default), Qwen3 0.6B, Qwen3.5 2B or Llama 3.2 3B; Gemma 4 E2B, marked slow (Chrome 137 or newer) | Only the download of the model files, once, from `huggingface.co`. Your questions, the page text and the results stay.                                              |
+| In the browser, on the processor and memory | llama.cpp in WebAssembly: Qwen3 0.6B, Qwen3 1.7B or Qwen3.5 2B (Chrome 137 or newer)                                                                   | The same: the model download only.                                                                                                                                  |
+| Chrome's built-in model                     | Chrome's own model (Gemini Nano), under Google's terms                                                                                                 | Nothing from this extension. Chrome downloads and runs the model.                                                                                                   |
+| Your own server on this computer            | An address on `localhost` or `127.0.0.1`: Ollama, LM Studio or another OpenAI-style server                                                             | The conversation goes to that local address. It does not leave the computer.                                                                                        |
+| A remote service                            | Any `https` OpenAI-style address, for example OpenRouter                                                                                               | Your questions, the page's tool list, tool results, any page text you read and your API key go to that host, which may charge. The panel asks first, once per host. |
 
 Model licences: [docs/MODEL-LICENCES.md](docs/MODEL-LICENCES.md). Measured speeds and tool use:
 [docs/EVAL.md](docs/EVAL.md).
@@ -154,7 +154,9 @@ The same tab has **Query**, **Vocabulary** and **Page data**. Query is a text bo
 questions of the AgenticSystemCore vocabulary; it runs in your browser with Oxigraph (WebAssembly, in the package)
 and sends nothing. An update or a `SERVICE` clause is refused. On a node, the model has one built-in tool,
 `webaiassist_query_graph`, for counts, lists and links that the page's tools cannot give; the same engine
-answers it, and no page tool can take its name. In the mode "ask for every call" it asks before each call, like a page tool; in the other modes it runs without a per-call question.
+answers it, and no page tool can take its name. A model in the browser (graphics card or processor) gets it
+only on a node page that offers no tools of its own: with both lists, the small models chose it for questions a
+page tool answers. In the mode "ask for every call" it asks before each call, like a page tool; in the other modes it runs without a per-call question.
 
 A site that says it wants no AI input (`Content-Signal: ai-input=no` in `robots.txt`) gets no
 page text or site files sent to the model and no **Read this page**. Its tool list and the results of the
@@ -199,7 +201,9 @@ local model on that tab; it is not offered with a chat endpoint.
 - **When to ask before a tool**: before every call (default), or once per site per session for
   tools the page marks read-only.
 - **Tool steps per question**: 1 to 12 (default 6).
-- **Memory**: on or off, and **Clear memory**.
+- **Memory**: on or off, and **Clear memory**. With Memory on, the model is given the earlier questions
+  of a site that used a tool; an earlier answer given without a tool is left out, because small models
+  copied such answers instead of asking the page.
 - **Give the model short facts from what the site publishes**: on by default.
 - **Downloaded models**: the list with sizes, and removal of one or all.
 - **Forget all sites**: clears what is kept for every site at once: chats, tool counts, activity entries,
@@ -212,7 +216,9 @@ local model on that tab; it is not offered with a chat endpoint.
 
 ## Other runtimes
 
-Use one when the computer has no usable graphics card, or to run a larger model.
+Use one when the computer has no usable graphics card, or to run a larger model. The graphics-card
+and the processor models run on one engine, llama.cpp in WebAssembly ([wllama](https://github.com/ngxson/wllama), MIT),
+and a model offered both ways is one file: it downloads once.
 
 **Qwen3 on the processor.** Choose **Qwen3 0.6B on the processor** (397 MB download, about 0.8 GB
 of memory) or **Qwen3 1.7B on the processor** (1.1 GB, about 1.5 GB) in the model list. It runs
@@ -227,24 +233,35 @@ called one each time; after the tool-use change the 0.6B model called a tool in 
 the 1.7B model in 5 of 5 ([docs/EVAL.md](docs/EVAL.md)). The downloaded file is checked against a recorded SHA-256 and deleted if it
 differs; a second Start uses the stored copy with no download.
 
-**Qwen3.5 2B.** Qwen3.5 2B is in the list twice: on the graphics card (about 1.1 GB
-download, about 2.3 GB of graphics memory) and on the processor (1.3 GB download, about 1.7 GB of
-memory). On the processor it loaded and answered all five measured questions, about twice as
-slowly as Qwen3 1.7B (3 to 4 tokens a second, 2.5 to 4 minutes a question). In the first run it called
-the expected tool first in four of the five; after the tool-use change, in three of the five
-([docs/EVAL.md](docs/EVAL.md)). On the graphics card it picked the right tool in 6 of 10
-questions, at 2 to 5 minutes a question (run of 16 Nov 2026). It is Apache-2.0 and never picked by
-itself. Llama 3.2 3B and Gemma 4 E2B are in the graphics-card list, each marked "slow: may stall on a
-laptop graphics card": on the measured graphics card both ran past five minutes on their first
-question and stopped the browser. Neither is ever picked by itself. Gemma 4 E2B (2.8 GB download,
-about 3.4 GB of graphics memory, Apache-2.0) is listed only when the graphics card reports the
-WebGPU feature `shader-f16`. A graphics
-card with little memory or a slow one can lose its device on a larger model; the panel then says
-the model stopped and offers to restart it or to use the processor.
+**The graphics-card models.** The list has five. Measured on one laptop with two graphics cards on
+18 Nov 2026, ten questions on a test node and ten on a live node, each question in a new chat
+([docs/EVAL.md](docs/EVAL.md)). Ten questions show a direction, not a rate.
+
+| Model                | Download | Graphics memory | Right tool, NVIDIA card: test node / live node | Right tool, integrated AMD card | Median answer, NVIDIA: test / live | Median answer, AMD: test / live |
+| -------------------- | -------- | --------------- | ---------------------------------------------- | ------------------------------- | ---------------------------------- | ------------------------------- |
+| Qwen3 1.7B (default) | 1.1 GB   | about 1.4 GB    | 8 / 5 of 10                                    | 8 / 5 of 10                     | 9 s / 15 s                         | 14 s / 20 s                     |
+| Qwen3 0.6B           | 397 MB   | about 0.7 GB    | 8 / 0 of 10                                    | 7 / 1 of 10                     | 7 s / 4 s                          | 10 s / 7 s                      |
+| Qwen3.5 2B           | 1.3 GB   | about 1.6 GB    | 6 / 5 of 10                                    | 9 / 2 of 10                     | 14 s / 21 s                        | 15 s / 31 s                     |
+| Llama 3.2 3B         | 2.0 GB   | about 2.4 GB    | 9 / 8 of 10                                    | 7 / 7 of 10                     | 14 s / 15 s                        | 18 s / 17 s                     |
+| Gemma 4 E2B          | 3.1 GB   | about 3.5 GB    | 6 / 6 of 10                                    | 8 / 5 of 10                     | 51 s / 94 s                        | 79 s / 154 s                    |
+
+Qwen3 1.7B and Llama 3.2 3B used a tool for every question, or all but one. Qwen3 0.6B answered
+almost every question on the live node without a tool.
+Llama 3.2 3B picked the right tool most often; it is a 2.0 GB download under the Llama 3.2
+Community License, so the panel does not pick it by itself. Gemma 4 E2B took 1 to 2.5 minutes an
+answer and some answers ran past 5 minutes; it is marked "slow: may stall on a laptop graphics card".
+Its 3.1 GB file is checked in pieces, because the browser hashes at most 2 GB at once. Of the five, only Qwen3 1.7B is picked
+by itself; the others download when you choose them.
+
+Qwen3.5 2B is also offered on the processor (1.3 GB download, about 1.7 GB of memory). There it
+answered all five measured questions, about twice as slowly as Qwen3 1.7B (3 to 4 tokens a second,
+2.5 to 4 minutes a question), with the expected tool first in three of the five
+([docs/EVAL.md](docs/EVAL.md)). A graphics card with little memory or a slow one can lose its
+device on a larger model; the panel then says the model stopped and offers to start it again.
 
 **Which model is selected, and the question before a download.** A model you choose is kept.
 Until you choose, the panel picks one and says why in one sentence under the list: Chrome's
-built-in model when Chrome has it ready, otherwise the graphics card (Qwen3 0.6B) whenever the
+built-in model when Chrome has it ready, otherwise the graphics card (Qwen3 1.7B) whenever the
 browser can use it (a slow first answer is named in that sentence), otherwise Qwen3 1.7B on the processor. Before the first download of any
 model the panel shows its size and where it comes from and waits for **Download**. Options lists
 the downloaded models with their sizes and removes them, and **Forget all sites** clears every
@@ -364,9 +381,9 @@ one, open an issue.
 - **You, on any site with WebMCP tools:** you ask in your own words, and the site's own functions do
   the work instead of a model guessing at buttons. You see each call and its arguments before it runs.
   With a model in the browser nothing you type leaves your computer, and there is no account or fee.
-  What you pay is time: on one laptop graphics card a small local model took a median of 26 seconds
-  on the test node and 60 seconds on the live node, and about 2 minutes on the processor, and it picks the
-  wrong tool more often than a large one ([docs/EVAL.md](docs/EVAL.md)).
+  What you pay is time: on one laptop the default model took a median of 9 to 15 seconds an answer on
+  the NVIDIA graphics card, 14 to 20 seconds on the integrated AMD one and about 30 seconds on the
+  processor (the first answer after a start about 2 minutes), and it picks the wrong tool more often than a large model ([docs/EVAL.md](docs/EVAL.md)).
 - **A site owner:** your visitors' assistant uses the tools you wrote, with the limits you set, and
   follows your `ai-input` signal. You can test your tools with the developer report and the test page
   before any large assistant arrives.
@@ -387,17 +404,22 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
 
 ## Limits
 
-- Chromium browsers only (Chrome 126 or later; the processor models need Chrome 137).
+- Chromium browsers only (Chrome 126 or later; the models in the browser, on the graphics card or the
+  processor, need Chrome 137).
 - WebMCP is a draft, not a W3C Standard; its shape may still change. In Chrome it needs the switch
   described above, so sites' tools do not appear without it.
 - Answers can be wrong: they come from an AI model. Check anything that matters.
 - Chrome's built-in model test: measured on a real computer on 14 Nov 2026 (Chrome 157, Windows). The download, started from the click, took 300 s; later starts took 3 to 14 s. After the tool-use change (15 Nov 2026) it used a tool in 5 of 5 questions on the test node and in 5 of 5 on the live node, the whole expected sequence in 4 of 5 on each, and an answer took 18 to 36 s (report: docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json). It stays optional. Small models choose tools less reliably than large ones.
 - A page has tools only if its own scripts register them through WebMCP.
-- The model in the browser needs WebGPU. Qwen3 0.6B needs about 1.4 GB of graphics memory,
-  Qwen3.5 2B and Llama 3.2 3B about 2.3 GB, Gemma 4 E2B about 3.4 GB.
-  The first answer after a load compiles the model's GPU programs, which takes up to a minute on
-  a slow GPU; the panel says so while it waits. Long prompts run in short pieces, so a slow GPU's
-  watchdog does not cut the model off; a model too large for the card can still stall (the two marked slow did).
+- A model on the graphics card needs WebGPU. Qwen3 0.6B needs about 0.7 GB of graphics memory,
+  Qwen3 1.7B about 1.4 GB, Qwen3.5 2B about 1.6 GB, Llama 3.2 3B about 2.4 GB, Gemma 4 E2B about 3.5 GB.
+  The first answer after a load is the slowest, up to a minute on a slow graphics card; the panel says
+  so while it waits. The engine sends a prompt to the card in pieces of 64 tokens, so a slow card's
+  watchdog does not cut the model off; a model too large for the card can still stall.
+- On a laptop with two graphics cards the browser decides which one a page gets, and the extension
+  cannot choose. On the measured laptop Chromium gave the integrated card unless it was started with
+  `--force_high_performance_gpu`; the default model's median answer on the test page took 14 seconds
+  on the integrated card and 9 on the other ([docs/EVAL.md](docs/EVAL.md)).
 - Small models pick tools less reliably than large ones; [docs/EVAL.md](docs/EVAL.md) records
   the measured rate.
 - The extension asks before tool calls, but it cannot check what a page's tool really does.
@@ -410,15 +432,15 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
 - **The model did not load, or no WebGPU**: use a Qwen model on the processor, Chrome's
   built-in model or an endpoint.
 - **The processor model says it needs memory**: close other tabs, or choose the 0.6B model.
-- **The model stopped with a lost GPU device**: the model host restarts itself; press **Start**
-  again. If it repeats, the computer's GPU is too slow for the model: choose Chrome's built-in
-  model or an endpoint.
+- **The model stopped with a lost GPU device**: press **Start** again; the model loads again. If it
+  repeats, the model is too large for the computer's graphics card: choose a smaller model, the same
+  model on the processor, Chrome's built-in model or an endpoint.
 - **No WebMCP tools**: see [WebMCP in your browser](#webmcp-in-your-browser), or **Read this page**.
 - **Not allowed yet**: press **Allow** at the top of the panel and accept Chrome's request, or
   click the toolbar button on the page. `chrome://` pages and the Chrome Web Store are closed to
   extensions.
 - **Endpoint fails or answers 403**: is Ollama or LM Studio running? Ollama needs `OLLAMA_ORIGINS`.
-- **Wrong tool, or "no valid action"**: try Qwen3 1.7B on the processor, or a chat endpoint, or ask more directly.
+- **Wrong tool, or "no valid action"**: try Qwen3 1.7B (on the graphics card or the processor), or a chat endpoint, or ask more directly.
 - **What does this browser support?** Load the development build (`npm run build:smoke`, folder
   `dist-smoke`), then **Help**, **Open the browser check** ([docs/SPIKE.md](docs/SPIKE.md)).
 

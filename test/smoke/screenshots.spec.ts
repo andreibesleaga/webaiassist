@@ -50,8 +50,6 @@ test('the four screenshots', async () => {
   const options = await session.context.newPage();
   await options.setViewportSize({ width: 760, height: 900 });
   await options.goto(`chrome-extension://${session.extensionId}/options.html`);
-  await expect(options.locator('#webllm-model option')).toHaveCount(
-    await webllmOptionCount(options),
-  );
+  await expect(options.locator('#webllm-model option')).toHaveCount(webllmOptionCount());
   await options.screenshot({ path: shot('4-options-page') });
 });

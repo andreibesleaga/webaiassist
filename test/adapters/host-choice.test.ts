@@ -23,26 +23,24 @@ describe('chooseHost', () => {
     expect(asked).toEqual(['offscreen']);
   });
 
-  it('falls back to the service worker and says why', async () => {
-    const host = await chooseHost((target) =>
-      Promise.resolve(target === 'offscreen' ? no('no adapter') : yes),
-    );
-    expect(host).toEqual({ host: 'worker', notes: ['offscreen document: no adapter'] });
+  it('never uses the service worker: with no adapter in the offscreen document it says why', async () => {
+    const asked: string[] = [];
+    const host = await chooseHost((target) => {
+      asked.push(target);
+      return Promise.resolve(no('no adapter'));
+    });
+    expect(host).toEqual({ host: 'none', notes: ['offscreen document: no adapter'] });
+    expect(asked).toEqual(['offscreen']);
   });
 
-  it('reports none when neither has WebGPU, including a probe that throws', async () => {
-    const host = await chooseHost((target) =>
-      target === 'offscreen' ? Promise.reject(new Error('closed')) : Promise.resolve(no('x')),
-    );
-    expect(host).toEqual({
-      host: 'none',
-      notes: ['offscreen document: closed', 'service worker: x'],
-    });
+  it('reports none when the probe throws', async () => {
+    const host = await chooseHost(() => Promise.reject(new Error('closed')));
+    expect(host).toEqual({ host: 'none', notes: ['offscreen document: closed'] });
   });
 
   it('notes a report with no adapter and no error text', async () => {
     const plain: GpuReport = { available: false, adapter: false, features: [], limits: {} };
     const host = await chooseHost(() => Promise.resolve(plain));
-    expect(host.notes).toEqual(['offscreen document: no WebGPU', 'service worker: no WebGPU']);
+    expect(host.notes).toEqual(['offscreen document: no WebGPU']);
   });
 });

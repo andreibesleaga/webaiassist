@@ -50,7 +50,7 @@ describe('the panel changes or closes a model', () => {
     click('start');
     await settle();
     deps.model = second;
-    byId<HTMLSelectElement>('model').value = 'webllm:Llama-3.2-3B-Instruct-q4f16_1-MLC';
+    byId<HTMLSelectElement>('model').value = 'webllm:llama-3.2-3b-instruct-q4_k_m';
     click('start');
     await settle();
     expect(order).toEqual(['unload first', 'load second']);
@@ -74,7 +74,7 @@ describe('the panel changes or closes a model', () => {
       };
       deps.model = old;
       await startPanel(deps);
-      byId<HTMLSelectElement>('model').value = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+      byId<HTMLSelectElement>('model').value = 'webllm:qwen3-0.6b-q4_k_m';
       click('start');
       await settle();
       deps.model = next;
@@ -91,7 +91,7 @@ describe('the panel changes or closes a model', () => {
     });
 
     it('lets the old graphics model go first for another graphics model', async () => {
-      const { order } = await twoStarts('webllm:Llama-3.2-3B-Instruct-q4f16_1-MLC');
+      const { order } = await twoStarts('webllm:llama-3.2-3b-instruct-q4_k_m');
       expect(order).toEqual(['unload old']); // the new model waits for the memory to be free
     });
   });

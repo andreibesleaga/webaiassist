@@ -42,9 +42,20 @@ export function mismatch(model: CpuModel): string {
 /** WebAssembly and the allocator report a lack of memory in several ways. */
 const MEMORY = /memory|alloc|out of bounds|too large|RangeError/i;
 
-export function cpuLoadError(error: unknown, model: CpuModel): string {
+export function cpuLoadError(
+  error: unknown,
+  model: CpuModel,
+  device: 'cpu' | 'gpu' = 'cpu',
+): string {
   const text = reason(error);
   if (!MEMORY.test(text) && !(error instanceof RangeError)) return text;
+  if (device === 'gpu') {
+    return (
+      `${modelName(model)} needs about ${model.memoryMb} MB of graphics memory and the graphics ` +
+      'card could not give it. Close other tabs or choose a smaller model or one on the processor, ' +
+      `then press Start. (${text})`
+    );
+  }
   return (
     `${modelName(model)} needs about ${model.memoryMb} MB of free memory and this computer ` +
     'could not give it. Close other tabs or choose the smaller model, then press Start. ' +

@@ -5,7 +5,9 @@
 // wllama's cache in the extension's private file storage. It never calls setCompat, so the
 // remote compatibility build is never used (its address is removed from the bundle).
 import { Wllama, type CacheEntryMetadata, type CacheManager } from '@wllama/wllama/esm/index.js';
+import { sha256OfBlob, sha256OfParts } from '../../adapters/sha256-parts';
 import type {
+  Device,
   WllamaChatRequest,
   WllamaEngineLike,
   WllamaFactory,
@@ -17,6 +19,12 @@ const CHECKED_KEY = 'webaiassistCheckedSha256';
 /** Qwen's recommended settings for replies without reasoning text. */
 const SAMPLING = { temperature: 0.7, top_p: 0.8, top_k: 20 } as const;
 const MAX_REPLY_TOKENS = 768;
+/** Every layer on the graphics card (llama.cpp takes any number above the model's own). */
+const ALL_LAYERS = 99_999;
+/** Tokens sent to the graphics card in one piece of work. With llama.cpp's default (2048) a
+ *  1.1 GB model made the graphics driver give up on the first question ("device hung", measured
+ *  18 Nov 2026, Windows, AMD gcn-5, wllama 3.8.1 and 3.13.0); with 64 the same model answered. */
+const GPU_BATCH = 64;
 
 type Checked = CacheEntryMetadata & { [CHECKED_KEY]?: string };
 
@@ -32,11 +40,6 @@ interface Chunk {
   choices: { delta: { content?: string | null } }[];
   timings?: Timings;
 }
-
-export const sha256OfBlob = async (blob: Blob): Promise<string> => {
-  const digest = await crypto.subtle.digest('SHA-256', await blob.arrayBuffer());
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-};
 
 /** The measuring builds only (smoke, eval): the speed of the prompt and of the reply of each
  *  answer, kept in localStorage, which every page of the extension shares, for `npm run
@@ -83,6 +86,12 @@ class WllamaEngine implements WllamaEngineLike {
     return sha256OfBlob(blob);
   }
 
+  async sha256Parts(url: string, partBytes: number): Promise<string[]> {
+    const blob = await this.wllama.cacheManager.open(url);
+    if (!blob) throw new Error('The stored file is missing.');
+    return sha256OfParts(blob, partBytes);
+  }
+
   remove(url: string): Promise<void> {
     return this.wllama.cacheManager.delete(url);
   }
@@ -101,13 +110,15 @@ class WllamaEngine implements WllamaEngineLike {
   }
 
   /** Loads from the stored copy only; a missing copy is an error, never a second download. */
-  async load(url: string, contextTokens: number): Promise<void> {
+  async load(url: string, contextTokens: number, device: Device): Promise<void> {
     const blob = await this.wllama.cacheManager.open(url);
     if (!blob)
       throw new Error('The stored model file is missing. Press Start to download it again.');
     await this.wllama.loadModel([blob], {
       n_ctx: contextTokens,
-      n_gpu_layers: 0,
+      ...(device === 'gpu'
+        ? { n_gpu_layers: ALL_LAYERS, n_batch: GPU_BATCH }
+        : { n_gpu_layers: 0 }),
       flash_attn: true,
       cache_type_k: 'q8_0',
       cache_type_v: 'q8_0',

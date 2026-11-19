@@ -61,7 +61,9 @@ Read again on 13 Nov 2026 (page updated 21 Oct 2026, and the explainer at github
 - `prompt()` and `promptStreaming()` take `responseConstraint` (a JSON Schema) and `omitResponseConstraintInput`; with the latter the schema does not count against the window.
 - Not from Chrome's page, from forum and blog reports (marked reported in the code and the panel): a window of about 9,216 tokens; `create()` starts the download only with user activation; the model needs the official Chrome build and is removed after 30 days without use. The code reads the window at run time and hard-codes none of these.
 
-## 4. WebLLM
+## 4. WebLLM (used by version 0.1.0; removed in 0.1.1)
+
+Version 0.1.1 no longer ships WebLLM or its model libraries; the graphics-card models run on wllama (section 15). This section records what was read for version 0.1.0.
 
 - URLs: <https://github.com/mlc-ai/web-llm>, <https://registry.npmjs.org/@mlc-ai/web-llm/latest>, <https://raw.githubusercontent.com/mlc-ai/web-llm/main/src/config.ts>, <https://github.com/mlc-ai/web-llm/tree/main/examples>
 - Fetched 12 Nov 2026.
@@ -165,7 +167,7 @@ Difference from earlier notes: none.
 - The maintainer's run on Windows 10, Chrome 157, AMD gcn-5 found WebGPU with `shader-f16` in the page,
   the service worker and the offscreen document, and native `document.modelContext`
   ([SPIKE.md](SPIKE.md)).
-- WebLLM is pinned to 0.2.86 (11 Oct 2026), the newest release at least two weeks old on 12 Nov.
+- Version 0.1.0 pinned WebLLM to 0.2.86 (11 Oct 2026), the newest release at least two weeks old on 12 Nov; version 0.1.1 removed it.
   Its `prebuiltAppConfig` has `Qwen3-0.6B-q4f16_1-MLC` and `Llama-3.2-3B-Instruct-q4f16_1-MLC`,
   with weights on `huggingface.co/mlc-ai` and model libraries on
   `raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs`. `extra_body.enable_thinking` exists for
@@ -175,9 +177,9 @@ Difference from earlier notes: none.
 
 ## 13. Release-candidate checks (12 Nov 2026)
 
-- Remote code: <https://developer.chrome.com/docs/webstore/program-policies/mv3-requirements>: "the full functionality of an extension must be easily discernible from its submitted code"; external resources "must not contain any logic". <https://developer.chrome.com/docs/extensions/develop/migrate/remote-hosted-code>: "Remotely hosted code, or RHC, is what the Chrome Web Store calls anything that is executed by the browser that is loaded from someplace other than the extension's own files. Things like JavaScript and WASM." It "does not include data or things like JSON or CSS". Decision: the model libraries ship inside the package (two on 12 Nov, four from 14 Nov 2026).
-- Model libraries: WebLLM 0.2.86 loads them from `raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_86/base/`. The only commit touching that folder is `00fe7a40e57e5e8eb9fef87526a4bf28ad5846c0` (11 Oct 2026, "Rebuild v0_2_86 with current TVM and add Gemma 4"). Files, sizes and SHA-256 in `scripts/model-libs.json`; the files at `main` had the same hashes on 12 Nov 2026. WebLLM's `ModelRecord.integrity.model_lib` takes an SRI hash and checks it before running the library (`lib/integrity.d.ts`).
-- Weights: Hugging Face API, `mlc-ai/Qwen3-0.6B-q4f16_1-MLC` sha `8c14ce481d4c692769976ad52afea453a102df19` (last modified 18 Apr 2026), `mlc-ai/Llama-3.2-3B-Instruct-q4f16_1-MLC` sha `1e80abf71e3d17cd564e2d2b63caa15cb226018e` (7 Sep 2025); both `resolve/<sha>/mlc-chat-config.json` URLs answered.
+- Remote code: <https://developer.chrome.com/docs/webstore/program-policies/mv3-requirements>: "the full functionality of an extension must be easily discernible from its submitted code"; external resources "must not contain any logic". <https://developer.chrome.com/docs/extensions/develop/migrate/remote-hosted-code>: "Remotely hosted code, or RHC, is what the Chrome Web Store calls anything that is executed by the browser that is loaded from someplace other than the extension's own files. Things like JavaScript and WASM." It "does not include data or things like JSON or CSS". Decision for version 0.1.0: the model libraries ship inside the package (two on 12 Nov, four from 14 Nov 2026). Version 0.1.1 ships no model library; its only compiled files are `model-libs/wllama.wasm` and `model-libs/oxigraph.wasm`, pinned by size and SHA-256 in `scripts/model-libs.json`.
+- Model libraries (version 0.1.0): WebLLM 0.2.86 loads them from `raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_86/base/`. The only commit touching that folder is `00fe7a40e57e5e8eb9fef87526a4bf28ad5846c0` (11 Oct 2026, "Rebuild v0_2_86 with current TVM and add Gemma 4"). Files, sizes and SHA-256 in `scripts/model-libs.json`; the files at `main` had the same hashes on 12 Nov 2026. WebLLM's `ModelRecord.integrity.model_lib` takes an SRI hash and checks it before running the library (`lib/integrity.d.ts`).
+- Weights of version 0.1.0: Hugging Face API, `mlc-ai/Qwen3-0.6B-q4f16_1-MLC` sha `8c14ce481d4c692769976ad52afea453a102df19` (last modified 18 Apr 2026), `mlc-ai/Llama-3.2-3B-Instruct-q4f16_1-MLC` sha `1e80abf71e3d17cd564e2d2b63caa15cb226018e` (7 Sep 2025); both `resolve/<sha>/mlc-chat-config.json` URLs answered.
 - Store images: <https://developer.chrome.com/docs/webstore/images>: a 128 × 128 icon in the zip; at least one 1280 × 800 or 640 × 400 screenshot; small promo tile 440 × 280 optional.
 - Store pages and the browser pages: the Chrome Web Store policies are in section 8; the browser pages are listed with dates in [BROWSERS.md](BROWSERS.md).
 - Ollama allowed origins: `envconfig/config.go` on `main` lists localhost origins and `app://`, `file://`, `tauri://`, `vscode-webview://`, `vscode-file://`, plus `OLLAMA_ORIGINS`; no `chrome-extension://`.
@@ -196,11 +198,12 @@ Difference from earlier notes: none.
   and a few small helpers (`commander`, `cli-table3`, `mime-types`, `tinyglobby`), all pinned by
   `package-lock.json`.
 
-## 15. wllama (llama.cpp in WebAssembly) and the processor models (14 Nov 2026)
+## 15. wllama (llama.cpp in WebAssembly) and the models (14 Nov 2026; graphics-card models added 18 Nov 2026)
 
 - `@wllama/wllama` 3.8.1 (2 Oct 2026, MIT; <https://github.com/ngxson/wllama>), exact pin, the
   newest release at least two weeks old on 13 Nov 2026. It bundles llama.cpp `b11364-46ca246`.
-  Nothing replaces it (no earlier CPU runtime). Version 3.13.0 (8 Nov 2026) is younger than two
+  Since version 0.1.1 it is the only engine for local models: on the processor, or with every layer
+  on the graphics card through WebGPU (`n_batch` 64, see `src/adapters/wllama-runtime.ts`). Version 3.13.0 (8 Nov 2026) is younger than two
   weeks; same-major bump from 22 Nov 2026. No dependencies. Read: `npm view`, the package files
   (`esm/index.js`, `esm/*.d.ts`), its README.
 - The package has no `exports` and its `main` points to a file that is not there; the extension
@@ -213,27 +216,34 @@ Difference from earlier notes: none.
   after `setCompat`, which the extension never calls. The build replaces them
   (`wllamaNoRemote` in `scripts/model-libs.mjs`) and fails if the package no longer has exactly two.
 - Models (Hugging Face, GGUF, Q4_K_M; address pinned to one commit; size and SHA-256 read from the
-  Hugging Face API on 13 Nov 2026 and checked after the download; the file was downloaded and its
+  Hugging Face API on 13 Nov 2026 (the last two rows on 18 Nov 2026) and checked after the download; the file was downloaded and its
   SHA-256 computed on 14 Nov 2026 for the 0.6B model):
 
-  | Model                     | Repository at commit                                                 | File                     | Bytes         | SHA-256                                                            | Licence    |
-  | ------------------------- | -------------------------------------------------------------------- | ------------------------ | ------------- | ------------------------------------------------------------------ | ---------- |
-  | Qwen3 0.6B (default)      | `unsloth/Qwen3-0.6B-GGUF` `50968a4468ef4233ed78cd7c3de230dd1d61a56b` | `Qwen3-0.6B-Q4_K_M.gguf` | 396,705,472   | `ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a` | Apache-2.0 |
-  | Qwen3 1.7B (alternative)  | `unsloth/Qwen3-1.7B-GGUF` `d7f544eead698dbd1f15126ef60b45a1e1933222` | `Qwen3-1.7B-Q4_K_M.gguf` | 1,107,409,472 | `b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897` | Apache-2.0 |
-  | Qwen3.5 2B (added 14 Nov) | `unsloth/Qwen3.5-2B-GGUF` `f6d5376be1edb4d416d56da11e5397a961aca8ae` | `Qwen3.5-2B-Q4_K_M.gguf` | 1,280,835,840 | `aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223` | Apache-2.0 |
+  | Model                                                              | Repository at commit                                                            | File                                | Bytes         | SHA-256                                                            | Licence                     |
+  | ------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ----------------------------------- | ------------- | ------------------------------------------------------------------ | --------------------------- |
+  | Qwen3 0.6B (`qwen3-0.6b-q4_k_m`, default)                          | `unsloth/Qwen3-0.6B-GGUF` `50968a4468ef4233ed78cd7c3de230dd1d61a56b`            | `Qwen3-0.6B-Q4_K_M.gguf`            | 396,705,472   | `ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a` | Apache-2.0                  |
+  | Qwen3 1.7B (`qwen3-1.7b-q4_k_m`, alternative)                      | `unsloth/Qwen3-1.7B-GGUF` `d7f544eead698dbd1f15126ef60b45a1e1933222`            | `Qwen3-1.7B-Q4_K_M.gguf`            | 1,107,409,472 | `b139949c5bd74937ad8ed8c8cf3d9ffb1e99c866c823204dc42c0d91fa181897` | Apache-2.0                  |
+  | Qwen3.5 2B (`qwen3.5-2b-q4_k_m`, added 14 Nov)                     | `unsloth/Qwen3.5-2B-GGUF` `f6d5376be1edb4d416d56da11e5397a961aca8ae`            | `Qwen3.5-2B-Q4_K_M.gguf`            | 1,280,835,840 | `aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223` | Apache-2.0                  |
+  | Llama 3.2 3B (`llama-3.2-3b-instruct-q4_k_m`, graphics card, slow) | `unsloth/Llama-3.2-3B-Instruct-GGUF` `e7d0997e49c9cb00d88b4c1a6a16aa894b0bbc31` | `Llama-3.2-3B-Instruct-Q4_K_M.gguf` | 2,019,377,600 | `6c99cc00ae910f6a532a80022cb4bc1939094527a089c29294b841c0bd87f74d` | Llama 3.2 Community License |
+  | Gemma 4 E2B (`gemma-4-e2b-it-q4_k_m`, graphics card, slow)         | `unsloth/gemma-4-E2B-it-GGUF` `0314792d7f1f7e229411f620751375812bb9faf2`        | `gemma-4-E2B-it-Q4_K_M.gguf`        | 3,106,738,272 | `740185b21d22ceb83a11c3aa62ad5842ef32c70f6096d756bbee85a1e4ec34b8` | Apache-2.0                  |
 
   The weights are never inside the package; the user's Start downloads them. The panel's model label
-  names the size, the memory and the licence (Apache-2.0).
+  names the size, the memory and the licence. The ids of the first three are also the ids of their
+  graphics-card entries (the same file, offered on both); the licences are those stated on each
+  Hugging Face page, see [MODEL-LICENCES.md](MODEL-LICENCES.md).
 
 - Not offered, with the reason: Llama 3.2 1B (Llama Community Licence), Gemma 3 (Gemma Terms of
   Use), LFM2.5 (LFM Open Licence), SmolLM2 1.7B (weaker at tools, 8k window), Gemma 3 270M (too
-  small for tools), Qwen3.5 0.8B (not yet run through wllama 3.8.1 here), Gemma 4 E2B on the
-  processor (its GGUF files are 2.8 GB or more; section 17).
+  small for tools), Qwen3.5 0.8B (not yet run through wllama 3.8.1 here), Gemma 4 E2B and
+  Llama 3.2 3B on the processor (their files are 2.0 and 3.1 GB; they are offered on the graphics
+  card only).
 - Measured on 14 Nov 2026, Chromium 156 headless, 16 cores (8 threads used): see
   `docs/eval/EVAL-CPU-0.6b-2026-11-13.json` and the reports it names. Qwen3's sampling settings for
   replies without reasoning text (temperature 0.7, top-p 0.8, top-k 20) are from the model card.
 
 ## 17. Qwen3.5 2B and Gemma 4 E2B (graphics card) and Qwen3.5 2B (processor), read on 14 Nov 2026
+
+The MLC records, libraries and hashes below are what version 0.1.0 used for the two graphics-card models; version 0.1.1 runs both from the GGUF files in section 15. The processor entry is unchanged.
 
 - **Qwen3.5 2B, graphics card.** WebLLM 0.2.86's record (`lib/index.js`): `Qwen3.5-2B-q4f16_1-MLC`, library `Qwen3.5-2B-q4f16_1_cs1k-webgpu.wasm`, `vram_required_MB` 2245.44, `low_resource_required` false, no `required_features`, `overrides` `context_window_size` 4096 and `max_history_size` 1 (the model keeps a recurrent state; WebLLM keeps one past turn in it). Weights: `https://huggingface.co/api/models/mlc-ai/Qwen3.5-2B-q4f16_1-MLC`, sha `dd74e9c8a20c4546df85c844103bff87b6dcacad` (last modified 29 Mar 2026), 39 files, 1,082,564,401 bytes in all. WebLLM fetches `tensor-cache.json`, the 31 weight shards, `mlc-chat-config.json` and `tokenizer.json`: 1,072,298,012 bytes (the figure the download question shows). SHA-256 of `mlc-chat-config.json` `43577b6de9a4c62cf0fe9c5ee57bc52ebb2fc487c64a21bf78d62431186b4b01` and of `tokenizer.json` `5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42` (the file's LFS object id), both at that revision.
 - **Gemma 4 E2B, graphics card only.** Record: `gemma-4-E2B-it-q4f16_1-MLC`, library `gemma-4-E2B-it-q4f16_1_cs512-webgpu.wasm`, `model_manifest` `mlc-model-manifest.json`, `buffer_size_required_bytes` 201,326,592, `vram_required_MB` 3387.37, `low_resource_required` false, `required_features` `["shader-f16"]`, context window 4096. Weights: `mlc-ai/gemma-4-E2B-it-q4f16_1-MLC`, sha `633df598b7a473759367855273c63912c9e2bc9a` (last modified 11 Oct 2026), 94 files, 2,831,045,154 bytes in all; WebLLM fetches the manifest, `tensor-cache.json`, 84 shards, `mlc-chat-config.json` and `tokenizer.json`: 2,830,391,017 bytes. SHA-256 of `mlc-chat-config.json` `7dfac96b8fccab749f888fcecf9540e3a138e6c7e72df2623df280a65a658025`, of `tokenizer.json` `cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f`. The model has no processor entry: its GGUF files are 2.8 GB or more.
@@ -250,15 +260,14 @@ read from `node_modules` and `npm view` on 14 Nov 2026.
 
 | Package                 | Version | Licence    | Used for                                                                                                          |
 | ----------------------- | ------- | ---------- | ----------------------------------------------------------------------------------------------------------------- |
-| `@mlc-ai/web-llm`       | 0.2.86  | Apache-2.0 | The graphics-card models (section 4)                                                                              |
-| `@wllama/wllama`        | 3.8.1   | MIT        | The processor models (section 15)                                                                                 |
+| `@wllama/wllama`        | 3.8.1   | MIT        | The models that run in the browser, on the processor or the graphics card (section 15)                            |
 | `@w3c/webmcp-polyfill`  | 0.1.0   | Apache-2.0 | Compat mode (section 9)                                                                                           |
 | `@cfworker/json-schema` | 4.1.1   | MIT        | Checks tool arguments against the tool's schema in the extension, without generating code (published 31 Jan 2025) |
 | `ajv`                   | 8.20.0  | MIT        | The same check in Node and in tests, and the build-time message validators (section 7)                            |
 | `idb`                   | 8.0.4   | ISC        | A small promise wrapper over IndexedDB for the chat memory (published 6 Oct 2026)                                 |
 | `force-graph`           | 1.52.0  | MIT        | The 2D drawing library of the graph explorer (section 20); published 28 Sep 2026                                  |
 
-The models are listed in sections 4 (graphics card), 15 (processor) and 3 (Chrome's built-in model,
+The models are listed in sections 15 (graphics card and processor) and 3 (Chrome's built-in model,
 which Chrome downloads itself).
 
 ## 17. What a site publishes: the files the panel reads (13 Nov 2026)
@@ -334,7 +343,6 @@ decide.
 - Full set of `LanguageModel.availability()` return values: the Prompt API page names only `downloading` and `unavailable`; the explainer lists `unavailable`, `downloadable`, `downloading`, `available`, which the panel handles.
 - Which JSON Schema draft WebMCP `inputSchema` uses: the spec does not say; only the 2020-12 reference is listed.
 - The second half of the WebMCP spec (characters beyond 100000 in the main page) was read only for a targeted search on schema, `navigator.modelContext` and `provideContext`.
-- WebLLM latest GitHub release: the Releases section is empty; only the npm version was read.
 - Web page fetches are summarised by a small model, so quoted wording should be rechecked against the source before it is cited in a paper or a store listing.
 
 ## 20. The graph explorer (14 Nov 2026)
@@ -403,32 +411,32 @@ Notes for the next reader:
 
 Every status below was read from the page named, on 14 Nov 2026.
 
-| Item                                            | Status read                                                                                                                                                              | Source                                                                                                 |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| WebMCP                                          | Draft Community Group Report, 13 Nov 2026: "It is not a W3C Standard nor is it on the W3C Standards Track."                                                              | <https://webmachinelearning.github.io/webmcp/>                                                         |
-| Chrome's WebMCP page                            | Origin trial "from Chrome 149"; the flag `chrome://flags/#enable-webmcp-testing` for local development; last updated 7 Oct 2026                                          | <https://developer.chrome.com/docs/ai/webmcp>                                                          |
-| Prompt API                                      | Draft Community Group Report, 9 Nov 2026; same "not a W3C Standard" sentence                                                                                             | <https://webmachinelearning.github.io/prompt-api/>                                                     |
-| RFC 9264 Linkset                                | Proposed Standard, July 2022                                                                                                                                             | <https://www.rfc-editor.org/rfc/rfc9264.json>                                                          |
-| RFC 8288 Web Linking                            | Proposed Standard, Oct 2017                                                                                                                                              | <https://www.rfc-editor.org/rfc/rfc8288.json>                                                          |
-| RFC 9530 Digest Fields                          | Proposed Standard, Feb 2024                                                                                                                                              | <https://www.rfc-editor.org/rfc/rfc9530.json>                                                          |
-| RFC 9727 api-catalog                            | Proposed Standard, June 2025                                                                                                                                             | <https://www.rfc-editor.org/rfc/rfc9727.json>                                                          |
-| RFC 9309 Robots Exclusion Protocol              | Proposed Standard, Sept 2022                                                                                                                                             | <https://www.rfc-editor.org/rfc/rfc9309.json>                                                          |
-| RFC 9116 security.txt                           | Informational, April 2022                                                                                                                                                | <https://www.rfc-editor.org/rfc/rfc9116.json>                                                          |
-| RFC 8615 Well-Known URIs                        | Proposed Standard, May 2019                                                                                                                                              | <https://www.rfc-editor.org/rfc/rfc8615.json>                                                          |
-| JSON-LD 1.1                                     | W3C Recommendation, 16 July 2020                                                                                                                                         | <https://www.w3.org/TR/json-ld11/>                                                                     |
-| RDF 1.1 N-Quads, RDF 1.1 Turtle                 | W3C Recommendations, 25 Feb 2014                                                                                                                                         | <https://www.w3.org/TR/n-quads/>, <https://www.w3.org/TR/turtle/>                                      |
-| SPARQL 1.1 Query, Results JSON, Results CSV/TSV | W3C Recommendations, 21 March 2013                                                                                                                                       | <https://www.w3.org/TR/sparql11-query/>, `.../sparql11-results-json/`, `.../sparql11-results-csv-tsv/` |
-| Web Cryptography API                            | W3C Recommendation                                                                                                                                                       | <https://www.w3.org/TR/WebCryptoAPI/>                                                                  |
-| WebGPU; WebAssembly Core 2.0                    | W3C Candidate Recommendation Drafts (not Recommendations)                                                                                                                | <https://www.w3.org/TR/webgpu/>, <https://www.w3.org/TR/wasm-core-2/>                                  |
-| TDMRep                                          | Final Community Group Report, 10 May 2024                                                                                                                                | <https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/>                                |
-| llms.txt                                        | "The /llms.txt file, v2"; a convention of its own site                                                                                                                   | <https://llmstxt.org/>                                                                                 |
-| Open Graph protocol                             | A convention of its own site (page reached; no status stated)                                                                                                            | <https://ogp.me/>                                                                                      |
-| A2A Protocol specification                      | Page reached; its status was not assessed                                                                                                                                | <https://a2a-protocol.org/latest/specification/>                                                       |
-| draft-besleaga-agentic-knowledge-wellknown      | Active Internet-Draft (individual), revision 02, 15 Nov 2026, no stream (read again 16 Nov 2026)                                                                         | <https://datatracker.ietf.org/doc/draft-besleaga-agentic-knowledge-wellknown/>                         |
-| draft-besleaga-sustainability-wellknown         | Active Internet-Draft, revision 12, 28 Oct 2026, Independent Submission, ISE state "Response to Review Needed"                                                           | <https://datatracker.ietf.org/doc/draft-besleaga-sustainability-wellknown/>                            |
-| Content Signals                                 | A policy of its own site (contentsignals.org); not a standard of any body. The page's text could not be read in full                                                     | <https://contentsignals.org/>                                                                          |
-| Model licences                                  | See [MODEL-LICENCES.md](MODEL-LICENCES.md)                                                                                                                               | `https://huggingface.co/api/models/<repository>` (each repository named there)                         |
-| Licences of bundled libraries                   | The `license` field and the licence file of each package in `node_modules` (see [NOTICE](../NOTICE)); llama.cpp, mlc-llm and the polyfill repository from the GitHub API | <https://api.github.com/repos/ggml-org/llama.cpp>, `.../mlc-ai/mlc-llm`, `.../w3c-oss/webmcp-polyfill` |
+| Item                                            | Status read                                                                                                                                                     | Source                                                                                                 |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| WebMCP                                          | Draft Community Group Report, 13 Nov 2026: "It is not a W3C Standard nor is it on the W3C Standards Track."                                                     | <https://webmachinelearning.github.io/webmcp/>                                                         |
+| Chrome's WebMCP page                            | Origin trial "from Chrome 149"; the flag `chrome://flags/#enable-webmcp-testing` for local development; last updated 7 Oct 2026                                 | <https://developer.chrome.com/docs/ai/webmcp>                                                          |
+| Prompt API                                      | Draft Community Group Report, 9 Nov 2026; same "not a W3C Standard" sentence                                                                                    | <https://webmachinelearning.github.io/prompt-api/>                                                     |
+| RFC 9264 Linkset                                | Proposed Standard, July 2022                                                                                                                                    | <https://www.rfc-editor.org/rfc/rfc9264.json>                                                          |
+| RFC 8288 Web Linking                            | Proposed Standard, Oct 2017                                                                                                                                     | <https://www.rfc-editor.org/rfc/rfc8288.json>                                                          |
+| RFC 9530 Digest Fields                          | Proposed Standard, Feb 2024                                                                                                                                     | <https://www.rfc-editor.org/rfc/rfc9530.json>                                                          |
+| RFC 9727 api-catalog                            | Proposed Standard, June 2025                                                                                                                                    | <https://www.rfc-editor.org/rfc/rfc9727.json>                                                          |
+| RFC 9309 Robots Exclusion Protocol              | Proposed Standard, Sept 2022                                                                                                                                    | <https://www.rfc-editor.org/rfc/rfc9309.json>                                                          |
+| RFC 9116 security.txt                           | Informational, April 2022                                                                                                                                       | <https://www.rfc-editor.org/rfc/rfc9116.json>                                                          |
+| RFC 8615 Well-Known URIs                        | Proposed Standard, May 2019                                                                                                                                     | <https://www.rfc-editor.org/rfc/rfc8615.json>                                                          |
+| JSON-LD 1.1                                     | W3C Recommendation, 16 July 2020                                                                                                                                | <https://www.w3.org/TR/json-ld11/>                                                                     |
+| RDF 1.1 N-Quads, RDF 1.1 Turtle                 | W3C Recommendations, 25 Feb 2014                                                                                                                                | <https://www.w3.org/TR/n-quads/>, <https://www.w3.org/TR/turtle/>                                      |
+| SPARQL 1.1 Query, Results JSON, Results CSV/TSV | W3C Recommendations, 21 March 2013                                                                                                                              | <https://www.w3.org/TR/sparql11-query/>, `.../sparql11-results-json/`, `.../sparql11-results-csv-tsv/` |
+| Web Cryptography API                            | W3C Recommendation                                                                                                                                              | <https://www.w3.org/TR/WebCryptoAPI/>                                                                  |
+| WebGPU; WebAssembly Core 2.0                    | W3C Candidate Recommendation Drafts (not Recommendations)                                                                                                       | <https://www.w3.org/TR/webgpu/>, <https://www.w3.org/TR/wasm-core-2/>                                  |
+| TDMRep                                          | Final Community Group Report, 10 May 2024                                                                                                                       | <https://www.w3.org/community/reports/tdmrep/CG-FINAL-tdmrep-20240510/>                                |
+| llms.txt                                        | "The /llms.txt file, v2"; a convention of its own site                                                                                                          | <https://llmstxt.org/>                                                                                 |
+| Open Graph protocol                             | A convention of its own site (page reached; no status stated)                                                                                                   | <https://ogp.me/>                                                                                      |
+| A2A Protocol specification                      | Page reached; its status was not assessed                                                                                                                       | <https://a2a-protocol.org/latest/specification/>                                                       |
+| draft-besleaga-agentic-knowledge-wellknown      | Active Internet-Draft (individual), revision 02, 15 Nov 2026, no stream (read again 16 Nov 2026)                                                                | <https://datatracker.ietf.org/doc/draft-besleaga-agentic-knowledge-wellknown/>                         |
+| draft-besleaga-sustainability-wellknown         | Active Internet-Draft, revision 12, 28 Oct 2026, Independent Submission, ISE state "Response to Review Needed"                                                  | <https://datatracker.ietf.org/doc/draft-besleaga-sustainability-wellknown/>                            |
+| Content Signals                                 | A policy of its own site (contentsignals.org); not a standard of any body. The page's text could not be read in full                                            | <https://contentsignals.org/>                                                                          |
+| Model licences                                  | See [MODEL-LICENCES.md](MODEL-LICENCES.md)                                                                                                                      | `https://huggingface.co/api/models/<repository>` (each repository named there)                         |
+| Licences of bundled libraries                   | The `license` field and the licence file of each package in `node_modules` (see [NOTICE](../NOTICE)); llama.cpp and the polyfill repository from the GitHub API | <https://api.github.com/repos/ggml-org/llama.cpp>, `.../w3c-oss/webmcp-polyfill`                       |
 
 Not verified: the status of the A2A specification, of Open Graph and of Content Signals as documents;
 whether Chrome's origin-trial window still admits a site's token in Chrome 157 (a note in a public

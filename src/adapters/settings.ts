@@ -2,6 +2,7 @@
 // The Options, kept in chrome.storage.local under one key with a version number. Every
 // read goes through normalizeSettings, so a missing, old or tampered value becomes a
 // valid one: unknown values fall back to the default, numbers are clamped.
+import { LEGACY_GPU_IDS } from './cpu-models';
 import { WEBLLM_MODEL_IDS } from './models';
 
 export const SETTINGS_KEY = 'settings';
@@ -16,7 +17,7 @@ export type Language = 'en';
 export interface Settings {
   readonly version: 3;
   readonly runtime: RuntimeChoice;
-  /** One of the shipped WebLLM models; '' means the default (see defaultModelId). */
+  /** One of the graphics-card models; '' means the default (see defaultModelId). */
   readonly webllmModel: string;
   /** A processor model (src/adapters/cpu-models.ts); '' means the default. */
   readonly cpuModel: string;
@@ -114,11 +115,18 @@ const RUNTIMES: readonly RuntimeChoice[] = ['auto', 'webllm', 'cpu', 'prompt-api
  *    (the owner's first test, 13 Nov 2026), so it goes back to the default once;
  *  - before version 3, "webllm" with no model named was the stored default, not a choice, so it
  *    becomes automatic; a named graphics-card model, the processor and an endpoint stay. */
+/** The saved graphics-card model: an id that version 0.1.0 stored names the same model today
+ *  (LEGACY_GPU_IDS); anything else unknown is no choice. */
+function gpuModel(value: unknown): string {
+  const id = typeof value === 'string' ? (LEGACY_GPU_IDS[value] ?? value) : value;
+  return pick(id, WEBLLM_MODEL_IDS, DEFAULT_SETTINGS.webllmModel);
+}
+
 function runtime(raw: Raw): RuntimeChoice {
   const value = pick(raw.runtime, RUNTIMES, DEFAULT_SETTINGS.runtime);
   const version = typeof raw.version === 'number' ? raw.version : 1;
   if (value === 'prompt-api' && version < 2) return 'auto';
-  if (value === 'webllm' && version < 3 && !WEBLLM_MODEL_IDS.includes(String(raw.webllmModel))) {
+  if (value === 'webllm' && version < 3 && gpuModel(raw.webllmModel) === '') {
     return 'auto';
   }
   return value;
@@ -130,7 +138,7 @@ export function normalizeSettings(value: unknown): Settings {
   return {
     version: SETTINGS_VERSION,
     runtime: runtime(raw),
-    webllmModel: pick(raw.webllmModel, WEBLLM_MODEL_IDS, d.webllmModel),
+    webllmModel: gpuModel(raw.webllmModel),
     cpuModel: cpuModel(raw.cpuModel),
     endpoint: endpoint(raw.endpoint),
     maxSteps: steps(raw.maxSteps),

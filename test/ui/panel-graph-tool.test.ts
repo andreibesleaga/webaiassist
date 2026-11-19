@@ -119,4 +119,18 @@ describe('the built-in graph tool in the panel', () => {
     await asked('hello');
     expect(system(none)).not.toContain(QUERY_TOOL_NAME);
   });
+
+  it('is not offered to a model that picks the page tools better alone, while the page has tools', async () => {
+    const port = graph();
+    const deps = await node([call(QUERY_TOOL_NAME, { sparql: 'ASK { ?s ?p ?o }' }), answer('x')], {
+      port,
+      quiet: true,
+    });
+    const caps = deps.model.capabilities();
+    vi.spyOn(deps.model, 'capabilities').mockReturnValue({ ...caps, pageToolsFirst: true });
+    await asked('How many concepts?');
+    expect(system(deps)).not.toContain(QUERY_TOOL_NAME);
+    expect(system(deps)).toContain('search');
+    expect(port.runs).toEqual([]);
+  });
 });

@@ -4,8 +4,8 @@
 >
 > - This page holds the text and images for the Chrome Web Store listing. Each quote block is the content of one field.
 > - Still open: the store link, the privacy policy URL and the demo node URL.
-> - The description says WebMCP is a draft, not a W3C Standard, that answers can be wrong, and that starting a model downloads 350 MB to 2.8 GB after you agree.
-> - Measured on one laptop graphics card, Qwen3 0.6B had the whole expected tool sequence right in 8 of 10 test-node questions and 2 of 10 live-node questions.
+> - The description says WebMCP is a draft, not a W3C Standard, that answers can be wrong, and that starting a model downloads 400 MB to 3.1 GB after you agree.
+> - Measured on one laptop with two graphics cards (version 0.1.1), the default model, Qwen3 1.7B, had the whole expected tool sequence right in 8 of 10 test-node questions and 5 of 10 live-node questions on both cards.
 > - Each run is a few questions, so the tables show a direction, not a rate. Host access is optional and never granted at install.
 
 The text and images for the WebAIAssist listing. Each quote block is the content of one field:
@@ -16,10 +16,10 @@ paste it without the leading `>` and without the angle brackets around links.
 Nothing below is guessed. These items stay open until the runs are done and recorded in
 `docs/eval/`:
 
-- [x] **The default-model line.** Decided 16 Nov 2026 from the runs: Chrome's built-in model when it is ready,
-      otherwise Qwen3 0.6B on the graphics card, otherwise Qwen3 1.7B on the processor. The description does not
-      name a model.
-- [x] **The graphics-card numbers.** Run of 15 to 16 Nov 2026 (table below).
+- [x] **The default-model line.** Decided 16 Nov 2026 from the runs, changed for 0.1.1 on 18 Nov 2026: Chrome's
+      built-in model when it is ready, otherwise Qwen3 1.7B on the graphics card, otherwise Qwen3 1.7B on the
+      processor. The description does not name a model.
+- [x] **The graphics-card numbers.** Runs of 18 Nov 2026, version 0.1.1, two cards (table below).
 - [x] **The built-in model re-run** after the last change: run of 15 Nov 2026 (table below).
 - [x] **The data-type answer** on the Privacy tab: "Website content" (decided 16 Nov 2026; see Data usage below).
 - [x] **Privacy policy URL** `https://agenticsystemcore.com/webaiassist/privacy/` and **demo node URL**
@@ -42,7 +42,9 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 
 **Description:**
 
-This is the text as submitted on 16 Nov 2026 (the maintainer's wording in the dashboard).
+This is the text as submitted on 16 Nov 2026 (the maintainer's wording in the dashboard), with two facts
+changed for 0.1.1: "WebGPU and WebAssembly" (was "WebGPU and WebLLM") and the download sizes "400 MB to
+3.1 GB" (was "350 MB to 2.8 GB").
 
 > WebAIAssist puts an AI inside your browser's side panel, with no server to install, and lets it use the tools a web page offers. By default, before any call runs, you see what it will do and press Allow or Deny.
 >
@@ -54,7 +56,7 @@ This is the text as submitted on 16 Nov 2026 (the maintainer's wording in the da
 >
 > Before you start:
 >
-> Chrome keeps WebMCP behind a switch. Open chrome://flags/#enable-webmcp-testing, choose Enabled and relaunch. Without it, sites' tools do not appear. WebGPU and WebLLM allow AI models to run locally in user's browser. WebMCP is a draft, not yet a W3C Standard. It may change. Needs Chrome or another Chromium browser. The first LLM model start downloads ~ 350 MB to 2.8 GB, after you agree to use in browser, or you can use a local (eg: ollama), or remote server model, via an OpenAI-style address (eg: OpenRouter).
+> Chrome keeps WebMCP behind a switch. Open chrome://flags/#enable-webmcp-testing, choose Enabled and relaunch. Without it, sites' tools do not appear. WebGPU and WebAssembly allow AI models to run locally in user's browser. WebMCP is a draft, not yet a W3C Standard. It may change. Needs Chrome or another Chromium browser. The first LLM model start downloads ~ 400 MB to 3.1 GB, after you agree to use in browser, or you can use a local (eg: ollama), or remote server model, via an OpenAI-style address (eg: OpenRouter).
 >
 > Answers can be wrong. Small models often miss the right tool, so check what matters.
 > No account, no analytics. No access to any site at install; you allow one site at a time.
@@ -75,21 +77,24 @@ called. Small models miss the right tool; the tables say how often.
 
 ### In the browser, on the graphics card
 
-Hardware: Windows 10 (build 10.0.26300), AMD gcn-5 laptop GPU, Chromium 156.0.8078.4. Run of the
-night of 15 to 16 Nov 2026, after the tool-use change, 10 questions per node, one browser per model
-(`docs/eval/EVAL-2026-11-16-156.0.8078.4.json`; [EVAL.md](EVAL.md) says why). Command:
-`npm run eval:gpu -- --models qwen,llama,qwen35,gemma4 --prompts 10`. Llama 3.2 3B and Gemma 4 E2B are
-marked "slow: may stall on a laptop graphics card" in the list and are never picked by default.
+Hardware: one Windows laptop (build 10.0.26300) with two graphics cards, NVIDIA (`nvidia/ampere`) and
+AMD integrated (`amd/gcn-5`); Chromium 156.0.8078.4; version 0.1.1. Runs of 18 Nov 2026, one model per
+run, 10 questions per node, each question in a new chat (`docs/eval/EVAL-GPU-2026-11-18-<card>-<model>.json`;
+[EVAL.md](EVAL.md) says why each question starts a new chat). Command:
+`npm run eval:gpu -- [--fast-gpu] --models <key> --prompts 10 --idle 0 --no-cancel-check`. Only Qwen3 1.7B is
+picked by default; Gemma 4 E2B is marked "slow: may stall on a laptop graphics card" in the list.
 
-| Model                      | Test node: whole sequence right                                              | Live node: whole sequence right | Median answer, test node / live node | Median first token, test node / live node |
-| -------------------------- | ---------------------------------------------------------------------------- | ------------------------------- | ------------------------------------ | ----------------------------------------- |
-| Qwen3 0.6B                 | 8 of 10 (a tool used: 10 of 10)                                              | 2 of 10 (a tool used: 9 of 10)  | 25.7 s / 59.6 s                      | 19.4 s / 26.9 s                           |
-| Qwen3.5 2B                 | 6 of 10 (3 over the time limit)                                              | not measured                    | 155.0 s / not measured               | 138.7 s / not measured                    |
-| Llama 3.2 3B (marked slow) | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
-| Gemma 4 E2B (marked slow)  | Ran past the 5-minute limit on its first question, which stopped the browser | not measured                    | not measured                         | not measured                              |
+| Model                | Whole sequence right, NVIDIA: test node / live node | Whole sequence right, AMD: test node / live node | Median answer, NVIDIA: test / live | Median answer, AMD: test / live |
+| -------------------- | --------------------------------------------------- | ------------------------------------------------ | ---------------------------------- | ------------------------------- |
+| Qwen3 1.7B (default) | 8 / 5 of 10 (a tool used: 10 and 10 of 10)          | 8 / 5 of 10 (a tool used: 10 and 10 of 10)       | 9.2 s / 15.2 s                     | 13.7 s / 19.7 s                 |
+| Qwen3 0.6B           | 8 / 0 of 10 (a tool used: 10 and 0 of 10)           | 7 / 1 of 10 (a tool used: 10 and 1 of 10)        | 6.6 s / 4.0 s                      | 10.0 s / 6.7 s                  |
+| Qwen3.5 2B           | 6 / 5 of 10                                         | 9 / 2 of 10                                      | 13.5 s / 21.1 s                    | 15.4 s / 30.8 s                 |
+| Llama 3.2 3B         | 9 / 8 of 10                                         | 7 / 7 of 10                                      | 13.7 s / 15.2 s                    | 18.3 s / 16.7 s                 |
+| Gemma 4 E2B (slow)   | 6 / 6 of 10 (2 questions over the 5-minute limit)   | 8 / 5 of 10 (3 over the limit)                   | 51.1 s / 94.4 s                    | 78.5 s / 153.9 s                |
 
-"Not measured" on the live node: the browser of that run could no longer open the page after the
-test-node questions.
+Version 0.1.0 (WebLLM, AMD card, 16 Nov 2026, before each question started a new chat): Qwen3 0.6B 8 of
+10 on the test node and 2 of 10 on the live node; Llama 3.2 3B and Gemma 4 E2B ran past the 5-minute
+limit on their first question.
 
 ### In the browser, on the processor and memory
 
@@ -98,11 +103,12 @@ recorded. Test node, five questions, after the tool-use change
 (`docs/eval/EVAL-CPU-<model>-P1-AFTER-2026-11-14.json`). Command:
 `npm run eval:cpu -- --model 0.6b --prompts 5` (also `--model 1.7b` and `--model qwen35-2b`).
 
-| Model      | Load, first download / stored copy | Whole sequence right | First tool right | A tool used | Median answer | Median reply speed  |
-| ---------- | ---------------------------------- | -------------------- | ---------------- | ----------- | ------------- | ------------------- |
-| Qwen3 0.6B | 27.1 s (397 MB) / 9.1 s            | 2 of 5               | 2 of 5           | 2 of 5      | 35.6 s        | 7.9 tokens a second |
-| Qwen3 1.7B | 66.5 s (1.1 GB) / 15.8 s           | 5 of 5               | 5 of 5           | 5 of 5      | 136.7 s       | 4.5 tokens a second |
-| Qwen3.5 2B | 77.0 s (1.3 GB) / 19.9 s           | 2 of 5               | 3 of 5           | 5 of 5      | 187.6 s       | 4.1 tokens a second |
+| Model                                                       | Load, first download / stored copy | Whole sequence right | First tool right | A tool used | Median answer                   | Median reply speed  |
+| ----------------------------------------------------------- | ---------------------------------- | -------------------- | ---------------- | ----------- | ------------------------------- | ------------------- |
+| Qwen3 0.6B                                                  | 27.1 s (397 MB) / 9.1 s            | 2 of 5               | 2 of 5           | 2 of 5      | 35.6 s                          | 7.9 tokens a second |
+| Qwen3 1.7B                                                  | 66.5 s (1.1 GB) / 15.8 s           | 5 of 5               | 5 of 5           | 5 of 5      | 136.7 s                         | 4.5 tokens a second |
+| Qwen3 1.7B, 0.1.1, 18 Nov 2026, each question in a new chat | 57.2 s (1.1 GB) / 11.7 s           | 4 of 5               | 4 of 5           | 5 of 5      | 28.0 s (first question 138.8 s) | 6.2 tokens a second |
+| Qwen3.5 2B                                                  | 77.0 s (1.3 GB) / 19.9 s           | 2 of 5               | 3 of 5           | 5 of 5      | 187.6 s                         | 4.1 tokens a second |
 
 The reply speed is the median of the speeds llama.cpp reported over all steps of the five questions.
 
@@ -187,9 +193,9 @@ ones from a real run.
 | `scripting`                                                                      | Adds the two small scripts that list and call the page's WebMCP tools, reads the page text on request, and registers the polyfill in compat mode; and, for a site the user allowed, reads that site's own public files (`llms.txt`, `robots.txt`, `security.txt` and a few well-known files) with a plain same-origin GET and no cookies, and the page's own title and structured data. No new permission is needed for this. |
 | Optional host access (`https://*/*`, `http://localhost/*`, `http://127.0.0.1/*`) | Never granted at install. Asked for one site when the user presses Allow in the side panel for that site, turns on compat mode for it, or saves a chat endpoint address (for example Ollama on localhost); the endpoint's host is used for the chat only.                                                                                                                                                                     |
 
-**Remote code:** No, I am not using remote code. The JavaScript and the WebAssembly model
-libraries are all inside the package. The extension downloads model weights (data files) from
-huggingface.co; they are not code.
+**Remote code:** No, I am not using remote code. The JavaScript and the two WebAssembly files (the
+llama.cpp engine that runs the models, and the Oxigraph query engine) are inside the package. The
+extension downloads model weights (data files) from huggingface.co; they are not code.
 
 **Data usage:** declare "Website content": the page text the user asks it to read and the results of
 the tools the user allows go to the model the user chose. That model is in the browser or in Chrome
@@ -215,7 +221,7 @@ Limited Use statement the store asks for.
 >    relaunch. Without it, no site shows tools.
 > 1. Click the toolbar button to open the side panel and press Start. The panel shows the size
 >    and the source of the model and waits for Download; the model then downloads once from
->    huggingface.co (about 350 MB for the smallest).
+>    huggingface.co (1.1 GB for the default, Qwen3 1.7B; 397 MB for the smallest, Qwen3 0.6B).
 > 2. Open `https://agenticsystemcore.com/concepts/harness/` (a page that offers WebMCP tools) and ask "Find items about review".
 >    The panel asks to use the site's tools, then asks before each tool call.
 > 3. On a page without WebMCP, press "Read this page" and ask about it.

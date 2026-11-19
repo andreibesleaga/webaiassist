@@ -2,8 +2,8 @@
 // Chrome's locale file, written by the build from the typed dictionary (src/ui/messages-en.ts).
 // The dictionary stays the one source of the interface texts: its keys are type-checked and the
 // panel reads it directly (src/ui/i18n.ts). _locales/en/messages.json is the same texts in the
-// format Chrome and translators expect, plus the two manifest texts Chrome itself shows (the
-// description and the title of the toolbar button). {name} placeholders are WebAIAssist's own
+// format Chrome and translators expect, plus the three manifest texts Chrome itself shows (the
+// description, the title of the toolbar button and the name of its keyboard shortcut). {name} placeholders are WebAIAssist's own
 // and are left as they are. Another language is one more dictionary and one more folder.
 
 /** Chrome accepts letters, digits, "_" and "@" in a message name; "@@" names are its own. */
@@ -39,17 +39,27 @@ export function chromeMessages(dictionary, manifestTexts) {
   );
 }
 
-/** A copy of the manifest whose description and button title come from the locale file, and those two texts. */
+/** A copy of the manifest whose description, button title and shortcut name come from the locale file, and those texts. */
 export function localiseManifest(manifest) {
+  const command = manifest.commands?._execute_action;
   const texts = {
     extDescription: manifest.description,
     extActionTitle: manifest.action.default_title,
+    ...(command?.description ? { extCommandTitle: command.description } : {}),
   };
   const localised = {
     ...manifest,
     default_locale: 'en',
     description: '__MSG_extDescription__',
     action: { ...manifest.action, default_title: '__MSG_extActionTitle__' },
+    ...(command?.description
+      ? {
+          commands: {
+            ...manifest.commands,
+            _execute_action: { ...command, description: '__MSG_extCommandTitle__' },
+          },
+        }
+      : {}),
   };
   return { manifest: localised, texts };
 }

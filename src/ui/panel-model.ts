@@ -232,7 +232,7 @@ function readyLine(
   if (where?.startsWith('cpu:')) return cpuReady(model, where);
   switch (choice.runtime) {
     case 'webllm':
-      return gpuReady(model, host, where);
+      return gpuReady(model, host);
     case 'cpu':
       return t('runsOnCpuPlain', { model });
     case 'prompt-api':
@@ -248,8 +248,7 @@ function endpointReady(ctx: PanelController): string {
   return t(key, { model, host: endpointHost(url) });
 }
 
-function gpuReady(model: string, host: HostName | undefined, where: string | undefined): string {
-  if (where === 'offscreen-main') return t('runsOnMain', { model });
+function gpuReady(model: string, host: HostName | undefined): string {
   if (host === undefined) return t('runsOnGpu', { model });
   return t('runsIn', { model, host: t(host === 'offscreen' ? 'hostOffscreen' : 'hostWorker') });
 }

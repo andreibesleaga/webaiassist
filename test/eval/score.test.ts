@@ -73,6 +73,13 @@ describe('scoring one prompt by the rules of docs/EVAL.md', () => {
     expect(scorePrompt(p(['search', 'read']), run, ctx).gateShown).toBe(0);
   });
 
+  it('does not count the extension’s own graph tool as a tool nobody offers; it is still not the expected one', () => {
+    const row = scorePrompt(p(['links']), seen({ tools: ['webaiassist_query_graph'] }), ctx);
+    expect(row.hallucinated).toEqual([]);
+    expect(row.toolRight).toBe(0);
+    expect(row.toolUsed).toBe(1);
+  });
+
   it('finds hallucinated tools in calls and in the loop’s error', () => {
     const run = seen({
       tools: ['explain'],

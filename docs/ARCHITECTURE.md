@@ -13,8 +13,8 @@ around it, and adapters that implement the ports with browser APIs or libraries.
 
 ## What it does, in four statements
 
-1. **Four model paths**, one `ModelRuntime` port: WebLLM on the graphics card, llama.cpp in
-   WebAssembly on the processor, Chrome's built-in model (Prompt API), and an OpenAI-compatible
+1. **Four model paths**, one `ModelRuntime` port: llama.cpp in WebAssembly on the graphics card
+   (WebGPU) and on the processor (one engine, `@wllama/wllama`), Chrome's built-in model (Prompt API), and an OpenAI-compatible
    endpoint. The panel picks a default by what the computer has and one measurement, and says why;
    a model the user chose is kept ("Where the model runs", below).
 2. **A page card that follows the tab**: the site, an access badge, the page's WebMCP tools (what
@@ -38,15 +38,15 @@ imports nothing from `src/adapters/`, `src/entries/`, `src/spike/`, `src/fakes/`
 compiles the core without the DOM types, and an ESLint rule (`eslint.core-boundary.js`) refuses
 those imports and the browser globals. Both run in `npm run verify`.
 
-| Port            | What it does                                                            | Adapters                                                                                                                                 | Fake                                       |
-| --------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| `ModelRuntime`  | Loads a model, streams a reply, stops on request                        | `webllm-runtime.ts`, `prompt-api-runtime.ts`, `endpoint-runtime.ts`, `port-model-runtime.ts` (the panel's link to the model host)        | `FakeModelRuntime`, `ScriptedModelRuntime` |
-| `ToolBridge`    | Lists (with the page's origin) and calls the tools of the page in a tab | `messaging-tool-bridge.ts` (panel), `tool-router.ts` (service worker), `page-bridge-isolated.ts` and `page-bridge-main.ts` (in the page) | `FakeToolBridge`                           |
-| `Memory`        | Chat per site, tool success counts per site, clear                      | `indexeddb-memory.ts`; `no-memory.ts` when memory is off in Options                                                                      | `InMemoryMemory`                           |
-| `ChatUI`        | Shows events and the streamed draft, asks Allow or Deny                 | `src/ui/panel-ui.ts`                                                                                                                     | `FakeChatUI`                               |
-| `SiteGrants`    | Sites whose tools the user allowed in this session                      | `session-site-grants.ts` (`chrome.storage.session`)                                                                                      | in the tests                               |
-| `Clock`         | The time, so tests use a fixed past date                                | `Date` in `src/entries/sidepanel.ts`                                                                                                     | `FixedClock`                               |
-| `ArgsValidator` | Checks tool arguments against the tool's `inputSchema`                  | `cfworker-args-validator.ts` in the extension; `ajv-args-validator.ts` in Node and tests                                                 | (Ajv in tests)                             |
+| Port            | What it does                                                            | Adapters                                                                                                                                                        | Fake                                       |
+| --------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `ModelRuntime`  | Loads a model, streams a reply, stops on request                        | `wllama-runtime.ts` (graphics card and processor), `prompt-api-runtime.ts`, `endpoint-runtime.ts`, `port-model-runtime.ts` (the panel's link to the model host) | `FakeModelRuntime`, `ScriptedModelRuntime` |
+| `ToolBridge`    | Lists (with the page's origin) and calls the tools of the page in a tab | `messaging-tool-bridge.ts` (panel), `tool-router.ts` (service worker), `page-bridge-isolated.ts` and `page-bridge-main.ts` (in the page)                        | `FakeToolBridge`                           |
+| `Memory`        | Chat per site, tool success counts per site, clear                      | `indexeddb-memory.ts`; `no-memory.ts` when memory is off in Options                                                                                             | `InMemoryMemory`                           |
+| `ChatUI`        | Shows events and the streamed draft, asks Allow or Deny                 | `src/ui/panel-ui.ts`                                                                                                                                            | `FakeChatUI`                               |
+| `SiteGrants`    | Sites whose tools the user allowed in this session                      | `session-site-grants.ts` (`chrome.storage.session`)                                                                                                             | in the tests                               |
+| `Clock`         | The time, so tests use a fixed past date                                | `Date` in `src/entries/sidepanel.ts`                                                                                                                            | `FixedClock`                               |
+| `ArgsValidator` | Checks tool arguments against the tool's `inputSchema`                  | `cfworker-args-validator.ts` in the extension; `ajv-args-validator.ts` in Node and tests                                                                        | (Ajv in tests)                             |
 
 Tool schemas arrive from the page at runtime, and Manifest V3 extension pages forbid
 `new Function`, so Ajv cannot compile them in the extension. The extension uses
@@ -65,7 +65,9 @@ Each run starts from a user message. The loop (`src/core/agent-loop.ts`):
 1. Binds the run to the tab and the site (origin) it starts on. Lists the page's tools and the
    site's tool counts, and builds the messages. On an AgenticSystemCore node it adds a short hint
    on the roles of the ten node tools. Page text from "Read this page" goes in before the
-   question, fenced as untrusted data, but only when it was read on the same tab and site. The
+   question, fenced as untrusted data, but only when it was read on the same tab and site. Of the
+   site's saved chat the model gets only the exchanges that used a tool or read page text
+   (`exchangesWithTools` in `src/core/history.ts`); an answer given without a tool is left out. The
    site's saved chat is trimmed before every request to fit the model's context window (4096
    tokens for the browser models, the Options value for an endpoint, the window Chrome reports
    for its built-in model), oldest turns first, with room for the reply (the runtime may ask for
@@ -141,8 +143,7 @@ flowchart LR
   Main -- "window.postMessage<br/>(page hop)" --- Iso["Isolated content script"]
   Iso -- "chrome.tabs / chrome.runtime<br/>(content hop)" --- SW["Service worker<br/>router"]
   Panel["Side panel<br/>agent loop, gate, chat"] -- "chrome.runtime<br/>(panel hop)" --- SW
-  Panel -- "runtime port<br/>(model/*)" --- Off["Offscreen document<br/>WebLLM and llama.cpp model hosts"]
-  SW -. "fallback model host" .- Panel
+  Panel -- "runtime port<br/>(model/*)" --- Off["Offscreen document<br/>llama.cpp model hosts"]
 ```
 
 One question that calls one tool:
@@ -203,35 +204,42 @@ runtime calls it, once per chat, with the prompt and completion token counts and
 dollars) the service returned in the last chunk of the stream. Nothing in this release stores or shows them
 (`src/core/ports/model-runtime.ts`); the endpoint evaluation script prints them.
 
-WebLLM needs WebGPU. The panel probes for it when the user presses Start and uses the first host
-that has an adapter: the offscreen document, then the extension service worker
-(`src/adapters/host-choice.ts`). The order was chosen from a measured run on 12 Nov 2026 (Windows
-10, Chrome 157, AMD gcn-5): WebGPU with `shader-f16` and 2 GiB buffers was available in the page,
-the service worker and the offscreen document alike ([SPIKE.md](SPIKE.md)). The offscreen document
-is the host because it has no idle time limit; the service worker is the proven fallback. In
-the offscreen document WebLLM runs in a dedicated module Worker (`model-worker.js`, through
-WebLLM's `WebWorkerMLCEngine`), which is the reason the document is opened for (`WORKERS`); the
-service worker cannot start a Worker, so there WebLLM runs in place. The model stays loaded in
-the host when the panel closes. While a model loads, the panel shows Cancel: it sends
-`model/cancel`, and the host unloads the engine, which stops WebLLM's download.
+The graphics-card models need WebGPU. The panel probes for it when the user presses Start and uses
+the offscreen document if it has an adapter (`src/adapters/host-choice.ts`); if not, the panel
+shows the reason (`offscreen document: <why>`). The service worker is never a host: it cannot start
+a Worker, which the engine needs. A measured run on 12 Nov 2026 (Windows 10, Chrome 157, AMD
+gcn-5) found WebGPU with `shader-f16` and 2 GiB buffers in the page, the service worker and the
+offscreen document alike ([SPIKE.md](SPIKE.md)). The offscreen document has no idle time limit.
+The engine runs in a Worker that wllama starts itself inside the offscreen document, which is the
+reason the document is opened for (`WORKERS`); every layer is on the graphics card (`n_batch` 64:
+with llama.cpp's default batch the 1.1 GB model made the graphics driver give up on the first
+question on 18 Nov 2026, Windows, AMD gcn-5). The model stays loaded in the host when the panel
+closes. While a model loads, the panel shows Cancel: it sends `model/cancel`, and the host
+unloads the engine, which stops the download. If a reply has not ended 5 seconds after Stop, the
+host ends the engine (its Worker is terminated) and the next Start loads the model again. A lost
+graphics device closes the offscreen document and the panel says the graphics card gave up; a
+fresh document opens at the next Start. The browser gives pages the integrated card on a computer
+with two graphics cards, whatever `powerPreference` they ask for (measured 18 Nov 2026, Windows,
+Chromium 156); the extension cannot choose the card.
 
 The model the panel selects is the one the user chose, which is kept in the Options
 (`runtime` other than `auto`); until then the panel picks a default and says why in one sentence
 under the list (`#model-why`; `src/ui/default-model.ts`). The order is: Chrome's built-in model
 when Chrome says it is available (not while it still has to download); the graphics card (Qwen3
-0.6B) whenever WebGPU works; the processor model (Qwen3 1.7B) where it does not; a configured endpoint;
+1.7B) whenever WebGPU works; the processor model (Qwen3 1.7B) where it does not; a configured endpoint;
 Chrome's built-in model still to download; the choice **Set up a chat endpoint**, for which Start
 opens Options and loads nothing. The measurement is the wait from the first question after a
 load to the first token (`src/ui/first-token-timer.ts`), stored with the adapter's name in
 `chrome.storage.local` (`src/adapters/stored-panel-state.ts`); more than 20 seconds is slow
-(`src/adapters/gpu-speed.ts`: the maintainer's laptop took about 40 s on 13 Nov 2026, the first
-answer compiles the GPU programs). The measurement only chooses the sentence under the list: in
-the runs of 15 and 16 Nov 2026 (docs/EVAL.md) Qwen3 0.6B on the laptop's graphics card answered in
+(`src/adapters/gpu-speed.ts`: with the engine of version 0.1.0 the maintainer's laptop took about
+40 s on 13 Nov 2026, the first answer compiling the GPU programs). The measurement only chooses the sentence under the list: in
+the runs of 15 and 16 Nov 2026 with that engine (docs/EVAL.md) Qwen3 0.6B on the laptop's graphics card answered in
 about 26 s and Qwen3 1.7B on the processor in about 137 s, so a slow first answer does not move the
 default to the processor. A measurement made on another adapter is ignored. Settings
 saved before 13 Nov 2026 (version 1) that name Chrome's built-in model go back to the default
 once, and the stored default of version 2 (`webllm` with no model named) reads as automatic
-(`src/adapters/settings.ts`).
+(`src/adapters/settings.ts`). A saved graphics-card model with an id of version 0.1.0 is mapped to
+the same model's new id.
 
 **Asking before a download.** Pressing Start on a model whose weights are not stored shows a
 question first (`#consent`, `src/ui/panel-consent.ts`): the size, the host the weights come from,
@@ -239,55 +247,61 @@ that they are stored in this browser, and **Download** or **Not now**. Nothing d
 Download; offline, the block says the model is not on this computer and offers nothing. Chrome's
 built-in model asks the same way when Chrome says it must download, and that click is the user
 activation Chrome needs. Whether a model is stored comes from one store over both runtimes
-(`src/adapters/model-store.ts`; WebLLM's Cache Storage through WebLLM's own `hasModelInCache`,
-`deleteModelAllInfoInCache`, and wllama's file storage). The Options page lists the stored models
+(`src/adapters/model-store.ts`; wllama's file storage; a model offered on both devices is one file,
+listed once). The Options page lists the stored models
 with their sizes and removes one or all (`src/ui/options-storage.ts`); both pages are on the
 extension's own origin, so they see what the offscreen document wrote. When no host finds an
 adapter, the error and **Use the processor instead** appear before any question
 (`src/ui/panel-model.ts`, `src/ui/panel-problems.ts`).
 
-WebLLM gets a model list with these four models only (`src/adapters/webllm-app-config.ts`). The
-model library of each (`.wasm`, compiled code) is a file inside the package: the build copies
-it from `vendor/model-libs/`, where it was fetched once from a pinned commit of
-`mlc-ai/binary-mlc-llm-libs` and checked against its SHA-256 (`scripts/model-libs.json`,
-`scripts/model-libs.mjs`). WebLLM checks the same hash again before it runs the library. The
-build also replaces WebLLM's own remote library address, and the build check refuses any bundle
-that names `raw.githubusercontent.com` or a remote `.wasm` file
-(`scripts/check-remote-code.mjs`): the Chrome Web Store does not allow code from outside the
-package. The weights are data; they download from one fixed revision of each model's Hugging
-Face repository, and WebLLM checks the model's `mlc-chat-config.json` and `tokenizer.json` against
-SHA-256 values pinned per revision. Other models run through a chat endpoint.
+The graphics card offers five models (`GPU_MODELS` in `src/adapters/cpu-models.ts`): Qwen3 0.6B,
+Qwen3 1.7B (the default), Qwen3.5 2B, Llama 3.2 3B and Gemma 4 E2B; the last is marked slow, and neither of the last two is picked by itself.
+The first three are the same files as the processor models. No model is filtered by a WebGPU
+feature today. The only compiled code in the package is the engine file `model-libs/wllama.wasm`
+and the query engine `model-libs/oxigraph.wasm`, copied in by the build and checked by size and
+SHA-256 (`scripts/model-libs.json`, `scripts/model-libs.mjs`); the build check refuses any bundle
+that names `raw.githubusercontent.com` or a remote `.wasm` file (`scripts/check-remote-code.mjs`):
+the Chrome Web Store does not allow code from outside the package. The weights are data; each
+downloads from one fixed commit of its Hugging Face repository, and size and SHA-256 are checked
+after the download (`docs/MODEL-LICENCES.md`). Other models run through a chat endpoint.
 
-The weights download once (about 350 MB for Qwen3 0.6B, 1.1 GB for Qwen3.5 2B, 1.8 GB for Llama 3.2 3B,
-2.8 GB for Gemma 4 E2B) into WebLLM's
-Cache Storage. The extension does not ask for `unlimitedStorage`: the smoke test measured a
-storage quota of 10 GiB for the extension in Chromium on 12 Nov 2026, enough for the four models (about 6 GB together).
-On a nearly full disk the quota is smaller and the download can fail; the error is shown.
+The weights download once (about 397 MB for Qwen3 0.6B, 1.1 GB for Qwen3 1.7B, 1.3 GB for Qwen3.5 2B,
+2.0 GB for Llama 3.2 3B, 3.1 GB for Gemma 4 E2B) into wllama's file storage in the extension's
+private storage. The extension does not ask for `unlimitedStorage`: the smoke test measured a
+storage quota of 10 GiB for the extension in Chromium on 12 Nov 2026, enough for the five files
+(about 7.9 GB together).
+On a nearly full disk the quota is smaller and the download can fail; the error is shown. On an
+update from version 0.1.0 the service worker deletes the three caches of the old engine once
+(`src/adapters/legacy-cache.ts`).
 
 ### The processor model (llama.cpp in WebAssembly)
 
 For a computer without a usable graphics card, or with little graphics memory, the panel offers
-Qwen3 0.6B, Qwen3 1.7B and Qwen3.5 2B on the processor (`src/adapters/wllama-runtime.ts`, package
+Qwen3 0.6B, Qwen3 1.7B and Qwen3.5 2B on the processor (the graphics card runs the same engine
+with `WllamaRuntime(factory, [], 'gpu')`) (`src/adapters/wllama-runtime.ts`, package
 `@wllama/wllama` 3.8.1). The choice is listed only when the browser has WebAssembly promise
 integration and 64-bit memory (Chrome 137; `src/adapters/cpu-support.ts`); the manifest minimum
 is 126, because compat mode's polyfill uses `URL.parse`.
 
 - **Where.** In the offscreen document, behind its own port `model-host:cpu` (the service worker
   cannot start a Worker, so it does not host this runtime). The panel reaches it with the same
-  `PortModelRuntime` and the same `model/*` messages as WebLLM; the panel gives it the
-  capabilities (`src/adapters/cpu-models.ts`): replies constrained by a JSON schema, a 4096-token
+  `PortModelRuntime` and the same `model/*` messages as the graphics-card host; the panel gives it the
+  capabilities (`src/adapters/cpu-models.ts`; the graphics-card port gets the same ones): replies constrained by a JSON schema, a 4096-token
   window. wllama starts its own Worker from a `blob:` URL built from code inside the package;
   the extension's content security policy allows that and is unchanged.
-- **One model in memory.** `ExclusiveRuntime` lets the WebLLM runtime go before the processor
+- **One model in memory.** `ExclusiveRuntime` lets the graphics-card runtime go before the processor
   model loads, and the other way round.
 - **Files.** The engine `model-libs/wllama.wasm` is copied in by the build and checked by hash
   (`scripts/model-libs.json`, `runtimes`). The weights are data: a fixed Hugging Face address per
   model, with the recorded size and SHA-256.
 - **Weights.** wllama stores them in the extension's private file storage. After a download the
   runtime compares size and SHA-256 with the record; a file that differs is deleted and never
-  loaded. A stored copy that was checked once is marked in wllama's cache record and starts
+  loaded. The browser's SHA-256 takes one buffer of at most 2 GiB, so a larger file (Gemma 4 E2B)
+  carries the SHA-256 of each 1 GiB piece and is compared piece by piece
+  (`src/adapters/sha256-parts.ts`, `parts` in `src/adapters/cpu-models.ts`). A stored copy that was checked once is marked in wllama's cache record and starts
   with no network request and no new hash. Cancel aborts the download request at once and
-  deletes what was written; a dropped connection deletes the partial file.
+  deletes what was written; a dropped connection deletes the partial file. The download and check
+  code is `src/adapters/wllama-weights.ts`.
 - **Threads.** wllama uses half the cores when the page can share memory between threads. An
   extension page can (measured 14 Nov 2026: 8 threads, `crossOriginIsolated` false), so the
   manifest has no isolation keys. If it could not, the model would run on one thread.
@@ -300,8 +314,8 @@ is 126, because compat mode's polyfill uses `URL.parse`.
   (`scripts/check-dist.mjs`). `npm run eval:cpu` runs the real engine and model.
 
 Chrome's built-in model (Prompt API) and an OpenAI-compatible endpoint run from the side panel
-itself. Tool calls use prompted JSON for every runtime: native tool calls exist in WebLLM only for
-models that are not shipped, and Chrome gives no reliable way to detect tool support in the
+itself. Tool calls use prompted JSON for every runtime (on the two local paths llama.cpp turns the
+schema the agent loop passes into a grammar), and Chrome gives no reliable way to detect tool support in the
 Prompt API (an unknown `tools` option is ignored, not refused).
 
 Chrome's built-in model in detail (`src/adapters/prompt-api-*.ts`):
@@ -410,6 +424,9 @@ The model's tool is built from the same parts. `GraphQuery` (core port) has `ava
 forms folded, case dropped, look-alike letters mapped, everything but ASCII letters and digits removed, then "starts with
 webaiassist") before the list is built, so a call by name can only meet the built-in one; the prompt lists it in its own
 section; the card marks the removed tools. Its results are node-author text and are fenced as untrusted like any tool result.
+The panel offers it for one question (`src/ui/panel-graph-tool.ts`) on a node that names its graph and allows AI input, but
+not to a runtime whose capabilities say `pageToolsFirst` (the graphics-card and processor models) while the page has tools
+of its own: with both lists, those small models chose the built-in tool for questions a page tool answers.
 Threats and controls: [THREAT-MODEL.md](THREAT-MODEL.md), "Query and semantic tools".
 
 ## Activity log
@@ -501,7 +518,7 @@ empty and that none of the development parts are present (`scripts/check-dist.mj
 `scripts/check-zip.mjs`).
 
 Extension pages run under `script-src 'self' 'wasm-unsafe-eval'; object-src 'self';`: the Manifest
-V3 minimum plus WebAssembly, which WebLLM needs. The build check refuses any other policy, refuses
+V3 minimum plus WebAssembly, which wllama needs. The build check refuses any other policy, refuses
 `web_accessible_resources` and `externally_connectable` (no web page or other extension can open
 or message the extension's pages), and scans every bundle for `eval`, `new Function`, remote
 scripts and remote code.
@@ -540,7 +557,6 @@ src/query/      the query worker's core, messages, result text and example quest
 spike/          spike page HTML
 fixtures/       the ten tools of an AgenticSystemCore node page
 scripts/        build, dist and zip checks, model-library pins, validator generator, spike server
-vendor/         model libraries fetched once by the build (not in git)
 test/           unit tests (Vitest), fixture replay, adversarial tests (test/security),
                 browser smoke and accessibility tests (Playwright, test/smoke)
 ```

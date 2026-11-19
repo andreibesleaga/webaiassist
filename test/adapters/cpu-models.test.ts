@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   CPU_MODELS,
   CPU_MODEL_IDS,
+  GPU_MODELS,
+  LOCAL_FILES,
   defaultCpuModelId,
   findCpuModel,
 } from '../../src/adapters/cpu-models';
@@ -55,5 +57,45 @@ describe('CPU model registry', () => {
     const extra = [{ ...CPU_MODELS[0]!, id: 'extra' }];
     expect(findCpuModel('extra', extra)?.id).toBe('extra');
     expect(findCpuModel('extra')).toBeUndefined();
+  });
+});
+
+describe('graphics-card model registry', () => {
+  it('lists five models in the documented order', () => {
+    expect(GPU_MODELS.map((m) => m.id)).toEqual([
+      'qwen3-0.6b-q4_k_m',
+      'qwen3-1.7b-q4_k_m',
+      'qwen3.5-2b-q4_k_m',
+      'llama-3.2-3b-instruct-q4_k_m',
+      'gemma-4-e2b-it-q4_k_m',
+    ]);
+  });
+
+  it('shares the file of the first three with the processor models of the same id', () => {
+    for (const model of GPU_MODELS.slice(0, 3)) {
+      const cpu = findCpuModel(model.id);
+      expect(cpu).toBeDefined();
+      expect(model).toMatchObject({ url: cpu?.url, bytes: cpu?.bytes, sha256: cpu?.sha256 });
+    }
+  });
+
+  it('pins every model to a Hugging Face commit, a SHA-256 and a licence', () => {
+    for (const model of GPU_MODELS) {
+      expect(model.url).toMatch(
+        /^https:\/\/huggingface\.co\/[\w.-]+\/[\w.-]+\/resolve\/[0-9a-f]{40}\//,
+      );
+      expect(model.sha256).toMatch(/^[0-9a-f]{64}$/);
+      expect(model.licence.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('stores five unique files', () => {
+    expect(LOCAL_FILES).toHaveLength(5);
+    expect(new Set(LOCAL_FILES.map((m) => m.url)).size).toBe(5);
+  });
+
+  it('says where each model runs in its label', () => {
+    for (const model of GPU_MODELS) expect(model.label).toContain('on your graphics card');
+    for (const model of CPU_MODELS) expect(model.label).toContain('on your processor');
   });
 });

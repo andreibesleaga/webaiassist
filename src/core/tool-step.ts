@@ -65,6 +65,9 @@ export interface LoopState {
   movedTo?: string;
   /** The saved chat's place in `messages` (history.ts trims it to the context window). */
   readonly history: HistorySpan;
+  /** The saved chat as it was loaded (newest 200 messages): saved again whole, whatever part of it
+   *  the model was given. */
+  savedHistory?: readonly ChatMessage[];
   /** Tokens of the largest tool result of this run: room is kept for one more that size. */
   largestResult: number;
   /** Messages of this run that are never saved with the chat (the site facts). */

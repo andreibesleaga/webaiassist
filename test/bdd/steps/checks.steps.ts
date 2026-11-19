@@ -77,7 +77,7 @@ Then("the only hosts contacted are the page's own host and the extension", async
 
 Then('the bundled model library has the recorded SHA-256', async ({ world }) => {
   const pins = JSON.parse(readFileSync('scripts/model-libs.json', 'utf8')) as {
-    libs: { file: string; sha256: string }[];
+    runtimes: { file: string; sha256: string }[];
   };
   const found = await world.requirePanel().evaluate(
     async (files) => {
@@ -89,7 +89,7 @@ Then('the bundled model library has the recorded SHA-256', async ({ world }) => 
       }
       return hashes;
     },
-    pins.libs.map((lib) => lib.file),
+    pins.runtimes.map((lib) => lib.file),
   );
-  expect(found).toEqual(Object.fromEntries(pins.libs.map((lib) => [lib.file, lib.sha256])));
+  expect(found).toEqual(Object.fromEntries(pins.runtimes.map((lib) => [lib.file, lib.sha256])));
 });

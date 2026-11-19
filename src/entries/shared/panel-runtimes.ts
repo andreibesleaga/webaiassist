@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-// Builds the ModelRuntime for the choice in the side panel. WebLLM runs in the host the
-// WebGPU probe picks (offscreen document, else service worker), reached through a port;
-// Chrome's built-in model and an endpoint run from the panel itself.
+// Builds the ModelRuntime for the choice in the side panel. The models in the browser run in
+// the offscreen document, reached through a port (the graphics-card ones only when the WebGPU
+// probe finds an adapter there); Chrome's built-in model and an endpoint run from the panel
+// itself.
 import { EndpointRuntime } from '../../adapters/endpoint-runtime';
 import { chooseHost, type HostTarget } from '../../adapters/host-choice';
 import { MODEL_PORT_PREFIX } from '../../adapters/model-host';
@@ -43,6 +44,7 @@ async function webllm(): Promise<{ runtime: ModelRuntime; host: HostName }> {
   const runtime = new PortModelRuntime(
     () => chrome.runtime.connect({ name }),
     () => crypto.randomUUID(),
+    CPU_CAPABILITIES,
   );
   return { runtime, host: choice.host };
 }

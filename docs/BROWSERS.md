@@ -5,7 +5,7 @@
 > - WebAIAssist is a Manifest V3 extension for Chromium-based desktop browsers. Firefox and Safari are not supported. The minimum is Chrome 126.
 > - Tested: Chrome 157 on Windows 10 by the maintainer, and headless Chromium 156 in the automated tests. Edge, Brave, Opera and Vivaldi were not tested.
 > - In the summary table, "Not documented" means no vendor page was found today. It does not mean unsupported.
-> - Model paths need: WebGPU (graphics card), Chrome 137 or later (processor), Chrome 138 or later and the hardware Chrome lists (built-in model).
+> - Model paths need: WebGPU in the offscreen document (graphics card; the same engine file as the processor), Chrome 137 or later (processor), Chrome 138 or later and the hardware Chrome lists (built-in model).
 > - WebMCP in Chrome is an origin trial from Chrome 149, with a local flag for development.
 
 WebAIAssist is a Manifest V3 extension for Chromium-based desktop browsers only. Firefox and
@@ -19,7 +19,7 @@ Chrome 126 (compat mode's polyfill uses `URL.parse`).
 - Chrome 157 on Windows 10 (AMD gcn-5 laptop GPU), by the maintainer, 12 and 13 Nov 2026: with
   the spike page, WebGPU with `shader-f16` worked in the page, the service worker and the
   offscreen document, and `document.modelContext` was present. With the extension on
-  `agenticsystemcore.com`, the graphics-card model ran, with a first answer of about 40
+  `agenticsystemcore.com`, the graphics-card model of version 0.1.0 (WebLLM) ran, with a first answer of about 40
   seconds (the GPU programs compile on it). Chrome's built-in model did not start in the first
   hand test. It was measured on 14 Nov 2026 in Chrome 157.0.8103.52 on Windows: the download from
   the click took 300 s, later starts 3 to 14 s, and in the re-run of 15 Nov 2026 a tool
@@ -32,12 +32,12 @@ Chrome 126 (compat mode's polyfill uses `URL.parse`).
 
 ## Which model paths a browser can offer
 
-| Path                    | Needs                                                                                                            |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Graphics card (WebLLM)  | WebGPU, in the offscreen document or the service worker (Chrome 126 or later).                                   |
-| Processor (llama.cpp)   | WebAssembly promise integration and 64-bit memory: Chrome 137 or later.                                          |
-| Chrome's built-in model | The Prompt API in the official Chrome build (Chrome 138 or later for extensions), and the hardware Chrome lists. |
-| Chat endpoint           | Any Chromium browser; Ollama needs `OLLAMA_ORIGINS=chrome-extension://*`.                                        |
+| Path                      | Needs                                                                                                                                                                                     |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Graphics card (llama.cpp) | WebGPU in the offscreen document (the service worker is never a host), and Chrome 137 or later: it is the same engine as the processor path. In an older browser the panel lists neither. |
+| Processor (llama.cpp)     | WebAssembly promise integration and 64-bit memory: Chrome 137 or later.                                                                                                                   |
+| Chrome's built-in model   | The Prompt API in the official Chrome build (Chrome 138 or later for extensions), and the hardware Chrome lists.                                                                          |
+| Chat endpoint             | Any Chromium browser; Ollama needs `OLLAMA_ORIGINS=chrome-extension://*`.                                                                                                                 |
 
 The panel checks the processor path's needs and hides that choice where they are missing. With no
 WebGPU it shows a plain error and **Use the processor instead**.

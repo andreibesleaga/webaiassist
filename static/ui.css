@@ -292,7 +292,7 @@ progress[value='1'] {
   padding: var(--space-3);
   gap: var(--space-2);
 }
-/* Only the conversation gives way; every other block keeps its height, so nothing overlaps and
+/* Only the conversation grows; every other block keeps its height, so nothing overlaps and
    a short panel scrolls as a page. */
 .panel > * {
   flex-shrink: 0;
@@ -329,8 +329,9 @@ progress[value='1'] {
 #page-card {
   box-sizing: border-box;
   min-height: 144px;
-  /* A long tools list scrolls inside the card; the model bar and the question box stay in view. */
-  max-height: 40vh;
+  /* A long tools list scrolls inside the card; the model bar and the question box stay in view,
+     and the conversation keeps most of the panel. */
+  max-height: 30vh;
   overflow-y: auto;
   display: grid;
   gap: var(--space-1);
@@ -523,9 +524,15 @@ progress[value='1'] {
 
 /* Conversation */
 .conversation {
-  flex: 1 1 4rem;
-  min-height: 4rem;
+  /* The answer is what the person came for: the chat takes half the panel's height, grows into
+     any space left, and its lower edge can be dragged to make it taller or shorter (never under
+     12rem). When that is more than the panel has, the panel scrolls as a page and the question
+     form stays at the lower edge (#ask below). */
+  flex: 1 1 auto;
+  height: 50vh;
+  min-height: 12rem;
   overflow-y: auto;
+  resize: vertical;
   padding: var(--space-1);
   border-top: 1px solid var(--line);
 }
@@ -598,6 +605,18 @@ pre.clamped {
   min-height: 1.5em;
   margin: 0;
   color: var(--muted);
+}
+/* The question box stays in view: when the panel is too short for every block (a tall chat, a
+   long card), the panel scrolls as a page under the form, which holds the lower edge. The
+   scroll padding keeps a focused control from ending up behind it (WCAG 2.2, 2.4.11). */
+#ask {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: var(--bg);
+}
+html:has(.panel) {
+  scroll-padding-bottom: 13rem;
 }
 #ask textarea {
   width: 100%;

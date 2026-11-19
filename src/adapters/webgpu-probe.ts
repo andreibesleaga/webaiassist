@@ -15,7 +15,7 @@ interface AdapterLike {
   readonly info?: { vendor?: string; architecture?: string; isFallbackAdapter?: boolean };
 }
 
-/** The limits that matter for running a model in WebLLM. */
+/** The limits that matter for running a model on the graphics card. */
 export const LIMIT_NAMES = [
   'maxBufferSize',
   'maxStorageBufferBindingSize',

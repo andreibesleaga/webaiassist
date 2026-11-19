@@ -34,12 +34,12 @@ test('one question with the scripted model goes through the gate on a WebMCP pag
   }
 });
 
-test('the model libraries load from inside the package and match their pins', async () => {
+test('the model engine loads from inside the package and matches its pin', async () => {
   const session = await startSession();
   try {
     const panel = await openPanel(session);
     const report = await panel.evaluate(async () => {
-      const response = await fetch('model-libs/Qwen3-0.6B-q4f16_1_cs1k-webgpu.wasm');
+      const response = await fetch('model-libs/wllama.wasm');
       const bytes = await response.arrayBuffer();
       const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
       const hex = [...digest].map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -47,7 +47,8 @@ test('the model libraries load from inside the package and match their pins', as
       return { ok: response.ok, hex, quota: quota ?? 0, usage: usage ?? 0 };
     });
     expect(report.ok).toBe(true);
-    expect(report.hex).toBe('19a1721867a481806adef35de0e0d0f2f4ff00a0c2e80d65b175fa55f21649c9');
+    // The pin of scripts/model-libs.json for @wllama/wllama 3.8.1.
+    expect(report.hex).toBe('551f13439366eff11e057b1b91fe46a7fdac29d56d67372d4c5f19a549dfe70c');
     // Recorded, not a gate: the storage the extension may use without unlimitedStorage.
     console.log(`storage quota of the extension: ${(report.quota / 1024 ** 3).toFixed(1)} GiB`);
   } finally {
