@@ -209,7 +209,7 @@ export const EN = {
     'Runs in this browser, on your processor and memory. Works on every computer. Downloads about {size} MB once. Slower than a graphics card. Nothing leaves your computer.',
   runtimeWebllm: 'Graphics card',
   runtimeWebllmHelp:
-    'Runs in this browser, on your graphics card (WebGPU). Downloads a model once (400 MB to 3.1 GB). Speed depends on the card. Nothing leaves your computer.',
+    'Runs in this browser, on your graphics card (WebGPU). Downloads a model once (400 MB to 3.1 GB). Speed depends on the card. On a computer with two graphics cards Chrome uses the built-in one unless it is started with --force_high_performance_gpu. Nothing leaves your computer.',
   cpuModelLabel: 'Model on the processor',
   cpuModelHelp: 'Automatic picks Qwen3 1.7B; the other models download only if you choose them.',
   runtimePromptApi: 'Chrome’s built-in model',
@@ -221,6 +221,7 @@ export const EN = {
   webllmModelLabel: 'Model in the browser',
   webllmModelHelp:
     'Automatic picks Qwen3 1.7B; the other models download only if you choose them. ' +
+    'In the measured runs Llama 3.2 3B picked the right tool most often (a 2.0 GB download). ' +
     'For other models, use a chat endpoint such as Ollama.',
   automatic: 'Automatic',
   endpointPreset: 'Endpoint preset',

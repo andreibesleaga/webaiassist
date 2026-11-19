@@ -8,6 +8,42 @@
 > - Processor, after the tool-use change: Qwen3 1.7B was right on 5 of 5 prompts. Each run is five prompts, so the numbers show a direction, not a rate.
 > - Real Chrome 157, 15 Nov 2026: the conformance page ran 16 of 16 cases as expected, and the panel listed the tools on 17 of Google's 18 demo pages.
 
+## Which path did best
+
+One laptop, 18 and 19 Nov 2026, version 0.1.1, each question in a new chat. "Right tool" is the whole
+expected tool sequence; "task done" is a tool the question accepts and an answer with no error. The
+runs are 5 or 10 questions per node: a direction, not a rate.
+
+| Path                                    | Right tool, test node / live node       | Task done, test / live | Median answer, test / live | What it costs                                         |
+| --------------------------------------- | --------------------------------------- | ---------------------- | -------------------------- | ----------------------------------------------------- |
+| Chrome's built-in model                 | 3 of 5 / 3 of 5                         | 5 of 5 / 5 of 5        | 15.5 s / 17.4 s            | No download by the extension; Google Chrome only      |
+| Qwen3 1.7B, graphics card (the default) | 8 of 10 / 5 of 10, on both cards        | 8 / 5 or 6 of 10       | 9 to 14 s / 15 to 20 s     | 1.1 GB download, about 1.4 GB of graphics memory      |
+| Llama 3.2 3B, graphics card             | 9 / 8 of 10 (NVIDIA), 7 / 7 of 10 (AMD) | 8 / 8, 5 / 8 of 10     | 14 to 18 s / 15 to 17 s    | 2.0 GB download, about 2.4 GB; Meta's licence         |
+| Qwen3.5 2B, graphics card               | 6 or 7 / 5 of 10 (NVIDIA), 9 / 2 (AMD)  | 7 or 8 / 7, 9 / 6      | 12 to 15 s / 21 to 31 s    | 1.3 GB download, about 1.6 GB                         |
+| Qwen3 0.6B, graphics card               | 7 or 8 / 0 or 1 of 10                   | 7 or 8 / 0 or 1 of 10  | 7 to 10 s / 4 to 7 s       | 397 MB download; answers the live node without a tool |
+| Gemma 4 E2B, graphics card              | 6 / 6 of 10 (NVIDIA), 8 / 5 (AMD)       | 6 / 7, 8 / 6 of 10     | 51 to 79 s / 94 to 154 s   | 3.1 GB download; marked slow                          |
+| Qwen3 1.7B, processor                   | 4 of 5 (test node only)                 | 4 of 5                 | 28 s (first answer 139 s)  | 1.1 GB download; no graphics card needed              |
+| Ollama `gemma3:4b`, local server        | 4 of 5 (test node only)                 | 5 of 5                 | 7.8 s                      | A server you install; stays on the computer           |
+| Larger hosted models (14 Nov 2026)      | 4 to 5 of 5 (test node only)            | 5 of 5                 | 6.3 to 16.4 s              | The conversation leaves the browser; 0.02 to 0.16 USD |
+
+What the numbers say:
+
+- **No download, every question answered through an accepted tool:** Chrome's built-in model. It is the
+  panel's first automatic choice when Chrome has it ready.
+- **Quickest model in the browser that keeps using the page's tools:** Qwen3 1.7B on the graphics card.
+  It is the automatic choice when Chrome's model is not ready, and the smallest download that used a
+  tool for every question on the live node.
+- **Right tool most often among the models in the browser:** Llama 3.2 3B. It is not picked
+  automatically: twice the download, about 1 GB more graphics memory, and Meta's licence instead of
+  Apache-2.0.
+- **Quickest answers:** Qwen3 0.6B, which is of use only where the page's tools are few and plain: on the
+  live node it answered without them.
+- **Right most often overall:** a larger model behind a chat endpoint, at the price of the conversation
+  leaving the browser (a remote service) or of installing a server.
+
+The automatic order in the panel (`src/ui/default-model.ts`) follows this: Chrome's built-in model when
+ready, Qwen3 1.7B on the graphics card, Qwen3 1.7B on the processor, then a chat endpoint you set up.
+
 How well each shipped model picks the right tool with the right arguments on an
 AgenticSystemCore node, measured by one command on a computer with a GPU. The tests in CI use a
 scripted model and cannot measure this.
@@ -150,6 +186,12 @@ model. It is not part of the gate; unit and browser tests use a fake server only
 
 Ollama needs `OLLAMA_ORIGINS=chrome-extension://*` for the extension; this script runs in Node and
 needs no setting.
+
+### Run of 19 Nov 2026 (version 0.1.1)
+
+Ollama on `localhost:11434`, `gemma3:4b`, the same command: the expected tool on 4 of 5 questions, a
+valid tool path and answer on 5 of 5, median answer 7.8 s, 11,267 prompt tokens and 262 completion
+tokens (`docs/eval/EVAL-ENDPOINT-localhost-2026-11-19.json`). The same result as on 14 Nov 2026.
 
 ### Run of 14 Nov 2026
 
@@ -319,9 +361,12 @@ asks WebGPU for an adapter and the browser decides which card it gets. On the me
 (Windows, Chromium 156, 18 Nov 2026) the panel got the AMD integrated card (`amd/gcn-5`) in every
 run, whatever power preference the engine asked for. It got the NVIDIA card (`nvidia/ampere`) only
 when the browser was started with `--force_high_performance_gpu`, which is what `--fast-gpu` does.
-The extension cannot choose the card. The switch was tried in Playwright's Chromium only, not in
-Google Chrome. Windows also has a graphics setting per application (Settings, System, Display,
-Graphics); whether it moves the browser's WebGPU to the faster card was not tested.
+The extension cannot choose the card. Google Chrome 157.0.8103.79 did the same on 19 Nov 2026: a page
+got `amd/gcn-5` for every power preference, and `nvidia/ampere` when Chrome was started with the
+switch, in either spelling (`--force_high_performance_gpu` or `--force-high-performance-gpu`); with a
+switch Chrome does not know it stayed on `amd/gcn-5`. The README section "Use the faster graphics card" gives the steps. Windows also has a
+graphics setting per application (Settings, System, Display, Graphics); whether it moves the
+browser's WebGPU to the faster card was not tested.
 
 ## When the model fails on a GPU
 
@@ -404,6 +449,18 @@ runs it there (the same mechanism as `eval:nano:win`); the report comes back und
 The report is `docs/eval/EVAL-CONFORMANCE-<date>-<chrome version>.json`. The suite also runs in
 Playwright's Chromium: `npx playwright test test/smoke/conformance-browser.spec.ts
 test/smoke/conformance.spec.ts`. The Chromium and Chrome results are compared by hand.
+
+Real-Chrome run, 19 Nov 2026, version 0.1.1, Chrome 157.0.8103.79 on Windows
+(`docs/eval/EVAL-CONFORMANCE-2026-11-19-157.0.8103.79.json`): in the browser alone 16 of 16 cases as
+expected, none failed, none unsupported; with the extension 16 of 16 cases, every step as expected.
+The demo pages were not run again.
+
+Chrome's built-in model, the same day and browser, version 0.1.1, each question in a new chat
+(`npm run eval:nano`, `docs/eval/EVAL-NANO-2026-11-19-157.0.8103.79.json`, on battery power): start
+12.4 s, second start 3.1 s; a tool used on 5 of 5 questions on the test node and 5 of 5 on the live
+node; the whole expected sequence on 3 of 5 on each (it called `search` where `ask` was expected,
+which the questions accept: a valid tool path and answer on 5 of 5 on each); no errors; median answer
+15.5 s and 17.4 s.
 
 Real-Chrome run, 15 Nov 2026, Chrome 157.0.8103.52 on Windows
 (`docs/eval/EVAL-CONFORMANCE-2026-11-15-157.0.8103.52.json`):

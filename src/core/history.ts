@@ -41,9 +41,17 @@ export function estimateTokens(text: string): number {
 const total = (messages: readonly ChatMessage[]): number =>
   messages.reduce((sum, message) => sum + estimateTokens(message.content), 0);
 
-/** The newest messages, at most MAX_HISTORY_MESSAGES, system messages dropped. */
-export function recentHistory(history: readonly ChatMessage[]): ChatMessage[] {
-  return startOnUser(history.filter((m) => m.role !== 'system').slice(-MAX_HISTORY_MESSAGES));
+/**
+ * The newest messages, at most MAX_HISTORY_MESSAGES, system messages dropped. The cut starts on a
+ * question; a message that `leads` says goes with the question after it (page text read on request,
+ * saved before its question) is kept in front of that question.
+ */
+export function recentHistory(
+  history: readonly ChatMessage[],
+  leads: (message: ChatMessage) => boolean = () => false,
+): ChatMessage[] {
+  const recent = history.filter((m) => m.role !== 'system').slice(-MAX_HISTORY_MESSAGES);
+  return startOnUser(recent, leads);
 }
 
 /** How the saved chat is read into questions (exchangesWithTools). */
@@ -54,8 +62,10 @@ export interface ExchangeRules {
   readonly leadsQuestion: (message: ChatMessage) => boolean;
 }
 
-/** The saved chat cut into questions: each starts at a question the person asked, with the page
- *  text read for it, and holds everything until the next one. */
+/** The saved chat cut into questions: each starts at a question the person asked and holds
+ *  everything until the next one. Page text read for a question is saved before it; here it comes
+ *  right after it, so every question starts on the person's turn and none loses its page text
+ *  when the model's part of the chat is cut to start on a user turn. */
 function exchanges(history: readonly ChatMessage[], rules: ExchangeRules): ChatMessage[][] {
   const groups: ChatMessage[][] = [];
   let current: ChatMessage[] = [];
@@ -65,7 +75,8 @@ function exchanges(history: readonly ChatMessage[], rules: ExchangeRules): ChatM
       const lead =
         last !== undefined && rules.leadsQuestion(last) ? [current.pop() as ChatMessage] : [];
       if (current.length > 0) groups.push(current);
-      current = lead;
+      current = [message, ...lead];
+      continue;
     }
     current.push(message);
   }
@@ -89,8 +100,13 @@ export function exchangesWithTools(
     .flat();
 }
 
-function startOnUser(messages: ChatMessage[]): ChatMessage[] {
-  while (messages.length > 0 && messages[0]?.role !== 'user') messages.shift();
+function startOnUser(
+  messages: ChatMessage[],
+  leads: (message: ChatMessage) => boolean,
+): ChatMessage[] {
+  const leadsQuestion = (): boolean =>
+    messages[0] !== undefined && leads(messages[0]) && messages[1]?.role === 'user';
+  while (messages.length > 0 && messages[0]?.role !== 'user' && !leadsQuestion()) messages.shift();
   return messages;
 }
 

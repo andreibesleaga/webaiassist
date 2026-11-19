@@ -108,6 +108,23 @@ describe('runAgent: plan, call, observe, answer', () => {
     expect(saved).toContain('ok');
   });
 
+  it('gives the model the page text of the first saved question, and keeps it in the saved chat', async () => {
+    const deps = makeDeps([answer('ok')]);
+    const history = [
+      { role: 'tool' as const, content: wrapUntrusted(PAGE_TEXT_TOOL, 'first page text') },
+      { role: 'user' as const, content: 'Q1 about the page' },
+      { role: 'assistant' as const, content: 'A1 from the page' },
+    ];
+    await runAgent(deps, { ...input, history });
+    const sent = (deps.model.requests[0]?.messages ?? []).map((m) => m.content);
+    expect(sent[1]).toContain('Q1 about the page');
+    expect(sent[2]).toContain('first page text');
+    expect(sent[3]).toContain('A1 from the page');
+    const saved = await deps.memory.loadChat(input.origin);
+    expect(saved[0]?.content).toContain('first page text');
+    expect(saved[1]?.content).toContain('Q1 about the page');
+  });
+
   it('splits the saved chat by question: page text, repair and nudge turns stay with their question', async () => {
     const deps = makeDeps([answer('ok')]);
     const page = wrapUntrusted(PAGE_TEXT_TOOL, 'the page text');
@@ -144,7 +161,12 @@ describe('runAgent: plan, call, observe, answer', () => {
       expect(all, kept).toContain(kept);
     for (const dropped of ['Q1 no tool', 'A1 no tool', 'Q5 no tool', 'A5 no tool'])
       expect(all, dropped).not.toContain(dropped);
+    // The first question kept is the one with page text: it starts on the person's turn and its
+    // page text follows it (saved before the question, given to the model after it).
     expect(deps.model.requests[0]?.messages[1]?.role).toBe('user');
+    expect(sent[1]).toContain('Q2 with page text');
+    expect(sent[2]).toContain('the page text');
+    expect(sent[3]).toContain('A2 from the page');
   });
 
   it('turns a thrown tool error into a failed result the model can see', async () => {

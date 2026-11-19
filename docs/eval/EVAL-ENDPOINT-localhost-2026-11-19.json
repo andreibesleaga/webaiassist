@@ -1,0 +1,91 @@
+{
+  "date": "2026-11-19",
+  "host": "localhost:11434",
+  "model": "gemma3:4b",
+  "local": true,
+  "rows": [
+    {
+      "n": 1,
+      "text": "What does this site say about handoffs?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 31.6,
+      "modelCalls": 2,
+      "promptTokens": 2257,
+      "completionTokens": 54,
+      "costUsd": null,
+      "answer": "The site mentions \"handoff\" (how work passes between agents, with context) and \"review\" (a reviewer checks the result)."
+    },
+    {
+      "n": 2,
+      "text": "Which items best answer: how do agents share work?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 7.8,
+      "modelCalls": 2,
+      "promptTokens": 2259,
+      "completionTokens": 58,
+      "costUsd": null,
+      "answer": "The items that best answer how agents share work are handoff (how work passes between agents, with context) and review (a reviewer checks the result)."
+    },
+    {
+      "n": 3,
+      "text": "Find items about review.",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 6.3,
+      "modelCalls": 2,
+      "promptTokens": 2248,
+      "completionTokens": 40,
+      "costUsd": null,
+      "answer": "review and review (a reviewer checks the result)"
+    },
+    {
+      "n": 4,
+      "text": "Search for \"memory\".",
+      "tools": [
+        "search"
+      ],
+      "toolRight": true,
+      "taskDone": true,
+      "seconds": 6.4,
+      "modelCalls": 2,
+      "promptTokens": 2250,
+      "completionTokens": 44,
+      "costUsd": null,
+      "answer": "Items related to 'memory' include handoff and review."
+    },
+    {
+      "n": 5,
+      "text": "Is there anything on guardrails here?",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": false,
+      "taskDone": true,
+      "seconds": 8.9,
+      "modelCalls": 2,
+      "promptTokens": 2253,
+      "completionTokens": 66,
+      "costUsd": null,
+      "answer": "Yes, there are several guardrails in place. The 'handoff' and 'review' items represent processes for ensuring work is passed between agents with sufficient context and for a reviewer to check the result."
+    }
+  ],
+  "totals": {
+    "toolRight": 4,
+    "taskDone": 5,
+    "promptTokens": 11267,
+    "completionTokens": 262,
+    "costUsd": null,
+    "medianSeconds": 7.8
+  }
+}
