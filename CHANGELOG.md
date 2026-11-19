@@ -69,7 +69,14 @@ call, Chrome's built-in model, the processor models and chat endpoints work as b
 - **The files of the old engine are removed once after the update**, so they do not keep taking disk space
   (they could be several gigabytes).
 - **Page text read for an earlier question stays with that question** when the saved chat is given to
-  the model: it now follows the question instead of being cut off when that question comes first.
+  the model: it now follows the question instead of being cut off when that question comes first, also
+  when the saved chat is cut to its newest 200 messages at that point. A follow-up question therefore
+  gets the page text you read before, from the saved chat (in 0.1.0 a page text that stood first was
+  dropped from the saved chat at the next question).
+- **The docs say which model path did best and how to use the faster graphics card**: README, "Which one
+  did best" and "Use the faster graphics card"; [docs/EVAL.md](docs/EVAL.md), "Which path did best". The
+  switch `--force_high_performance_gpu` was checked in Google Chrome 157. Options names it and says that
+  Llama 3.2 3B picked the right tool most often.
 - **A graphics-card model that fails to load says why in graphics terms**: too little graphics memory, or
   a graphics device that gave up (the model host then starts again with a fresh device).
 - **The name of the keyboard shortcut is in the language file**, with the other texts Chrome shows.

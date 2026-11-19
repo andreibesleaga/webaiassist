@@ -99,6 +99,19 @@ Pick one in the panel or in Options. The panel picks one for you, and says why i
 Model licences: [docs/MODEL-LICENCES.md](docs/MODEL-LICENCES.md). Measured speeds and tool use:
 [docs/EVAL.md](docs/EVAL.md).
 
+**Which one did best** (one laptop, 18 and 19 Nov 2026; few questions, so a direction, not a rate):
+
+- **Chrome's built-in model** answered every question through a tool the question accepts (10 of 10), in
+  15 to 17 seconds, with no download by the extension. The panel picks it first when Chrome has it ready.
+- **Qwen3 1.7B on the graphics card** is the quickest model in the browser that keeps using the page's
+  tools: 9 to 20 seconds an answer, the right tool in 8 of 10 questions on the test node and 5 of 10 on
+  the live node. The panel picks it when Chrome's model is not ready.
+- **Llama 3.2 3B on the graphics card** picked the right tool most often of the models in the browser
+  (live node: 8 of 10 on the NVIDIA card, 7 of 10 on the AMD one), at 14 to 18 seconds. Choose it
+  yourself: it is a 2.0 GB download, needs about 2.4 GB of graphics memory and has Meta's licence.
+- **A chat endpoint** with a larger model was right most often overall (hosted models: 4 to 5 of 5 on the
+  test node, 6 to 16 seconds), but the conversation leaves the browser, and a remote service may charge.
+
 A model you choose yourself is kept. Details are under [Other runtimes](#other-runtimes).
 
 ## What it works with
@@ -417,14 +430,40 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
   so while it waits. The engine sends a prompt to the card in pieces of 64 tokens, so a slow card's
   watchdog does not cut the model off; a model too large for the card can still stall.
 - On a laptop with two graphics cards the browser decides which one a page gets, and the extension
-  cannot choose. On the measured laptop Chromium gave the integrated card unless it was started with
+  cannot choose. On the measured laptop Chrome gave the integrated card unless it was started with
   `--force_high_performance_gpu`; the default model's median answer on the test page took 14 seconds
-  on the integrated card and 9 on the other ([docs/EVAL.md](docs/EVAL.md)).
+  on the integrated card and 9 on the other. [Use the faster graphics card](#use-the-faster-graphics-card)
+  says how.
 - Small models pick tools less reliably than large ones; [docs/EVAL.md](docs/EVAL.md) records
   the measured rate.
 - The extension asks before tool calls, but it cannot check what a page's tool really does.
   [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) lists what it protects against and what it
   does not.
+
+## Use the faster graphics card
+
+Many laptops have two graphics cards: one inside the processor and a faster separate one. Chrome
+decides which one a page gets, and on the measured Windows laptop (Chrome 157) it gave the one inside
+the processor, whatever the extension asked for. To start Chrome on the faster card:
+
+1. Close every Chrome window. If Chrome keeps running in the background (its icon near the clock),
+   exit it there too: the switch is read only when Chrome starts.
+2. Start Chrome with the switch `--force_high_performance_gpu`:
+   - **Windows:** press Win+R and run `chrome.exe --force_high_performance_gpu`. To keep it, right-click
+     the Chrome shortcut, choose Properties, and add a space and `--force_high_performance_gpu` at the end
+     of **Target**, after the closing quote.
+   - **macOS** (not tried): `open -a "Google Chrome" --args --force_high_performance_gpu`.
+   - **Linux** (not tried): `google-chrome --force_high_performance_gpu`.
+3. Check: open `chrome://gpu` and read which card is marked active, or use **Copy diagnostics** in the
+   panel, which names the graphics adapter.
+
+The spelling with hyphens, `--force-high-performance-gpu`, selected the same card in Chrome 157; a
+switch Chrome does not know changed nothing.
+
+Measured on that laptop: with the switch the page got the NVIDIA card, and the default model's median
+answer took 9 seconds instead of 14 ([docs/EVAL.md](docs/EVAL.md), "Two graphics cards"). It also uses
+more power. Windows has a graphics setting per application (Settings, System, Display, Graphics); whether
+it moves Chrome's WebGPU to the faster card was not tried.
 
 ## Troubleshooting
 
@@ -435,6 +474,8 @@ no account and no analytics. Details: [docs/PRIVACY.md](docs/PRIVACY.md).
 - **The model stopped with a lost GPU device**: press **Start** again; the model loads again. If it
   repeats, the model is too large for the computer's graphics card: choose a smaller model, the same
   model on the processor, Chrome's built-in model or an endpoint.
+- **Answers are slow on a laptop with two graphics cards**: see
+  [Use the faster graphics card](#use-the-faster-graphics-card).
 - **No WebMCP tools**: see [WebMCP in your browser](#webmcp-in-your-browser), or **Read this page**.
 - **Not allowed yet**: press **Allow** at the top of the panel and accept Chrome's request, or
   click the toolbar button on the page. `chrome://` pages and the Chrome Web Store are closed to

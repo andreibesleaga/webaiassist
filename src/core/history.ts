@@ -41,9 +41,17 @@ export function estimateTokens(text: string): number {
 const total = (messages: readonly ChatMessage[]): number =>
   messages.reduce((sum, message) => sum + estimateTokens(message.content), 0);
 
-/** The newest messages, at most MAX_HISTORY_MESSAGES, system messages dropped. */
-export function recentHistory(history: readonly ChatMessage[]): ChatMessage[] {
-  return startOnUser(history.filter((m) => m.role !== 'system').slice(-MAX_HISTORY_MESSAGES));
+/**
+ * The newest messages, at most MAX_HISTORY_MESSAGES, system messages dropped. The cut starts on a
+ * question; a message that `leads` says goes with the question after it (page text read on request,
+ * saved before its question) is kept in front of that question.
+ */
+export function recentHistory(
+  history: readonly ChatMessage[],
+  leads: (message: ChatMessage) => boolean = () => false,
+): ChatMessage[] {
+  const recent = history.filter((m) => m.role !== 'system').slice(-MAX_HISTORY_MESSAGES);
+  return startOnUser(recent, leads);
 }
 
 /** How the saved chat is read into questions (exchangesWithTools). */
@@ -92,8 +100,13 @@ export function exchangesWithTools(
     .flat();
 }
 
-function startOnUser(messages: ChatMessage[]): ChatMessage[] {
-  while (messages.length > 0 && messages[0]?.role !== 'user') messages.shift();
+function startOnUser(
+  messages: ChatMessage[],
+  leads: (message: ChatMessage) => boolean,
+): ChatMessage[] {
+  const leadsQuestion = (): boolean =>
+    messages[0] !== undefined && leads(messages[0]) && messages[1]?.role === 'user';
+  while (messages.length > 0 && messages[0]?.role !== 'user' && !leadsQuestion()) messages.shift();
   return messages;
 }
 

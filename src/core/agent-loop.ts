@@ -107,7 +107,9 @@ async function startState(deps: AgentDeps, input: AgentInput): Promise<LoopState
   state.tools = listing?.tools ?? [];
   const stats = await deps.memory.history(input.origin);
   const system = systemPrompt(deps, input, state.tools, stats);
-  state.savedHistory = recentHistory(input.history ?? []).map(fenceSaved);
+  state.savedHistory = recentHistory(input.history ?? [], SAVED_CHAT_RULES.leadsQuestion).map(
+    fenceSaved,
+  );
   const history = startOnUserTurn(exchangesWithTools(state.savedHistory, SAVED_CHAT_RULES));
   state.history.count = history.length;
   state.messages.push(...buildMessages(system, history, input.userText));

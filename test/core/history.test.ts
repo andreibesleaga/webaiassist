@@ -34,6 +34,23 @@ describe('recentHistory', () => {
     expect(recentHistory(turns(1000))).toHaveLength(MAX_HISTORY_MESSAGES);
     expect(recentHistory(turns(1000))[0]?.role).toBe('user');
   });
+
+  it('keeps page text that leads a question when the cut falls on it, with more than the cap saved', () => {
+    const page: ChatMessage = { role: 'tool', content: 'PAGE TEXT' };
+    const isPage = (m: ChatMessage): boolean => m.content === 'PAGE TEXT';
+    // 6 older messages, then the page text, its question, and 198 more: the newest 200 start on the page text.
+    const history = [...turns(6, 'old'), page, ...turns(MAX_HISTORY_MESSAGES - 1, 'kept')];
+    expect(history.length).toBeGreaterThan(MAX_HISTORY_MESSAGES);
+    const kept = recentHistory(history, isPage);
+    expect(kept).toHaveLength(MAX_HISTORY_MESSAGES);
+    expect(kept[0]).toBe(page);
+    expect(kept[1]).toEqual({ role: 'user', content: 'kept 0' });
+    // Without the rule the page text is cut, as any other leading message that is not a question.
+    expect(recentHistory(history)[0]).toEqual({ role: 'user', content: 'kept 0' });
+    // A leading result that no question follows is still cut.
+    const orphan = [page, { role: 'assistant' as const, content: 'a' }, ...turns(2, 'q')];
+    expect(recentHistory(orphan, isPage)[0]).toEqual({ role: 'user', content: 'q 0' });
+  });
 });
 
 describe('fitToContext', () => {

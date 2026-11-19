@@ -50,7 +50,7 @@ describe('side panel: model download', () => {
 });
 
 describe('side panel: read page text', () => {
-  it('is used on the same tab and site, once', async () => {
+  it('is used on the same tab and site; a later question gets it once, with the question it was read for', async () => {
     const deps = fakeDeps([answer('ok')]);
     const model = new FakeModelRuntime([answer('ok')]);
     deps.model = model;
@@ -67,8 +67,16 @@ describe('side panel: read page text', () => {
       await settle();
     }
     const texts = model.requests.map((r) => r.messages.map((m) => m.content).join('\n'));
-    expect(texts[0]).toContain('551204');
-    expect(texts[1]).not.toContain('551204');
+    const count = (text: string | undefined): number => (text ?? '').split('551204').length - 1;
+    expect(count(texts[0])).toBe(1);
+    // Not read again for the second question: it comes back once, from the saved chat, after the
+    // question it was read for and before that question's answer.
+    expect(count(texts[1])).toBe(1);
+    const second = model.requests[1]?.messages.map((m) => m.content) ?? [];
+    const at = second.findIndex((c) => c.includes('551204'));
+    expect(second[at - 1]).toContain('first?');
+    expect(second.at(-1)).toContain('second?');
+    expect(at).toBeLessThan(second.length - 2);
   });
 
   it('is dropped, with a note, when it was read on another site than the question’s', async () => {
