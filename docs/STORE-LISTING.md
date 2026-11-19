@@ -30,7 +30,11 @@ Nothing below is guessed. These items stay open until the runs are done and reco
 
 ## Store listing tab
 
-**Name:** WebAIAssist
+**Name** (the manifest `name`, 74 of 75 characters; the store reads the title from the package):
+
+> WebAIAssist - Browser AI for WebMCP websites and the agentic knowledge web
+
+The short name, which Chrome shows where space is tight, stays `WebAIAssist`.
 
 **Summary** (the manifest description, 116 of 132 characters):
 

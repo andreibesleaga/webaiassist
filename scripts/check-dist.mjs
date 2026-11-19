@@ -61,10 +61,23 @@ const DEV_FILES = ['spike/index.html', 'spike/spike.js'];
 
 const same = (a, b) => JSON.stringify([...(a ?? [])].sort()) === JSON.stringify([...b].sort());
 
+/** The store title: the product name first, then a short line on what it is (Chrome allows 75
+ *  characters). The short name is what Chrome shows where space is tight. */
+function checkName(m) {
+  const titled = typeof m.name === 'string' && /^WebAIAssist( - .+)?$/.test(m.name);
+  if (!titled || m.name.length > 75) {
+    return ['name must be "WebAIAssist" or start with "WebAIAssist - ", at most 75 characters'];
+  }
+  if (m.name !== 'WebAIAssist' && m.short_name !== 'WebAIAssist') {
+    return ['short_name must be "WebAIAssist" when the name is longer'];
+  }
+  return [];
+}
+
 function checkIdentity(m) {
   const problems = [];
   if (m.manifest_version !== 3) problems.push('manifest_version must be 3');
-  if (m.name !== 'WebAIAssist') problems.push('name must be "WebAIAssist"');
+  problems.push(...checkName(m));
   if (!/^\d+(\.\d+){0,3}$/.test(String(m.version))) {
     problems.push('version must be one to four dot-separated numbers');
   }
