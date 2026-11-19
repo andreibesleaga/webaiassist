@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it } from 'vitest';
+import { LEGACY_GPU_IDS } from '../../src/adapters/cpu-models';
 import {
   DEFAULT_SETTINGS,
   ENDPOINT_PRESETS,
@@ -98,7 +99,7 @@ describe('settings', () => {
     const chosen = {
       ...DEFAULT_SETTINGS,
       runtime: 'endpoint',
-      webllmModel: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
+      webllmModel: 'llama-3.2-3b-instruct-q4_k_m',
       confirmMode: 'per-site',
       memory: false,
     };
@@ -127,7 +128,7 @@ describe('settings', () => {
       ...DEFAULT_SETTINGS,
       version: 2,
       runtime: 'webllm',
-      webllmModel: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
+      webllmModel: 'llama-3.2-3b-instruct-q4_k_m',
     };
     expect(normalizeSettings(named).runtime).toBe('webllm');
     for (const runtime of ['cpu', 'endpoint', 'prompt-api']) {
@@ -138,6 +139,20 @@ describe('settings', () => {
   it('turns a browser model that is not shipped into "automatic"', () => {
     const old = { ...DEFAULT_SETTINGS, webllmModel: 'Phi-3.5-mini-instruct-q4f16_1-MLC' };
     expect(normalizeSettings(old).webllmModel).toBe('');
+  });
+
+  it('reads each model id that version 0.1.0 saved as its new id, keeping the graphics-card choice', () => {
+    for (const [oldId, newId] of Object.entries(LEGACY_GPU_IDS)) {
+      const old = { ...DEFAULT_SETTINGS, version: 2, runtime: 'webllm', webllmModel: oldId };
+      expect(normalizeSettings(old)).toMatchObject({ runtime: 'webllm', webllmModel: newId });
+    }
+    expect(Object.keys(LEGACY_GPU_IDS)).toHaveLength(4);
+    expect(LEGACY_GPU_IDS['Qwen3-0.6B-q4f16_1-MLC']).toBe('qwen3-0.6b-q4_k_m');
+    expect(LEGACY_GPU_IDS['Qwen3.5-2B-q4f16_1-MLC']).toBe('qwen3.5-2b-q4_k_m');
+    expect(LEGACY_GPU_IDS['Llama-3.2-3B-Instruct-q4f16_1-MLC']).toBe(
+      'llama-3.2-3b-instruct-q4_k_m',
+    );
+    expect(LEGACY_GPU_IDS['gemma-4-E2B-it-q4f16_1-MLC']).toBe('gemma-4-e2b-it-q4_k_m');
   });
 
   it('saves, loads and resets through chrome.storage.local', async () => {

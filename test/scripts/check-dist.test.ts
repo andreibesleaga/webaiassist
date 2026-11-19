@@ -19,7 +19,6 @@ const FILES = [
   'ui.css',
   'content-isolated.js',
   'content-main.js',
-  'model-worker.js',
   'query-worker.js',
   'webmcp-polyfill.js',
   'explorer.html',
@@ -178,12 +177,11 @@ describe('checkManifest', () => {
   it('requires a module service worker and refuses references to files that were not built', () => {
     const problems = checkManifest(
       { ...good, background: { service_worker: 'service-worker.js' } },
-      (path) => path !== 'model-worker.js' && path !== 'options.html',
+      (path) => path !== 'options.html',
     );
     expect(problems).toEqual([
       'background must be a module service worker',
       'missing file: options.html',
-      'missing file: model-worker.js',
     ]);
   });
 

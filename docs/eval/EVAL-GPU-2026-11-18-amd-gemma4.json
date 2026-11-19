@@ -1,0 +1,478 @@
+{
+  "date": "2026-11-18",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true,
+    "adapter": "amd/gcn-5"
+  },
+  "models": [
+    {
+      "key": "gemma4",
+      "id": "gemma-4-e2b-it-q4_k_m",
+      "ready": true,
+      "loadS": 27.3,
+      "status": "Ready: Gemma 4 E2B. Running in this browser, on your graphics card (in the offscreen document)."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:62441/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    },
+    {
+      "name": "live",
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 76.5,
+      "totalS": 116.6
+    },
+    {
+      "n": 2,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 27.4,
+      "totalS": 64.7
+    },
+    {
+      "n": 3,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 28.5,
+      "totalS": 68.8
+    },
+    {
+      "n": 4,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 17.9,
+      "totalS": 55.9
+    },
+    {
+      "n": 5,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 35.6,
+      "totalS": 77.1
+    },
+    {
+      "n": 6,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 31,
+      "totalS": 66.6
+    },
+    {
+      "n": 7,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 52.8,
+      "totalS": 101
+    },
+    {
+      "n": 8,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 50.2,
+      "totalS": 99.1
+    },
+    {
+      "n": 9,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 45,
+      "totalS": 79.9
+    },
+    {
+      "n": 10,
+      "model": "gemma4",
+      "target": "stub",
+      "tools": [
+        "explain"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 89.9,
+      "totalS": 128.1
+    },
+    {
+      "n": 1,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "search",
+        "ask"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 84.1,
+      "totalS": 300,
+      "error": "timed out"
+    },
+    {
+      "n": 2,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 32.9,
+      "totalS": 124
+    },
+    {
+      "n": 3,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "search",
+        "ask"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 25.3,
+      "totalS": 136.4
+    },
+    {
+      "n": 4,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 32.9,
+      "totalS": 68.6
+    },
+    {
+      "n": 5,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 216.1,
+      "totalS": 271.2
+    },
+    {
+      "n": 6,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 16.8,
+      "totalS": 55.3
+    },
+    {
+      "n": 7,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 79.4,
+      "totalS": 171.3
+    },
+    {
+      "n": 8,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 50.4,
+      "totalS": 85.5
+    },
+    {
+      "n": 9,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 249.4,
+      "totalS": 249.5,
+      "error": "Error: The model gave no valid action: no JSON object in the reply."
+    },
+    {
+      "n": 10,
+      "model": "gemma4",
+      "target": "live",
+      "tools": [
+        "ask",
+        "search"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 64.3,
+      "totalS": 300.1,
+      "error": "timed out"
+    }
+  ],
+  "summary": [
+    {
+      "model": "gemma4",
+      "target": "stub",
+      "prompts": 10,
+      "toolRight": 8,
+      "firstToolRight": 8,
+      "toolUsed": "10 of 10",
+      "taskDone": 8,
+      "gateShown": "10 of 10",
+      "factInAnswer": "8 of 10",
+      "hallucinated": 0,
+      "errors": 0,
+      "repeated": 0,
+      "medianFirstTokenS": 40.3
+    },
+    {
+      "model": "gemma4",
+      "target": "live",
+      "prompts": 10,
+      "toolRight": 5,
+      "firstToolRight": 6,
+      "toolUsed": "9 of 10",
+      "taskDone": 6,
+      "gateShown": "9 of 9",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 0,
+      "errors": 3,
+      "repeated": 0,
+      "medianFirstTokenS": 57.349999999999994
+    }
+  ],
+  "checks": [
+    {
+      "name": "storage.local.setAccessLevel",
+      "result": "pass",
+      "detail": "resolved in the service worker"
+    },
+    {
+      "name": "Hosts contacted on first Start",
+      "result": "review",
+      "detail": "8 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start"
+    },
+    {
+      "name": "Idle 0 min, then a question",
+      "result": "skipped",
+      "detail": "--idle 0"
+    },
+    {
+      "name": "Corrupted cached library is refused",
+      "result": "skipped",
+      "detail": "no cached .wasm (scripted or library served from the package)"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

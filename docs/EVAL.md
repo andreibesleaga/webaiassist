@@ -3,8 +3,8 @@
 > **In short**
 >
 > - This page records how well each model picks the right tool on an AgenticSystemCore node. CI tests use a scripted model and cannot measure it.
-> - Graphics card, 16 Nov 2026, one laptop: Qwen3 0.6B used a tool on 10 of 10 test questions, the right one on 8. On the live node the right tool on 2 of 10.
-> - Llama 3.2 3B and Gemma 4 E2B ran past the 5-minute limit on question one; both are marked slow in the list. Chrome's built-in model, 15 Nov: a tool on 10 of 10 questions, the right one on 8.
+> - Graphics card, 18 Nov 2026, version 0.1.1 (llama.cpp), one laptop with two cards: the default, Qwen3 1.7B, used a tool for 10 of 10 questions on both nodes and picked the right one for 8 of 10 on the test node and 5 of 10 on the live node, on both cards. Median answer 9 to 20 s.
+> - Llama 3.2 3B picked the right tool most often (live node: 8 of 10 on the NVIDIA card, 7 on the AMD one). Gemma 4 E2B answers but takes about 1 to 2.5 minutes; it stays marked slow. Chrome's built-in model, 15 Nov: a tool on 10 of 10 questions, the right one on 8.
 > - Processor, after the tool-use change: Qwen3 1.7B was right on 5 of 5 prompts. Each run is five prompts, so the numbers show a direction, not a rate.
 > - Real Chrome 157, 15 Nov 2026: the conformance page ran 16 of 16 cases as expected, and the panel listed the tools on 17 of Google's 18 demo pages.
 
@@ -14,12 +14,12 @@ scripted model and cannot measure this.
 
 ## What is measured for each model path
 
-| Path                    | Measured by                                               | State on 16 Nov 2026                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| ----------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Graphics card           | `npm run eval:gpu` on the maintainer's laptop (AMD gcn-5) | Run of 16 Nov, 10 questions per page: Qwen3 0.6B used a tool on 10 of 10 test questions, the right one on 8, about 19 s to the first token; on the live node the right tool on 2 of 10. Qwen3.5 2B: the right tool on 6 of 10, 2 to 5 minutes per answer, 3 over the 5-minute limit. Llama 3.2 3B and Gemma 4 E2B loaded and then ran past the limit on their first question, which also stopped that browser. See the results block below. |
-| Processor and memory    | `npm run eval:cpu`, headless Chromium on 16 cores         | Three models, five prompts (three for Qwen3 1.7B): see "The processor model".                                                                                                                                                                                                                                                                                                                                                               |
-| Chrome's built-in model | `npm run eval:nano` in real Chrome 157 on Windows         | Run of 15 Nov, after the profile used for earlier builds was replaced (in it the panel showed no tools at all): a tool used on 10 of 10 questions, the whole expected sequence on 8 (4 of 5 on the test node, 4 of 5 on the live node); 18 to 36 s per answer; start 14 s, later starts 3 s. Report: `docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json`.                                                                                   |
-| Chat endpoint           | Unit and browser tests against a fake server              | No run against a real Ollama or LM Studio is recorded.                                                                                                                                                                                                                                                                                                                                                                                      |
+| Path                    | Measured by                                                                 | State on 16 Nov 2026                                                                                                                                                                                                                                                                                                                                      |
+| ----------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Graphics card           | `npm run eval:gpu` on the maintainer's laptop (AMD gcn-5 and NVIDIA ampere) | Runs of 18 Nov 2026 with version 0.1.1: one model per run, 10 questions per node, each in a new chat; all five models on both cards. See "Results". The runs of 16 Nov 2026 (version 0.1.0, WebLLM) stay in `docs/eval/` as history.                                                                                                                      |
+| Processor and memory    | `npm run eval:cpu`, headless Chromium on 16 cores                           | Three models, five prompts (three for Qwen3 1.7B): see "The processor model".                                                                                                                                                                                                                                                                             |
+| Chrome's built-in model | `npm run eval:nano` in real Chrome 157 on Windows                           | Run of 15 Nov, after the profile used for earlier builds was replaced (in it the panel showed no tools at all): a tool used on 10 of 10 questions, the whole expected sequence on 8 (4 of 5 on the test node, 4 of 5 on the live node); 18 to 36 s per answer; start 14 s, later starts 3 s. Report: `docs/eval/EVAL-NANO-2026-11-15-157.0.8103.52.json`. |
+| Chat endpoint           | Unit and browser tests against a fake server                                | No run against a real Ollama or LM Studio is recorded.                                                                                                                                                                                                                                                                                                    |
 
 ## Run
 
@@ -29,15 +29,21 @@ scripted model and cannot measure this.
    From WSL, `npm run eval:gpu:win` runs it on the Windows side, installs that Chromium there, and
    copies the report back.
 2. It builds `dist-eval/` (the extension plus install-time access to `localhost`, `127.0.0.1` and
-   `agenticsystemcore.com`), starts each model (Qwen3 0.6B, then Qwen3.5 2B; add Llama 3.2 3B
-   and Gemma 4 E2B with `--models`) and asks the prompts.
+   `agenticsystemcore.com`), starts the model (Qwen3 1.7B, the one the panel picks; another with
+   `--models`) and asks the prompts. **Run one model per run.** A second model in the same run
+   sees the chat the first one saved for that site and copies its answers: on 18 Nov 2026 a model
+   that used a tool in 10 of 10 questions alone used none after a model that had answered without
+   tools.
 3. Every prompt runs in a fresh panel, on a local stub of the ten AgenticSystemCore tools and,
    unless `--no-live`, on the live node. Each confirmation question is allowed and recorded.
-4. Options: `--models qwen,qwen35` (the default; the others are `llama` and `gemma4`), `--prompts 20`, `--idle 10` (minutes), `--headless`,
+4. Options: `--models qwen17` (the default; the others are `qwen`, `qwen35`, `llama` and `gemma4`), `--prompts 20`, `--idle 10` (minutes), `--headless`,
    `--no-live`, `--fresh-profile` (forget cached models), `--scripted` (flow check, no GPU),
-   `--no-cancel-check` (skip the Cancel-during-download check, to see its effect on the GPU alone).
-5. Output: `docs/eval/EVAL-<date>-<chrome>.json`, four screenshots in `docs/eval/screenshots/`,
-   and the results block below. Exit code 2 means the panel found no WebGPU adapter.
+   `--no-cancel-check` (skip the Cancel-during-download check, to see its effect on the GPU alone),
+   `--fast-gpu` (start the browser with `--force_high_performance_gpu`; see "Two graphics cards"),
+   `--keep-chat` (keep the saved chats between questions, as with Memory on).
+5. Output: `docs/eval/EVAL-<date>-<chrome>.json` (it names the graphics card the panel got, as
+   vendor and architecture), four screenshots in `docs/eval/screenshots/`, and the results block
+   below. Exit code 2 means the panel found no WebGPU adapter.
 6. Do by hand what a program cannot see: Edge, Brave, Opera and Vivaldi sideload, a screen
    reader, and Chrome's own site-access request from the toolbar.
 
@@ -89,10 +95,20 @@ answers all five prompts.
   left no file. One sample of the browser's main process while the model was in memory showed
   1.7 GB resident (`top`), which is the memory the label gives.
 
+### Run of 18 Nov 2026 (version 0.1.1, each question in a new chat)
+
+`npm run eval:cpu -- --model 1.7b`, same machine (16 cores, 8 threads), headless Chromium 156,
+report `docs/eval/EVAL-CPU-1.7b-2026-11-18.json`. Qwen3 1.7B downloaded (1.1 GB) and loaded in 57.2 s,
+11.7 s from the stored copy. The expected tool on 4 of 5 questions (`ask`, `ask`, `search`, `search`;
+the fifth expected `search` and called `links`). The first question took 138.8 s, the next four 25 to
+30 s (median of all five 28 s); reply 6.2 tokens a second, prompt 9.0 (medians). The earlier runs'
+answers of 47 to 137 s carried each site's saved chat ("Each question in a new chat"). Cancel during
+the download answered in 73 ms and left no file.
+
 ## The 4,096-token window
 
-Every listed model runs with a window of 4,096 tokens (WebLLM's record for the graphics-card
-models, `CPU_CAPABILITIES` for the processor ones). `test/adapters/context-fit.test.ts` builds the
+Every listed model runs with a window of 4,096 tokens (`CPU_CAPABILITIES`, on the graphics card
+and on the processor). `test/adapters/context-fit.test.ts` builds the
 request the loop sends for the live AgenticSystemCore node (the rules and node hint, its ten tools
 as the page lists them, the site files the node publishes, the question) with each model's
 capabilities and counts it with the loop's own estimate (`estimateTokens`, three Latin characters
@@ -181,36 +197,98 @@ and `...-P1-AFTER-...json`. One run of five prompts each: the numbers show a dir
 
 <!-- eval-results:start -->
 
-Last run: 2026-11-16, Chrome 156.0.8078.4, win32 10.0.26300; WebGPU adapter: yes; report `docs/eval/EVAL-2026-11-16-156.0.8078.4.json`.
+Runs of 18 Nov 2026, version 0.1.1, Chromium 156.0.8078.4, Windows 10.0.26300, one laptop with two
+graphics cards: NVIDIA (`nvidia/ampere`, browser started with `--fast-gpu`) and AMD integrated
+(`amd/gcn-5`, the browser's default). One model per run, 10 questions on the test node ("stub") and
+10 on the live node, each in a new chat. Command: `npm run eval:gpu:win -- [--fast-gpu] --models <key>
+--prompts 10 --idle 0 --no-cancel-check`. Reports: `docs/eval/EVAL-GPU-2026-11-18-<card>-<model>.json`.
+"Median answer" is the median time from sending the question to the end of the answer.
 
-| Model  | Target | Prompts | Tool right | First tool right | Tool used | Task done | Gate shown | Fact in answer | Hallucinated | Errors | Repeated calls | Median first token (s) |
-| ------ | ------ | ------- | ---------- | ---------------- | --------- | --------- | ---------- | -------------- | ------------ | ------ | -------------- | ---------------------- |
-| qwen   | stub   | 10      | 8          | 9                | 10 of 10  | 5         | 10 of 10   | 6 of 10        | 0            | 0      | 0              | 19.45                  |
-| qwen   | live   | 10      | 2          | 2                | 9 of 10   | 2         | 9 of 9     | 0 of 0         | 5            | 0      | 6              | 26.9                   |
-| llama  | stub   | 1       | 0          | 0                | 0 of 1    | 0         | 0 of 0     | 0 of 1         | 0            | 1      | 0              | -                      |
-| qwen35 | stub   | 10      | 6          | 6                | 10 of 10  | 6         | 10 of 10   | 7 of 10        | 0            | 3      | 0              | 138.65                 |
-| qwen35 | live   | 1       | 1          | 1                | 1 of 1    | 0         | 1 of 1     | 0 of 0         | 0            | 1      | 0              | 170.4                  |
-| gemma4 | stub   | 1       | 0          | 0                | 0 of 1    | 0         | 0 of 0     | 0 of 1         | 0            | 1      | 0              | -                      |
-| gemma4 | live   | 1       | 0          | 0                | 0 of 1    | 0         | 0 of 0     | 0 of 0         | 0            | 1      | 0              | -                      |
+| Card   | Model  | Target | Prompts | Tool right | First tool right | Tool used | Task done | Gate shown | Fact in answer | Hallucinated | Errors | Repeated calls | Median first token (s) | Median answer (s) |
+| ------ | ------ | ------ | ------- | ---------- | ---------------- | --------- | --------- | ---------- | -------------- | ------------ | ------ | -------------- | ---------------------- | ----------------- |
+| NVIDIA | qwen17 | stub   | 10      | 8          | 8                | 10 of 10  | 8         | 10 of 10   | 9 of 10        | 0            | 0      | 0              | 2.6                    | 9.2               |
+| NVIDIA | qwen17 | live   | 10      | 5          | 5                | 10 of 10  | 5         | 10 of 10   | 0 of 0         | 0            | 0      | 0              | 4.15                   | 15.15             |
+| NVIDIA | qwen   | stub   | 10      | 8          | 8                | 10 of 10  | 8         | 10 of 10   | 9 of 10        | 0            | 0      | 0              | 2.1                    | 6.55              |
+| NVIDIA | qwen   | live   | 10      | 0          | 0                | 0 of 10   | 0         | 0 of 0     | 0 of 0         | 0            | 0      | 0              | 3.95                   | 4                 |
+| NVIDIA | qwen35 | stub   | 10      | 6          | 6                | 10 of 10  | 8         | 10 of 10   | 8 of 10        | 0            | 0      | 0              | 3.85                   | 13.5              |
+| NVIDIA | qwen35 | live   | 10      | 5          | 6                | 9 of 10   | 7         | 9 of 9     | 0 of 0         | 0            | 0      | 0              | 4.25                   | 21.1              |
+| NVIDIA | llama  | stub   | 10      | 9          | 9                | 10 of 10  | 8         | 10 of 10   | 9 of 10        | 0            | 0      | 0              | 3.45                   | 13.65             |
+| NVIDIA | llama  | live   | 10      | 8          | 8                | 10 of 10  | 8         | 10 of 10   | 0 of 0         | 0            | 0      | 0              | 3.85                   | 15.15             |
+| NVIDIA | gemma4 | stub   | 10      | 6          | 6                | 10 of 10  | 6         | 10 of 10   | 7 of 10        | 0            | 0      | 0              | 22.05                  | 51.05             |
+| NVIDIA | gemma4 | live   | 10      | 6          | 6                | 10 of 10  | 7         | 10 of 10   | 0 of 0         | 0            | 2      | 0              | 44.25                  | 94.35             |
+| AMD    | qwen17 | stub   | 10      | 8          | 8                | 10 of 10  | 8         | 10 of 10   | 9 of 10        | 0            | 0      | 0              | 3.35                   | 13.65             |
+| AMD    | qwen17 | live   | 10      | 5          | 5                | 10 of 10  | 5         | 10 of 10   | 0 of 0         | 0            | 0      | 0              | 5.65                   | 19.65             |
+| AMD    | qwen   | stub   | 10      | 7          | 7                | 10 of 10  | 7         | 10 of 10   | 8 of 10        | 0            | 0      | 0              | 2.85                   | 9.95              |
+| AMD    | qwen   | live   | 10      | 1          | 1                | 1 of 10   | 1         | 1 of 1     | 0 of 0         | 0            | 0      | 0              | 6.25                   | 6.65              |
+| AMD    | qwen35 | stub   | 10      | 9          | 9                | 10 of 10  | 9         | 10 of 10   | 9 of 10        | 0            | 0      | 0              | 4.5                    | 15.35             |
+| AMD    | qwen35 | live   | 10      | 2          | 5                | 9 of 10   | 6         | 9 of 9     | 0 of 0         | 0            | 1      | 0              | 5.15                   | 30.8              |
+| AMD    | llama  | stub   | 10      | 7          | 7                | 10 of 10  | 5         | 10 of 10   | 7 of 10        | 0            | 0      | 0              | 4.95                   | 18.3              |
+| AMD    | llama  | live   | 10      | 7          | 7                | 9 of 10   | 8         | 9 of 9     | 0 of 0         | 0            | 0      | 0              | 5.6                    | 16.7              |
+| AMD    | gemma4 | stub   | 10      | 8          | 8                | 10 of 10  | 8         | 10 of 10   | 8 of 10        | 0            | 0      | 0              | 40.3                   | 78.5              |
+| AMD    | gemma4 | live   | 10      | 5          | 6                | 9 of 10   | 6         | 9 of 9     | 0 of 0         | 0            | 3      | 0              | 57.35                  | 153.85            |
 
-| Model  | Ready | Start (s) | Model line after Start                                                                           |
-| ------ | ----- | --------- | ------------------------------------------------------------------------------------------------ |
-| qwen   | yes   | 4.1       | Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document).   |
-| llama  | yes   | 290.8     | Ready: Llama 3.2 3B. Running in this browser, on your graphics card (in the offscreen document). |
-| qwen35 | yes   | 10.9      | Ready: Qwen3.5 2B. Running in this browser, on your graphics card (in the offscreen document).   |
-| gemma4 | yes   | 21.2      | Ready: Gemma 4 E2B. Running in this browser, on your graphics card (in the offscreen document).  |
+| Card   | Model  | Ready | Start (s) | Model line after Start                                                                           |
+| ------ | ------ | ----- | --------- | ------------------------------------------------------------------------------------------------ |
+| NVIDIA | qwen17 | yes   | 8.2       | Ready: Qwen3 1.7B. Running in this browser, on your graphics card (in the offscreen document).   |
+| NVIDIA | qwen   | yes   | 7.7       | Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document).   |
+| NVIDIA | qwen35 | yes   | 10.3      | Ready: Qwen3.5 2B. Running in this browser, on your graphics card (in the offscreen document).   |
+| NVIDIA | llama  | yes   | 299.7     | Ready: Llama 3.2 3B. Running in this browser, on your graphics card (in the offscreen document). |
+| NVIDIA | gemma4 | yes   | 19.4      | Ready: Gemma 4 E2B. Running in this browser, on your graphics card (in the offscreen document).  |
+| AMD    | qwen17 | yes   | 8.2       | Ready: Qwen3 1.7B. Running in this browser, on your graphics card (in the offscreen document).   |
+| AMD    | qwen   | yes   | 6.1       | Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document).   |
+| AMD    | qwen35 | yes   | 12.3      | Ready: Qwen3.5 2B. Running in this browser, on your graphics card (in the offscreen document).   |
+| AMD    | llama  | yes   | 10.8      | Ready: Llama 3.2 3B. Running in this browser, on your graphics card (in the offscreen document). |
+| AMD    | gemma4 | yes   | 27.3      | Ready: Gemma 4 E2B. Running in this browser, on your graphics card (in the offscreen document).  |
 
-| Check                               | Result  | Detail                                                                                                                                                                    |
-| ----------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cancel stops the download           | pass    | Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0                                                                                              |
-| storage.local.setAccessLevel        | pass    | resolved in the service worker                                                                                                                                            |
-| Hosts contacted on first Start      | review  | 10 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start |
-| Idle 10 min, then a question        | fail    | no answer after the idle wait                                                                                                                                             |
-| Corrupted cached library is refused | skipped | no cached .wasm (scripted or library served from the package)                                                                                                             |
+"Start" counts from the press of Start to Ready, with the model already stored, except Llama 3.2 3B on
+the NVIDIA card (299.7 s), whose 2.0 GB file was downloaded in that run. "Errors" are questions that
+ended with an error or ran past the 5-minute limit (Gemma 4 E2B: 2 on the NVIDIA card, 3 on the AMD
+one). `webaiassist_query_graph` is the extension's own graph tool: a call to it is counted as used,
+not as hallucinated, but not as the expected page tool (Qwen3 1.7B chose it for 4 of the 10 live-node
+questions on both cards).
+
+Checks of a separate run with a new browser profile (NVIDIA card, Qwen3 1.7B, two questions, report `docs/eval/EVAL-GPU-2026-11-18-nvidia-checks.json`):
+
+| Check                               | Result  | Detail                                                                                                                                                                   |
+| ----------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Cancel stops the download           | pass    | Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0                                                                                             |
+| storage.local.setAccessLevel        | pass    | resolved in the service worker                                                                                                                                           |
+| Hosts contacted on first Start      | review  | 8 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start |
+| Idle 10 min, then a question        | pass    | answered                                                                                                                                                                 |
+| Corrupted cached library is refused | skipped | no cached .wasm (scripted or library served from the package)                                                                                                            |
 
 <!-- eval-results:end -->
 
-The block above merges three runs of the night of 15 to 16 Nov 2026, one browser each, because a model
+### The final build, 19 Nov 2026
+
+Two changes came after the runs above: a model in the browser no longer gets the built-in graph tool on a
+page that has tools of its own, and an earlier answer given without a tool is no longer given to the model
+again (CHANGELOG). Re-run on the NVIDIA card, 10 questions per node (reports
+`docs/eval/EVAL-GPU-2026-11-19-nvidia-<model>.json`):
+
+| Model      | Right tool, test node | Right tool, live node | Tool used, live node | Median answer, test / live |
+| ---------- | --------------------- | --------------------- | -------------------- | -------------------------- |
+| Qwen3 1.7B | 8 of 10               | 5 of 10               | 10 of 10             | 10.2 s / 19.4 s            |
+| Qwen3 0.6B | 7 of 10               | 0 of 10               | 0 of 10              | 7.0 s / 4.4 s              |
+| Qwen3.5 2B | 7 of 10               | 5 of 10               | 8 of 10              | 12.4 s / 20.5 s            |
+
+Qwen3 1.7B no longer calls the built-in graph tool on the live node; on the four questions where it had
+called it, it called the general `ask` tool instead, so the count of the expected tool stays at 5 of 10.
+
+**With a saved chat (Memory on).** `--keep-chat` keeps what the extension remembers of each site between
+questions. Qwen3 0.6B first filled the chats with answers given without a tool
+(`EVAL-GPU-2026-11-19-nvidia-qwen-saved-chat.json`); then Qwen3 1.7B asked the same questions on top of them
+(`EVAL-GPU-2026-11-19-nvidia-qwen17-saved-chat.json`): the right tool on 9 of 10 test-node questions and on 5
+of 10 live-node questions, as with a new chat. Before the change, with such chats, it was 1 to 4 of 10 on the
+live node. Answers took longer (median 37 s and 50 s), because the earlier tool results go with each question.
+
+### Version 0.1.0 (WebLLM), 15 and 16 Nov 2026
+
+On the AMD card, before the change "Each question in a new chat": Qwen3 0.6B, the right tool on 8 of
+10 test-node questions and 2 of 10 live-node questions, median first token 19.45 s and 26.9 s;
+Qwen3.5 2B, 6 of 10 on the test node with 2 to 5 minutes an answer; Llama 3.2 3B and Gemma 4 E2B ran
+past the 5-minute limit on their first question. The report is `EVAL-2026-11-16-156.0.8078.4.json`.
+It merged three runs of the night of 15 to 16 Nov 2026, one browser each, because a model
 that runs past the time limit leaves its browser unable to open the next page: Qwen3 0.6B and Llama
 3.2 3B (`EVAL-GPU-2026-11-16-qwen-llama.json`), Qwen3.5 2B (`EVAL-GPU-2026-11-16-qwen35.json`), Gemma 4
 E2B (`EVAL-GPU-2026-11-16-gemma4.json`); merged in `EVAL-2026-11-16-156.0.8078.4.json`. A row with 1
@@ -220,13 +298,53 @@ time limit, not a finding about the idle path. Re-run on 16 Nov 2026 with Qwen3 
 with the Stop change, a new browser profile, 2 questions per page): "Idle 10 min, then a question" passed,
 the question was answered (`docs/eval/EVAL-GPU-2026-11-16-idle.json`).
 
+## Each question in a new chat
+
+The panel keeps one saved chat per site and gives it to the model with the next question, and the
+evaluation's browser profile is kept between runs so that a model downloads once. Until 18 Nov 2026
+a reload was the only "new chat", so a question on the live node came with the answers saved for
+that site by older runs and by other models, and a model often copied an earlier answer that used
+no tool. Since 18 Nov 2026 the evaluation empties what the extension remembers of every site before
+each question (`clearMemory` in `scripts/eval/panel.ts`), in the graphics-card, processor and
+built-in model evaluations alike. With it, the default model's right tool on the live node went from
+1 to 4 of 10 to 5 of 10 on both cards, and Qwen3 0.6B's on the test node from 2 of 10 to 7 or 8. The
+live-node numbers of earlier runs, those of version 0.1.0 included, were measured without it. A
+person with memory on meets the same effect when a site's saved chat holds answers given without a
+tool; **Forget this site** in the panel empties it.
+
+## Two graphics cards
+
+A laptop often has two graphics cards: one inside the processor and a faster separate one. A page
+asks WebGPU for an adapter and the browser decides which card it gets. On the measured laptop
+(Windows, Chromium 156, 18 Nov 2026) the panel got the AMD integrated card (`amd/gcn-5`) in every
+run, whatever power preference the engine asked for. It got the NVIDIA card (`nvidia/ampere`) only
+when the browser was started with `--force_high_performance_gpu`, which is what `--fast-gpu` does.
+The extension cannot choose the card. The switch was tried in Playwright's Chromium only, not in
+Google Chrome. Windows also has a graphics setting per application (Settings, System, Display,
+Graphics); whether it moves the browser's WebGPU to the faster card was not tested.
+
 ## When the model fails on a GPU
 
+**Version 0.1.1 (llama.cpp).** On 18 Nov 2026 the AMD gcn-5 card stopped on the first question of
+Qwen3 1.7B (a 1.1 GB file): Windows reported `DXGI_ERROR_DEVICE_HUNG`, the browser reported "Device
+lost", the engine aborted and every later question failed. Qwen3 0.6B answered on the same card.
+llama.cpp's default sends a whole prompt to the card as one piece of work, which kept this card
+busy for longer than its driver allows. With pieces of 64 tokens (`GPU_BATCH` in
+`src/entries/shared/wllama-engine.ts`) the same model answered every question of the runs above;
+wllama 3.13.0 behaved the same as 3.8.1. When an engine does end by itself, the panel says that
+the model stopped and that the graphics card gave up, and the next Start loads the model again
+(`test/adapters/wllama-runtime-gpu.test.ts`, `test/adapters/wllama-runtime-stop.test.ts`).
+
+### Version 0.1.0 (WebLLM), kept as history
+
+The script `scripts/gpu-check/run.ts` and the file `src/adapters/prefill-chunk.ts` named below
+were removed with WebLLM in 0.1.1.
+
 `node scripts/gpu-check/run.ts [--channel chrome|chromium] [--model <id>] [--words <n>] [--chunk <n>]`
-runs WebLLM alone, without the extension: one load, a warm-up question, one question with a prompt
-of `--words` filler words, and prints a JSON line per model with the load, warm-up and first-token
-seconds (the weights come from WebLLM's own CDN; it is a diagnostic, not the no-remote-code build).
-It tells the extension apart from the GPU: on 13 Nov 2026 an AMD gcn-5 laptop GPU lost its device on
+ran WebLLM alone, without the extension: one load, a warm-up question, one question with a prompt
+of `--words` filler words, and printed a JSON line per model with the load, warm-up and first-token
+seconds (the weights came from WebLLM's own CDN; it was a diagnostic, not the no-remote-code build).
+It told the extension apart from the GPU: on 13 Nov 2026 an AMD gcn-5 laptop GPU lost its device on
 every prompt over a few hundred tokens, in Chrome and Chromium alike, until the prefill chunk was
 small (`src/adapters/prefill-chunk.ts`, the `--chunk` option here). A GPU on which the warm-up
 takes tens of seconds is one on which the first answer takes as long; the panel says so.
@@ -237,10 +355,10 @@ loaded" error; Qwen3 0.6B answered on the same run. WebLLM and tvmjs free their 
 GPU device is lost (`device.lost` handlers in `lib/index.js`), and the call still running then
 reads a freed one; the device loss itself, by the 2 s watchdog, is the reading that fits the
 13 Nov measurements (a fixed 32-token chunk was sized for the 0.6B model, a 3B model costs about
-six times as much per token), but it was not measured on this run. The prefill chunk is now one
+six times as much per token), but it was not measured on this run. In 0.1.0 the prefill chunk was one
 value per model (`src/adapters/prefill-chunk.ts`: 32 for Qwen3 0.6B, 10 for
 Qwen3.5 2B), scaled from the measured 32 by the weight each model reads per
-token; these are estimates to be checked with `npm run eval:gpu`. The panel now treats
+token; these were estimates. The panel of 0.1.0 treated
 "already been disposed" as a lost device (host restart, plain banner, model line no longer
 "Ready") and a chat on an engine WebLLM no longer has as "The model stopped. Press Start to load
 it again.".
@@ -248,7 +366,9 @@ it again.".
 ## Checks the run makes
 
 Storage access level, hosts contacted on the first Start (only those in `docs/PRIVACY.md`),
-Cancel during a download, a corrupted cached library refused, and a question after the idle wait.
+Cancel during a download, and a question after the idle wait. The check "Corrupted cached
+library is refused" is always skipped since 0.1.1: the engine file is inside the package and no
+model library is cached (`test/smoke/smoke.spec.ts` checks the packaged file against its pin).
 The report lists each with its result; "review" means the program could not observe it, so open
 DevTools on the first Start and look. Differences between browsers go in `docs/BROWSERS.md`.
 

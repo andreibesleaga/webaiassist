@@ -14,7 +14,7 @@ async function settle(): Promise<void> {
 }
 
 const CPU = 'cpu:qwen3-1.7b-q4_k_m';
-const QWEN = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+const QWEN = 'webllm:qwen3-1.7b-q4_k_m';
 const model = (): HTMLSelectElement => byId<HTMLSelectElement>('model');
 const text = (id: string): string => byId(id).textContent ?? '';
 

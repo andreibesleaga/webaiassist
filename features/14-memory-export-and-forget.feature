@@ -76,6 +76,14 @@ Feature: Memory, export and forget
     When the site is opened again and a question is asked
     Then the saved result reaches the model fenced as untrusted data
 
+  # test: test/core/agent-loop.test.ts
+  @unit
+  Scenario: An earlier answer that used no tool is not given to the model again
+    Given a saved chat with one answer given without a tool and one answer built on a tool result
+    When a question is asked on that site
+    Then the model gets the exchange with the tool result
+    And it does not get the answer given without a tool, which stays in the saved chat
+
   @smoke
   Scenario: Going back to a site shows its saved chat again, with Memory on
     Given Memory is on and a chat was held on site A

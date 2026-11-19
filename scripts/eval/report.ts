@@ -32,7 +32,8 @@ export interface EvalReport {
   readonly chrome: string;
   readonly os: string;
   readonly scripted: boolean;
-  readonly webgpu: { readonly panelAdapter: boolean };
+  /** `adapter` is "vendor/architecture" of the graphics card the panel got (from 18 Nov 2026). */
+  readonly webgpu: { readonly panelAdapter: boolean; readonly adapter?: string };
   readonly models: readonly ModelLine[];
   readonly targets: readonly {
     name: string;
@@ -105,7 +106,8 @@ const summaryRows = (r: EvalReport): (readonly unknown[])[] =>
   ]);
 
 export function renderResults(r: EvalReport, reportPath: string): string {
-  const gpu = r.webgpu.panelAdapter ? 'yes' : 'no';
+  const card = r.webgpu.adapter ? ` (${r.webgpu.adapter})` : '';
+  const gpu = r.webgpu.panelAdapter ? `yes${card}` : 'no';
   const head = `Last run: ${r.date}, Chrome ${r.chrome}, ${r.os}; WebGPU adapter: ${gpu}; report \`${reportPath}\`.`;
   return [
     head + (r.scripted ? ' Scripted test model (flow check, not a model result).' : ''),

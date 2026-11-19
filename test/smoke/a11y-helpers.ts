@@ -63,17 +63,8 @@ export async function tabOrder(
   return { ids, shown };
 }
 
-/** What the graphics-card list of Options holds in this browser: "Automatic" and the three models
- *  that need nothing special, and Gemma 4 E2B only when the WebGPU adapter reports `shader-f16`
- *  (a headless browser may or may not). */
-export async function webllmOptionCount(options: Page): Promise<number> {
-  const f16 = await options.evaluate(async () => {
-    const adapter = await (
-      navigator as unknown as {
-        gpu?: { requestAdapter(): Promise<{ features: Set<string> } | null> };
-      }
-    ).gpu?.requestAdapter();
-    return adapter?.features.has('shader-f16') === true;
-  });
-  return f16 ? 5 : 4;
+/** What the graphics-card list of Options holds: "Automatic" and the five models. None of them
+ *  needs a feature that only some graphics cards have, so the count is the same in every browser. */
+export function webllmOptionCount(): number {
+  return 6;
 }

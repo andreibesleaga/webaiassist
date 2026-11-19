@@ -153,3 +153,12 @@ Feature: Query and semantic tools
   Scenario: The panel offers the built-in tool only on a node that publishes its graph and allows AI input
     Given a page that is not a node, a node that asks for no AI input, and a node that does not name graph.nq
     Then none of them is given the built-in tool
+
+  # test: test/ui/panel-graph-tool.test.ts
+  @unit
+  Scenario: A model in the browser gets the page's own tools first
+    Given a node page that offers its own WebMCP tools
+    And a model in the browser, on the graphics card or the processor
+    When a question is asked
+    Then the model's tool list has the page's tools and not the built-in graph tool
+    And Chrome's built-in model and a chat endpoint still get the built-in tool

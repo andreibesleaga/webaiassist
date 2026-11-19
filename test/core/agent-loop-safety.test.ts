@@ -171,21 +171,22 @@ describe('runAgent: a run is bound to the site it started on', () => {
 
 describe('runAgent: what reaches the model from the page is cleaned', () => {
   it('trims a long saved chat to the model’s context window, newest turns kept', async () => {
-    const history = Array.from({ length: 400 }, (_, i) => ({
-      role: i % 2 === 0 ? ('user' as const) : ('assistant' as const),
+    // Saved exchanges that used a tool (question, tool result, answer), the last one complete.
+    const history = Array.from({ length: 399 }, (_, i) => ({
+      role: (['user', 'tool', 'assistant'] as const)[i % 3] ?? 'user',
       content: `turn ${i} ${'x'.repeat(200)}`,
     }));
     const deps = makeDeps([answer('ok')]);
     await runAgent(deps, { ...input, history });
     const sent = deps.model.requests[0]?.messages ?? [];
     expect(sent.length).toBeLessThan(40);
-    expect(sent.at(-2)?.content).toContain('turn 399');
+    expect(sent.at(-2)?.content).toContain('turn 398');
     expect(sent.reduce((n, m) => n + m.content.length, 0) / 3).toBeLessThan(4096);
   });
 
   it('keeps room for the largest tool result of the run: the next request trims more', async () => {
-    const history = Array.from({ length: 40 }, (_, i) => ({
-      role: i % 2 === 0 ? ('user' as const) : ('assistant' as const),
+    const history = Array.from({ length: 39 }, (_, i) => ({
+      role: (['user', 'tool', 'assistant'] as const)[i % 3] ?? 'user',
       content: `turn ${i} ${'x'.repeat(120)}`,
     }));
     const deps = makeDeps([call('read', { slug: 'a' }), answer('ok')]);

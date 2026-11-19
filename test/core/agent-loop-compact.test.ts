@@ -57,8 +57,9 @@ describe('usableContext', () => {
 
 describe('the saved chat is cut to the reply size of the runtime', () => {
   it('drops old turns sooner when the reply needs more room', async () => {
+    // Saved exchanges that used a tool (question, tool result, answer): the ones the model is given.
     const turns = Array.from({ length: 12 }, (_, i) => ({
-      role: i % 2 === 0 ? ('user' as const) : ('assistant' as const),
+      role: (['user', 'tool', 'assistant'] as const)[i % 3] ?? 'user',
       content: `turn ${i} ${'word '.repeat(60)}`,
     }));
     const roomy = { ...makeDeps([]), model: small({ contextTokens: 3200 }) };

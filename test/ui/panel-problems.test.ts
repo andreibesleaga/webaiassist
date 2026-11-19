@@ -42,7 +42,7 @@ describe('failures shown in the banner', () => {
         new NoGpuError('This browser has no usable graphics acceleration here: no adapter.'),
       );
     await startPanel(deps);
-    byId<HTMLSelectElement>('model').value = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+    byId<HTMLSelectElement>('model').value = 'webllm:qwen3-0.6b-q4_k_m';
     click('start');
     await settle();
     expect(banner()).toBe('This browser has no usable graphics acceleration here: no adapter.');
@@ -83,7 +83,7 @@ describe('failures shown in the banner', () => {
     deps.store.stored = [];
     deps.createRuntime = () => Promise.reject(new NoGpuError('no graphics here'));
     await startPanel(deps);
-    byId<HTMLSelectElement>('model').value = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+    byId<HTMLSelectElement>('model').value = 'webllm:qwen3-0.6b-q4_k_m';
     click('start');
     await settle();
     expect(byId('consent').hidden).toBe(true);
@@ -94,7 +94,7 @@ describe('failures shown in the banner', () => {
     const deps = cpuDeps();
     deps.store.stored = [];
     await startPanel(deps);
-    byId<HTMLSelectElement>('model').value = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+    byId<HTMLSelectElement>('model').value = 'webllm:qwen3-0.6b-q4_k_m';
     click('start');
     await settle();
     expect(byId('consent').hidden).toBe(false);
@@ -118,7 +118,7 @@ describe('failures shown in the banner', () => {
       Promise.reject(new Error('Object has already been disposed (DXGI_ERROR_DEVICE_REMOVED)'));
     deps.model = model;
     await startPanel(deps);
-    byId<HTMLSelectElement>('model').value = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+    byId<HTMLSelectElement>('model').value = 'webllm:qwen3-0.6b-q4_k_m';
     click('start');
     await settle();
     await ask('hello');
@@ -140,7 +140,7 @@ describe('failures shown in the banner', () => {
     model.chat = () => Promise.reject(new Error(why));
     deps.model = model;
     await startPanel(deps);
-    byId<HTMLSelectElement>('model').value = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+    byId<HTMLSelectElement>('model').value = 'webllm:qwen3-0.6b-q4_k_m';
     click('start');
     await settle();
     expect(byId('model-status').textContent).toMatch(/^Ready: /);

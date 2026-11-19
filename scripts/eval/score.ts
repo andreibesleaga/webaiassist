@@ -97,8 +97,12 @@ export function taskDone(prompt: EvalPrompt, seen: Observation, target: string):
   return bit(clean && fact && toolsServe(prompt, seen.tools));
 }
 
+/** The extension's own tool (src/core/builtin-tools.ts): offered on a node, so a call to it is
+ *  not a call to a tool nobody offers. It still is not the expected page tool. */
+const BUILT_IN = 'webaiassist_query_graph';
+
 function hallucinated(seen: Observation, pageTools: readonly string[]): string[] {
-  const called = seen.tools.filter((tool) => !pageTools.includes(tool));
+  const called = seen.tools.filter((tool) => tool !== BUILT_IN && !pageTools.includes(tool));
   const named = seen.errors.flatMap((e) =>
     [...e.matchAll(/unknown tool "([^"]+)"/g)].map((m) => m[1] ?? ''),
   );

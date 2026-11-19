@@ -1,0 +1,124 @@
+{
+  "date": "2026-11-18",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true,
+    "adapter": "nvidia/ampere"
+  },
+  "models": [
+    {
+      "key": "qwen17",
+      "id": "qwen3-1.7b-q4_k_m",
+      "ready": true,
+      "loadS": 133.4,
+      "status": "Ready: Qwen3 1.7B. Running in this browser, on your graphics card (in the offscreen document)."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:55478/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "qwen17",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 30,
+      "totalS": 37
+    },
+    {
+      "n": 2,
+      "model": "qwen17",
+      "target": "stub",
+      "tools": [
+        "ask"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3,
+      "totalS": 10.4
+    }
+  ],
+  "summary": [
+    {
+      "model": "qwen17",
+      "target": "stub",
+      "prompts": 2,
+      "toolRight": 2,
+      "firstToolRight": 2,
+      "toolUsed": "2 of 2",
+      "taskDone": 2,
+      "gateShown": "2 of 2",
+      "factInAnswer": "2 of 2",
+      "hallucinated": 0,
+      "errors": 0,
+      "repeated": 0,
+      "medianFirstTokenS": 16.5
+    }
+  ],
+  "checks": [
+    {
+      "name": "Cancel stops the download",
+      "result": "pass",
+      "detail": "Start usable again after 0 s; left Ready: true; weight requests after 5 s: 0"
+    },
+    {
+      "name": "storage.local.setAccessLevel",
+      "result": "pass",
+      "detail": "resolved in the service worker"
+    },
+    {
+      "name": "Hosts contacted on first Start",
+      "result": "review",
+      "detail": "8 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start"
+    },
+    {
+      "name": "Idle 10 min, then a question",
+      "result": "pass",
+      "detail": "answered"
+    },
+    {
+      "name": "Corrupted cached library is refused",
+      "result": "skipped",
+      "detail": "no cached .wasm (scripted or library served from the package)"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

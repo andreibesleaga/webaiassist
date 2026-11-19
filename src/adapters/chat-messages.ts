@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Shared by the model runtime adapters: the message list a runtime accepts, and the
-// streaming loop. Neither WebLLM (for non-Hermes models) nor Chrome's Prompt API has a
-// tool role, so tool results go in as user turns; they are already fenced as untrusted.
+// streaming loop. Neither the local engine's chat templates as used here nor Chrome's Prompt
+// API has a tool role, so tool results go in as user turns; they are already fenced as untrusted.
 import type { ChatMessage } from '../core/types';
 
 export interface RuntimeMessage {

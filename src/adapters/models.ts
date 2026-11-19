@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
-// The models the picker offers. The four WebLLM ids are records in WebLLM's prebuiltAppConfig
-// (version pinned in package.json); GPU memory is its vram_required_MB.
+// The models the picker offers. The graphics-card models are the GGUF records of
+// src/adapters/cpu-models.ts, run by llama.cpp with every layer on the graphics card.
+// "webllm" is the name version 0.1.0 stored for the graphics-card choice (it then used another
+// engine); the stored name stays so that saved settings keep working.
+import { defaultGpuModelId, GPU_MODELS } from './cpu-models';
 
 export type RuntimeKind = 'webllm' | 'prompt-api' | 'scripted';
 
@@ -8,62 +11,30 @@ export interface ModelChoice {
   readonly id: string;
   readonly label: string;
   readonly runtime: RuntimeKind;
-  /** A WebGPU feature the graphics card must have; the picker lists the model only then. */
+  /** A WebGPU feature the graphics card must have; the picker lists the model only then.
+   *  No model needs one today. */
   readonly requiredFeature?: 'shader-f16';
 }
 
 export const PROMPT_API_ID = 'chrome-built-in';
 export const SCRIPTED_ID = 'scripted-test-model';
 
-const SMALL = 'Qwen3-0.6B-q4f16_1-MLC';
-const LARGE = 'Llama-3.2-3B-Instruct-q4f16_1-MLC';
-const QWEN35 = 'Qwen3.5-2B-q4f16_1-MLC';
-const GEMMA = 'gemma-4-E2B-it-q4f16_1-MLC';
+const WEBLLM_MODELS: readonly ModelChoice[] = GPU_MODELS.map((model) => ({
+  id: model.id,
+  label: model.label,
+  runtime: 'webllm',
+}));
 
-/** Where a graphics-card model runs, as every label says it. */
-const ON_GPU = 'in this browser, on your graphics card';
+/** Bytes each graphics-card model downloads: its one GGUF file. */
+export const WEBLLM_DOWNLOADS: Readonly<Record<string, number>> = Object.fromEntries(
+  GPU_MODELS.map((model) => [model.id, model.bytes]),
+);
 
-const WEBLLM_MODELS: readonly ModelChoice[] = [
-  {
-    id: SMALL,
-    label: `Qwen3 0.6B (the smallest; ${ON_GPU}; needs about 1.4 GB of GPU memory)`,
-    runtime: 'webllm',
-  },
-  {
-    id: QWEN35,
-    label: `Qwen3.5 2B (newer, for tools; ${ON_GPU}; 1.1 GB download; needs about 2.3 GB of GPU memory; Apache-2.0)`,
-    runtime: 'webllm',
-  },
-  {
-    id: LARGE,
-    label: `Llama 3.2 3B (slow: may stall on a laptop graphics card; ${ON_GPU}; needs about 2.3 GB of GPU memory)`,
-    runtime: 'webllm',
-  },
-  {
-    id: GEMMA,
-    label: `Gemma 4 E2B (slow: may stall on a laptop graphics card; ${ON_GPU}; 2.8 GB download; needs about 3.4 GB of GPU memory; Apache-2.0)`,
-    runtime: 'webllm',
-    requiredFeature: 'shader-f16',
-  },
-];
-
-/** Bytes the weights, tokenizer and config of each graphics-card model download: the sum of the
- *  files of the pinned Hugging Face revisions, read from its tree API on 14 Nov 2026. Qwen3 0.6B
- *  and Llama 3.2 3B are the sum of every file of the revision; Qwen3.5 2B and Gemma 4 E2B
- *  are exactly the files WebLLM fetches (weight shards, tensor-cache.json, mlc-chat-config.json,
- *  tokenizer.json, and for Gemma mlc-model-manifest.json). */
-export const WEBLLM_DOWNLOADS: Readonly<Record<string, number>> = {
-  [SMALL]: 351_517_143,
-  [QWEN35]: 1_072_298_012,
-  [LARGE]: 1_816_811_105,
-  [GEMMA]: 2_830_391_017,
-};
-
-/** The graphics-card model "Start" loads when the user has not picked one: the smallest, on
- *  every GPU (measured best on the graphics card, 16 Nov 2026). The other three download only
- *  when the user chooses them; Llama 3.2 3B and Gemma 4 E2B are marked slow and never a default. */
+/** The graphics-card model "Start" loads when the user has not picked one (cpu-models.ts). The
+ *  others download only when the user chooses them; Llama 3.2 3B and Gemma 4 E2B are never a
+ *  default, and Gemma 4 E2B is marked slow (1 to 2 minutes a question on the measured laptop). */
 export function defaultModelId(): string {
-  return SMALL;
+  return defaultGpuModelId();
 }
 
 export const WEBLLM_MODEL_IDS: readonly string[] = WEBLLM_MODELS.map((m) => m.id);

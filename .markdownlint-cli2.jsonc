@@ -2,6 +2,8 @@
   "config": {
     "default": true,
     "MD013": false,
+    // A changelog repeats "Added", "Changed" and "Known limits" under each version.
+    "MD024": { "siblings_only": true },
   },
   "globs": ["**/*.md"],
   "ignores": [

@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { describe, expect, it } from 'vitest';
+import { GPU_MODELS } from '../../src/adapters/cpu-models';
 import {
   defaultModelId,
   findModel,
@@ -11,71 +12,73 @@ import {
 } from '../../src/adapters/models';
 
 describe('model choices', () => {
-  it('ships four WebLLM models, the small one first, the two slow ones last', () => {
+  it('ships five graphics-card models, the small one first, the two slow ones last', () => {
     expect(WEBLLM_MODEL_IDS).toEqual([
-      'Qwen3-0.6B-q4f16_1-MLC',
-      'Qwen3.5-2B-q4f16_1-MLC',
-      'Llama-3.2-3B-Instruct-q4f16_1-MLC',
-      'gemma-4-E2B-it-q4f16_1-MLC',
+      'qwen3-0.6b-q4_k_m',
+      'qwen3-1.7b-q4_k_m',
+      'qwen3.5-2b-q4_k_m',
+      'llama-3.2-3b-instruct-q4_k_m',
+      'gemma-4-e2b-it-q4_k_m',
     ]);
     const choices = modelChoices({ promptApi: false });
     expect(choices.map((c) => c.id)).toEqual(WEBLLM_MODEL_IDS);
-    expect(choices.every((c) => c.runtime === 'webllm' && /GB/.test(c.label))).toBe(true);
+    expect(choices.every((c) => c.runtime === 'webllm' && /GB|MB/.test(c.label))).toBe(true);
   });
 
-  it('says in plain words what each newer model is for, its size and its licence', () => {
+  it('says in plain words what each model is for, its size and its licence', () => {
     const label = (id: string): string => findModel(id)?.label ?? '';
-    expect(label('Qwen3.5-2B-q4f16_1-MLC')).toMatch(
-      /^Qwen3\.5 2B \(.*2\.3 GB of GPU memory.*Apache-2\.0\)$/,
+    expect(label('qwen3.5-2b-q4_k_m')).toMatch(
+      /^Qwen3\.5 2B \(.*on your graphics card.*1\.6 GB of GPU memory.*Apache-2\.0\)$/,
     );
-    expect(label('gemma-4-E2B-it-q4f16_1-MLC')).toMatch(
-      /^Gemma 4 E2B \(.*3\.4 GB of GPU memory.*Apache-2\.0\)$/,
+    expect(label('gemma-4-e2b-it-q4_k_m')).toMatch(
+      /^Gemma 4 E2B \(.*3\.5 GB of GPU memory.*Apache-2\.0\)$/,
     );
   });
 
-  it('marks Llama 3.2 3B and Gemma 4 E2B as slow, and neither is ever the default', () => {
+  it('marks Gemma 4 E2B as slow, and neither it nor Llama 3.2 3B is ever the default', () => {
     const label = (id: string): string => findModel(id)?.label ?? '';
-    for (const id of ['Llama-3.2-3B-Instruct-q4f16_1-MLC', 'gemma-4-E2B-it-q4f16_1-MLC']) {
-      expect(label(id)).toContain('slow: may stall');
+    expect(label('gemma-4-e2b-it-q4_k_m')).toContain('slow: may stall');
+    for (const id of ['llama-3.2-3b-instruct-q4_k_m', 'gemma-4-e2b-it-q4_k_m']) {
       expect(id).not.toBe(defaultModelId());
     }
-    expect(label('Qwen3-0.6B-q4f16_1-MLC')).not.toContain('slow');
-    expect(label('Qwen3.5-2B-q4f16_1-MLC')).not.toContain('slow');
+    for (const id of [
+      'qwen3-0.6b-q4_k_m',
+      'qwen3-1.7b-q4_k_m',
+      'qwen3.5-2b-q4_k_m',
+      'llama-3.2-3b-instruct-q4_k_m',
+    ]) {
+      expect(label(id)).not.toContain('slow');
+    }
   });
 
-  it('says what the slow models need: Llama 3.2 3B memory, Gemma 4 E2B download and memory', () => {
+  it('says what the two larger models need: download size, graphics memory and licence', () => {
     const label = (id: string): string => findModel(id)?.label ?? '';
-    expect(label('Llama-3.2-3B-Instruct-q4f16_1-MLC')).toMatch(
-      /^Llama 3\.2 3B \(slow: .*2\.3 GB of GPU memory\)$/,
+    expect(label('llama-3.2-3b-instruct-q4_k_m')).toMatch(
+      /^Llama 3\.2 3B \(larger, picks tools well; .*2\.0 GB download.*2\.4 GB of GPU memory; Llama 3\.2 Community License\)$/,
     );
-    expect(label('gemma-4-E2B-it-q4f16_1-MLC')).toMatch(
-      /^Gemma 4 E2B \(slow: .*2\.8 GB download.*3\.4 GB of GPU memory.*Apache-2\.0\)$/,
+    expect(label('gemma-4-e2b-it-q4_k_m')).toMatch(
+      /^Gemma 4 E2B \(slow: .*3\.1 GB download.*3\.5 GB of GPU memory.*Apache-2\.0\)$/,
     );
   });
 
-  it('leaves the model that needs shader-f16 out only when the card is known to lack it', () => {
+  it('lists every graphics-card model on every card: none needs shader-f16 any more', () => {
     const ids = (f: boolean | undefined): string[] => webllmChoices(f).map((m) => m.id);
-    expect(ids(false)).toEqual(WEBLLM_MODEL_IDS.filter((id) => !id.startsWith('gemma')));
+    expect(ids(false)).toEqual(WEBLLM_MODEL_IDS);
     expect(ids(true)).toEqual(WEBLLM_MODEL_IDS);
     expect(ids(undefined)).toEqual(WEBLLM_MODEL_IDS);
+    expect(modelChoices({ promptApi: false }).filter((m) => m.requiredFeature)).toEqual([]);
   });
 
-  it('marks the one model that needs the shader-f16 feature of the graphics card', () => {
-    const needs = modelChoices({ promptApi: false }).filter((m) => m.requiredFeature);
-    expect(needs.map((m) => [m.id, m.requiredFeature])).toEqual([
-      ['gemma-4-E2B-it-q4f16_1-MLC', 'shader-f16'],
-    ]);
-  });
-
-  it('knows the download size of every graphics-card model, read from the pinned revisions', () => {
+  it('knows the download size of every graphics-card model: the size of its file', () => {
     expect(Object.keys(WEBLLM_DOWNLOADS)).toEqual([...WEBLLM_MODEL_IDS]);
-    expect(WEBLLM_DOWNLOADS['Llama-3.2-3B-Instruct-q4f16_1-MLC']).toBe(1_816_811_105);
-    expect(WEBLLM_DOWNLOADS['Qwen3.5-2B-q4f16_1-MLC']).toBe(1_072_298_012);
-    expect(WEBLLM_DOWNLOADS['gemma-4-E2B-it-q4f16_1-MLC']).toBe(2_830_391_017);
+    for (const model of GPU_MODELS) expect(WEBLLM_DOWNLOADS[model.id]).toBe(model.bytes);
+    expect(WEBLLM_DOWNLOADS['llama-3.2-3b-instruct-q4_k_m']).toBe(2_019_377_600);
+    expect(WEBLLM_DOWNLOADS['qwen3.5-2b-q4_k_m']).toBe(1_280_835_840);
+    expect(WEBLLM_DOWNLOADS['gemma-4-e2b-it-q4_k_m']).toBe(3_106_738_272);
   });
 
-  it('defaults to the small bundled model on every GPU', () => {
-    expect(defaultModelId()).toBe('Qwen3-0.6B-q4f16_1-MLC');
+  it('defaults to Qwen3 1.7B on every GPU', () => {
+    expect(defaultModelId()).toBe('qwen3-1.7b-q4_k_m');
   });
 
   it("adds Chrome's built-in model only when the Prompt API is present, labelled optional", () => {

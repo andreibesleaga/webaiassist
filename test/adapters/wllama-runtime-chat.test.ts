@@ -77,6 +77,7 @@ describe('WllamaRuntime chat', () => {
       nativeToolCalls: false,
       jsonConstraint: true,
       contextTokens: 4096,
+      pageToolsFirst: true,
     });
     expect(setup().runtime.where()).toBeUndefined();
   });

@@ -2,15 +2,90 @@
 
 > **In short**
 >
+> - Version 0.1.1 moves the graphics-card models to the same engine as the processor models (llama.cpp, MIT) and removes WebLLM and four compiled model libraries whose repository states no licence. Released on 19 Nov 2026.
 > - Version 0.1.0 is the first release, of 16 Nov 2026; on the [Chrome Web Store](https://chromewebstore.google.com/detail/webaiassist/mekikidmpikblfalilhckiadncbjfppi) since 17 Nov 2026.
 > - It adds a side panel where a local AI model uses the page's WebMCP tools, through four model paths: graphics card, processor, Chrome's built-in model and a chat endpoint.
 > - Every tool call goes through a confirmation (Allow once or Deny). The manifest has five install permissions and no install-time host access.
-> - Measured on one laptop graphics card (AMD gcn-5): Qwen3 0.6B picked the right tool in 8 of 10 test-node questions but 2 of 10 on the live node.
-> - WebMCP is a draft (a Community Group report, not a W3C Standard), and other graphics cards are not measured.
+> - Measured on one laptop with two graphics cards (0.1.1, 18 Nov 2026): the default, Qwen3 1.7B, picked the right tool in 8 of 10 test-node questions and 5 of 10 on the live node, on both cards.
+> - WebMCP is a draft (a Community Group report, not a W3C Standard), and other computers are not measured.
 
 All notable changes are listed here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/).
+
+## [0.1.1] - 2026-11-19
+
+One engine for every model in the browser. Version 0.1.0 ran the graphics-card models with WebLLM and
+shipped four compiled model libraries from a repository that states no licence. This version removes
+both. Nothing else in the extension changes: the permissions, the confirmation before every tool
+call, Chrome's built-in model, the processor models and chat endpoints work as before.
+
+### Changed
+
+- **The graphics-card models run on llama.cpp** (`@wllama/wllama`, MIT), the engine that already ran the
+  processor models, with every layer on the graphics card through WebGPU. The package holds one engine
+  file for models and no compiled model library.
+- **Every model file has a licence stated by its publisher**: Apache-2.0 for Qwen3 0.6B, Qwen3 1.7B,
+  Qwen3.5 2B and Gemma 4 E2B, the Llama 3.2 Community License for Llama 3.2 3B
+  ([docs/MODEL-LICENCES.md](docs/MODEL-LICENCES.md)). Each is one GGUF file at a fixed commit, checked
+  against its recorded size and SHA-256 before use. The one file above 2 GB (Gemma 4 E2B, 3.1 GB) is
+  checked in pieces of 1 GB, because the browser's SHA-256 takes at most 2 GB in one call.
+- **A model offered on the graphics card and on the processor is one file**: it downloads once and is
+  listed once in Options.
+- **A saved choice from 0.1.0 selects the same model**: the four graphics-card models of 0.1.0 keep
+  their place in the list under new ids.
+- **The models in the browser need Chrome 137 or later**, on the graphics card too (0.1.0: Chrome 126 for
+  the graphics card). In an older browser the list offers Chrome's built-in model and chat endpoints.
+- **The chat takes at least half of the panel's height**, and its lower edge can be dragged to make it
+  taller or shorter. When that is more than the panel has, the panel scrolls as a page and the question
+  box stays at the lower edge. The page card above it takes at most 30 % of the height (was 40 %).
+- **The package is smaller**: the zip is about 4.6 MB (0.1.0: about 11.5 MB).
+- **Llama 3.2 3B is no longer marked slow.** On the new engine it answered in a median of 14 to 18 seconds
+  and picked the right tool most often (live node: 8 of 10 on the NVIDIA card, 7 on the AMD one). It is still
+  never picked by itself. Gemma 4 E2B stays marked slow (1 to 2.5 minutes an answer).
+- **The model evaluations start each question in a new chat** (`npm run eval:gpu`, `npm run eval:cpu`,
+  `npm run eval:nano`): they empty the saved
+  chats first. Before, a question saw the answers that earlier runs and other models had saved for the
+  site, which lowered the live-node numbers of the 0.1.0 runs ([docs/EVAL.md](docs/EVAL.md)).
+
+### Added
+
+- **A model in the browser uses the page's own tools first.** On a node page that offers tools, the
+  graphics-card and processor models no longer get the built-in graph tool beside them: in the runs of
+  18 Nov 2026 Qwen3 1.7B chose it for 4 of 10 live-node questions that a page tool answers. Chrome's
+  built-in model and chat endpoints keep it; a page with no tools of its own still gets it. With the
+  change Qwen3 1.7B used a page tool for 10 of 10 live-node questions; it picked the expected one for 5
+  of 10, as before, and the general `ask` tool for most of the others.
+- **An earlier answer given without a tool is not given to the model again.** With Memory on, a site's
+  saved exchanges that used a tool (or page text read on request) still go with the next question; one
+  answered without a tool is left out of what the model is given, and stays in the saved chat and the
+  transcript. Small models copied such answers and stopped calling tools. Measured on 19 Nov 2026 with Qwen3 1.7B and a site chat full of such answers: the
+  right tool on the live node in 5 of 10 questions, as with a new chat (1 to 4 of 10 before this change).
+- **Qwen3 1.7B on the graphics card, now the default.** In the runs of 18 Nov 2026 it used a tool for every
+  question and picked the right one for 8 of 10 on the test node and 5 of 10 on the live node, on both cards
+  of the measured laptop, with a median answer of 9 to 20 seconds.
+- **A model that ends by itself says so**: when the engine stops (the graphics card gave up, or memory ran
+  out), the panel says to press Start again, and the next Start loads the model again.
+- **The files of the old engine are removed once after the update**, so they do not keep taking disk space
+  (they could be several gigabytes).
+- **A graphics-card model that fails to load says why in graphics terms**: too little graphics memory, or
+  a graphics device that gave up (the model host then starts again with a fresh device).
+- **The name of the keyboard shortcut is in the language file**, with the other texts Chrome shows.
+
+### Removed
+
+- **WebLLM and the four compiled model libraries.** The service worker no longer hosts a model: the
+  engine runs in a Worker of the offscreen document only.
+
+### Known limits
+
+- On a laptop with two graphics cards the browser gives pages the integrated one, whatever they ask for
+  (measured 18 Nov 2026, Windows, Chromium 156: AMD integrated by default; NVIDIA only when the browser was
+  started with `--force_high_performance_gpu`). The extension cannot choose the card.
+- The engine sends work to the graphics card in pieces of 64 tokens. With llama.cpp's default the
+  1.1 GB model made the graphics driver give up on its first question on the measured AMD card.
+- The measured numbers are in [docs/EVAL.md](docs/EVAL.md): one laptop, two graphics cards.
+- WebMCP is a draft (a Community Group report), not a W3C Standard.
 
 ## [0.1.0] - 2026-11-16
 
@@ -260,4 +335,5 @@ First release. Sent to the Chrome Web Store for review on the same day.
   116 seconds a question; Qwen3.5 2B, in its first run, called the expected tool first in four of five, at 153 to 256 seconds a question.
 - WebMCP is a draft (a Community Group report), not a W3C Standard.
 
+[0.1.1]: https://github.com/andreibesleaga/webaiassist/releases/tag/v0.1.1
 [0.1.0]: https://github.com/andreibesleaga/webaiassist/releases/tag/v0.1.0

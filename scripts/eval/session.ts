@@ -75,6 +75,7 @@ async function launch(args: EvalArgs): Promise<Launched> {
       `--load-extension=${DIST}`,
       '--enable-features=WebMCPTesting',
       '--enable-unsafe-extension-debugging',
+      ...(args.fastGpu ? ['--force_high_performance_gpu'] : []),
     ],
   });
   return { context };

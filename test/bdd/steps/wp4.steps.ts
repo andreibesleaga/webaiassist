@@ -59,7 +59,7 @@ Given('this computer has no usable WebGPU', async ({ world }) => {
 
 When('I press {string} with the graphics card model selected', async ({ world }, name: string) => {
   const panel = world.requirePanel();
-  await panel.selectOption('#model', 'webllm:Qwen3-0.6B-q4f16_1-MLC');
+  await panel.selectOption('#model', 'webllm:qwen3-0.6b-q4_k_m');
   await panel.getByRole('button', button(name)).click();
 });
 

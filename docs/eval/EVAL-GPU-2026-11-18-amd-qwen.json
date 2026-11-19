@@ -1,0 +1,456 @@
+{
+  "date": "2026-11-18",
+  "chrome": "156.0.8078.4",
+  "os": "win32 10.0.26300",
+  "scripted": false,
+  "webgpu": {
+    "panelAdapter": true,
+    "adapter": "amd/gcn-5"
+  },
+  "models": [
+    {
+      "key": "qwen",
+      "id": "qwen3-0.6b-q4_k_m",
+      "ready": true,
+      "loadS": 6.1,
+      "status": "Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document)."
+    }
+  ],
+  "targets": [
+    {
+      "name": "stub",
+      "url": "http://localhost:49980/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    },
+    {
+      "name": "live",
+      "url": "https://agenticsystemcore.com/specs/agentic-knowledge/",
+      "tools": [
+        "ask",
+        "brief",
+        "check",
+        "compose",
+        "explain",
+        "links",
+        "propose",
+        "read",
+        "remember",
+        "search"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 16.9,
+      "totalS": 25.7
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3.2,
+      "totalS": 10.1
+    },
+    {
+      "n": 3,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 2.5,
+      "totalS": 10
+    },
+    {
+      "n": 4,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "search"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 2.5,
+      "totalS": 8.5
+    },
+    {
+      "n": 5,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3,
+      "totalS": 10.1
+    },
+    {
+      "n": 6,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3.1,
+      "totalS": 8.8
+    },
+    {
+      "n": 7,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "read"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 2.7,
+      "totalS": 11.6
+    },
+    {
+      "n": 8,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 2.1,
+      "totalS": 6.4
+    },
+    {
+      "n": 9,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": 1,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 2.1,
+      "totalS": 8.4
+    },
+    {
+      "n": 10,
+      "model": "qwen",
+      "target": "stub",
+      "tools": [
+        "explain"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 0,
+      "gateShown": 1,
+      "factInAnswer": 0,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3,
+      "totalS": 9.9
+    },
+    {
+      "n": 1,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 22.3,
+      "totalS": 22.3
+    },
+    {
+      "n": 2,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 5.9,
+      "totalS": 5.9
+    },
+    {
+      "n": 3,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 13.8,
+      "totalS": 13.8
+    },
+    {
+      "n": 4,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 6.1,
+      "totalS": 6.1
+    },
+    {
+      "n": 5,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 6.4,
+      "totalS": 6.4
+    },
+    {
+      "n": 6,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3.8,
+      "totalS": 3.8
+    },
+    {
+      "n": 7,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 7.8,
+      "totalS": 7.8
+    },
+    {
+      "n": 8,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 3.1,
+      "totalS": 3.1
+    },
+    {
+      "n": 9,
+      "model": "qwen",
+      "target": "live",
+      "tools": [
+        "links"
+      ],
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": 1,
+      "taskDone": 1,
+      "gateShown": 1,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 2.1,
+      "totalS": 7.3
+    },
+    {
+      "n": 10,
+      "model": "qwen",
+      "target": "live",
+      "tools": [],
+      "toolRight": 0,
+      "firstToolRight": 0,
+      "toolUsed": 0,
+      "taskDone": 0,
+      "gateShown": null,
+      "factInAnswer": null,
+      "hallucinated": [],
+      "repeated": 0,
+      "firstTokenS": 6.9,
+      "totalS": 6.9
+    }
+  ],
+  "summary": [
+    {
+      "model": "qwen",
+      "target": "stub",
+      "prompts": 10,
+      "toolRight": 7,
+      "firstToolRight": 7,
+      "toolUsed": "10 of 10",
+      "taskDone": 7,
+      "gateShown": "10 of 10",
+      "factInAnswer": "8 of 10",
+      "hallucinated": 0,
+      "errors": 0,
+      "repeated": 0,
+      "medianFirstTokenS": 2.85
+    },
+    {
+      "model": "qwen",
+      "target": "live",
+      "prompts": 10,
+      "toolRight": 1,
+      "firstToolRight": 1,
+      "toolUsed": "1 of 10",
+      "taskDone": 1,
+      "gateShown": "1 of 1",
+      "factInAnswer": "0 of 0",
+      "hallucinated": 0,
+      "errors": 0,
+      "repeated": 0,
+      "medianFirstTokenS": 6.25
+    }
+  ],
+  "checks": [
+    {
+      "name": "storage.local.setAccessLevel",
+      "result": "pass",
+      "detail": "resolved in the service worker"
+    },
+    {
+      "name": "Hosts contacted on first Start",
+      "result": "review",
+      "detail": "8 requests seen, none to a host PRIVACY.md does not name; no model download seen (the offscreen document is not visible to Playwright): open DevTools on the first Start"
+    },
+    {
+      "name": "Idle 0 min, then a question",
+      "result": "skipped",
+      "detail": "--idle 0"
+    },
+    {
+      "name": "Corrupted cached library is refused",
+      "result": "skipped",
+      "detail": "no cached .wasm (scripted or library served from the package)"
+    }
+  ],
+  "manual": [
+    "Edge/Brave/Opera/Vivaldi sideload",
+    "screen reader",
+    "Chrome's own site-access request from the toolbar (Allow button on a site without pre-granted access)"
+  ]
+}

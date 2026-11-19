@@ -19,6 +19,7 @@ import {
   type CpuAnswer,
   type CpuStart,
 } from './cpu-run.ts';
+import { clearMemory } from './panel.ts';
 import { loadPrompts, promptsFor } from './prompts.ts';
 import { startSession } from './session.ts';
 
@@ -81,6 +82,8 @@ async function firstRun(): Promise<
           `  #${prompt.n}: tools [${done.row.tools.join(', ')}] ${done.row.totalS} s: ${done.answer}`,
         );
         answers.push(done);
+        // A fresh chat for the next question: nothing remembered of the site, then a reload.
+        await clearMemory(panel);
         await panel.reload();
         await panel.locator('#page-status').filter({ hasNotText: 'No page yet.' }).waitFor();
         await startCpu(panel, key, START_TIMEOUT_MIN);

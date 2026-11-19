@@ -12,7 +12,7 @@ import { makeZip, zipName } from '../../scripts/zip.mjs';
 
 const lib = Buffer.from('wasm bytes');
 const pins = {
-  libs: [
+  runtimes: [
     { file: 'm.wasm', bytes: lib.length, sha256: createHash('sha256').update(lib).digest('hex') },
   ],
 };
@@ -40,7 +40,6 @@ function files(extra: Record<string, Uint8Array> = {}): Record<string, Uint8Arra
     'ui.css',
     'content-isolated.js',
     'content-main.js',
-    'model-worker.js',
     'query-worker.js',
     'query-worker.js',
     'webmcp-polyfill.js',

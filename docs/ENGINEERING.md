@@ -2,9 +2,9 @@
 
 > **In short**
 >
-> - Everything runs from the repository alone (Node.js 24 and npm). The network is needed at the initial build, to fetch model libraries of about 32 MB.
+> - Everything runs from the repository alone (Node.js 24 and npm). The build needs no network beyond `npm ci`: the two engine files come from `node_modules`.
 > - `npm run verify:release` runs every check in order. Green means the zip can be released.
-> - The build checks refuse an undocumented permission, `eval`, remote code, a changed model library, and a zip over 12 MiB (the 0.1.0 zip is about 11.5 MB).
+> - The build checks refuse an undocumented permission, `eval`, remote code, a changed engine file, and a zip over 6 MiB (the 0.1.1 zip is about 4.6 MB).
 > - To release: update CHANGELOG.md, run `npm version`, run `npm run verify:release`, then push a tag `vx.y.z`. The workflow does not upload to the Chrome Web Store.
 > - Dependencies use exact pins, same major version, at least 14 days old. A major update is a recorded decision with a reason.
 
@@ -15,10 +15,9 @@ alone.
 
 - Node.js 24 (`.nvmrc`) and npm. `.npmrc` sets exact versions and strict engines.
 - For the browser tests: `npx playwright install chromium` once. If a test says "Executable doesn't exist", the installed Playwright wants a Chromium build the shared browser folder lacks: run `PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium` (the variable keeps Playwright from deleting other projects' browsers), or point `PLAYWRIGHT_BROWSERS_PATH` at a folder inside the project, for example `node_modules/.cache/ms-playwright`.
-- Network on the first build only: it fetches the four model libraries into `vendor/model-libs/`
-  (about 32 MB, not in git). Later builds use that copy and check its SHA-256 every time. The
-  llama.cpp engine (`wllama.wasm`) comes from `node_modules/@wllama/wllama` and is checked the
-  same way.
+- No network at the build beyond `npm ci`: the llama.cpp engine (`wllama.wasm`) and the query
+  engine (`oxigraph.wasm`) come from `node_modules`, and the build checks their size and SHA-256
+  every time (`scripts/model-libs.json`).
 - After a rebuild, press **Reload** on `chrome://extensions`, or use a new browser profile. Chrome keeps
   the service worker script of an unpacked extension for as long as its version stays the same, so a
   profile that loaded an older build of the same version runs the old background script with the new
@@ -50,7 +49,7 @@ alone.
 | `npm run build:smoke`          | Builds the development build `dist-smoke/`: scripted test model, fake processor engine with four test models, `?tab=` override, browser check (spike) page.                                                                                                                                                                               |
 | `npm run eval:cpu`             | Builds `dist-eval/` and runs the real processor model (llama.cpp; `--model 0.6b`, `1.7b` or `qwen35-2b`, default `0.6b`) in headless Chromium: five prompts on the stub node, then a second start from the stored copy. Needs the network once (397 MB to 1.3 GB). Writes `docs/eval/EVAL-CPU-<model>-<date>.json`. Not part of the gate. |
 | `npm run build:eval`           | Builds `dist-eval/` (the extension plus install-time access to `localhost`, `127.0.0.1` and `agenticsystemcore.com`) and checks it.                                                                                                                                                                                                       |
-| `npm run eval:gpu`             | Builds `dist-eval/` and runs the model evaluation on a computer with a GPU: visible browser windows, 20 prompts, the models of `--models` (default `qwen,qwen35`; also `llama`, `gemma4`), a report in `docs/eval/`. Not part of the gate. See [EVAL.md](EVAL.md).                                                                        |
+| `npm run eval:gpu`             | Builds `dist-eval/` and runs the model evaluation on a computer with a GPU: visible browser windows, 20 prompts, the model of `--models` (default `qwen17`; also `qwen`, `qwen35`, `llama`, `gemma4`; run one model per run), each question in a new chat, a report in `docs/eval/`. Not part of the gate. See [EVAL.md](EVAL.md).        |
 | `npm run eval:gpu:win`         | From WSL: runs the same evaluation on the Windows side and copies the report back.                                                                                                                                                                                                                                                        |
 | `npm run eval:nano`            | Chrome's built-in model for real, in Google Chrome. Writes `docs/eval/EVAL-NANO-<date>-<version>.json`. Not part of the gate.                                                                                                                                                                                                             |
 | `npm run eval:nano:win`        | From WSL: the same on the Windows side.                                                                                                                                                                                                                                                                                                   |
@@ -77,16 +76,16 @@ for a release.
   link to it, or code that reads the `?tab=` override (`checkDevOnly`);
 - remote code: any mention of `raw.githubusercontent.com`, a remote `.wasm` URL, a remote
   `import()` or `importScripts()` (`scripts/check-remote-code.mjs`);
-- a model library that is missing, changed (size or SHA-256), or not pinned;
+- an engine file (`wllama.wasm`, `oxigraph.wasm`) that is missing, changed (size or SHA-256), or not pinned;
 - in the zip only: a file that is not in `dist/`, a missing file, a source map or
-  source-map comment, a version other than `package.json`, more than 12 MiB (the 0.1.0 zip is about 11.5 MB, 11.0 MiB, with the query engine's 1.5 MB WebAssembly file).
+  source-map comment, a version other than `package.json`, more than 6 MiB (the 0.1.1 zip is about 4.6 MB, 4.3 MiB; the 0.1.0 zip was about 11.5 MB with four compiled model libraries that are no longer shipped).
 
 ## Tests
 
 - `test/core`, `test/adapters`, `test/ui`, `test/protocol`, `test/spike`: unit tests (Vitest, jsdom
-  for UI). The four model paths are tested against fakes: `wllama-runtime*.test.ts` (processor,
-  fake engine), `prompt-api-*.test.ts` (Chrome's built-in model, fake `LanguageModel`),
-  `endpoint-runtime.test.ts`, and the WebLLM adapter with a fake engine. `default-model.test.ts`
+  for UI). The four model paths are tested against fakes: `wllama-runtime*.test.ts` (graphics card and
+  processor, fake engine), `prompt-api-*.test.ts` (Chrome's built-in model, fake `LanguageModel`),
+  `endpoint-runtime.test.ts`. `default-model.test.ts`
   holds the order in which the panel picks a default.
 - `test/replay`: the ten AgenticSystemCore tools through the whole message path.
 - `test/security` and `test/security-review`: the adversarial pass of
@@ -175,17 +174,15 @@ pending now, and a test keeps it so; see [MANUAL-CHECKS.md](MANUAL-CHECKS.md)). 
   `markdown-it` 14.3.3, `re2js` 2.8.8, `katex` 0.18.11, and `minimatch` 11.0.3 under
   `@typescript-eslint/typescript-estree`. Remove an override when the tool above it ships the patched
   version itself.
-- WebLLM (`@mlc-ai/web-llm`): a new version usually brings new model libraries.
-  1. Find the library folder the new version uses (`modelVersion` in
-     `node_modules/@mlc-ai/web-llm/lib/index.js`) and the commit of
-     `mlc-ai/binary-mlc-llm-libs` that holds it.
-  2. Update `scripts/model-libs.json`: the `source` commit, each file name, its size and
-     SHA-256 (`sha256sum` of a file downloaded from that commit).
-  3. Delete `vendor/model-libs/` and run `npm run build`: it fetches the new files and checks
-     them.
-  4. If the build says WebLLM's remote library prefix was not found once, read how the new
-     version builds library URLs and update `scripts/model-libs.mjs`.
-  5. Check the Hugging Face revisions in `src/adapters/webllm-app-config.ts` (the model
-     repository's commit list) and run a real model by hand ([EVAL.md](EVAL.md)).
+- wllama (`@wllama/wllama`): a new version can change the engine file and the llama.cpp build.
+  1. Update the exact pin in `package.json` and `package-lock.json`.
+  2. Update `scripts/model-libs.json`: the package, the file's size and SHA-256 (`sha256sum` of
+     `node_modules/@wllama/wllama/esm/wasm/wllama.wasm`).
+  3. Run `npm run build`: it copies the file and checks it. If the build says the compatibility
+     addresses were not found exactly twice, read how the new version names them and update
+     `wllamaNoRemote` in `scripts/model-libs.mjs`.
+  4. Check the Hugging Face commits pinned in `src/adapters/cpu-models.ts` (and
+     [MODEL-LICENCES.md](MODEL-LICENCES.md)) and run a real model by hand ([EVAL.md](EVAL.md)) on
+     the processor and on a graphics card.
 - WebMCP: the specification is a draft. Re-read it before each release and record the date in
   [SOURCES.md](SOURCES.md).

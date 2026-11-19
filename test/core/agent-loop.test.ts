@@ -2,6 +2,9 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_MAX_STEPS, runAgent } from '../../src/core/agent-loop';
 import { answer, call, makeDeps } from '../helpers';
+import { REPAIR } from '../../src/core/check-action';
+import { NUDGE } from '../../src/core/repeat';
+import { PAGE_TEXT_TOOL, wrapUntrusted } from '../../src/core/untrusted';
 
 const input = { tabId: 7, origin: 'https://node.example', userText: 'What is a handoff?' };
 
@@ -72,11 +75,76 @@ describe('runAgent: plan, call, observe, answer', () => {
     expect(saved.map((m) => m.role)).toEqual(['user', 'assistant']);
   });
 
-  it('keeps earlier history in the messages', async () => {
+  it('keeps earlier history in the messages: the exchanges that used a tool', async () => {
     const deps = makeDeps([answer('ok')]);
-    await runAgent(deps, { ...input, history: [{ role: 'user', content: 'earlier question' }] });
-    const roles = deps.model.requests[0]?.messages.map((m) => m.content);
-    expect(roles).toContain('earlier question');
+    const history = [
+      { role: 'user' as const, content: 'earlier question' },
+      { role: 'tool' as const, content: 'earlier result' },
+      { role: 'assistant' as const, content: 'earlier answer' },
+    ];
+    await runAgent(deps, { ...input, history });
+    const sent = deps.model.requests[0]?.messages.map((m) => m.content) ?? [];
+    expect(sent.some((c) => c.includes('earlier question'))).toBe(true);
+    expect(sent.some((c) => c.includes('earlier answer'))).toBe(true);
+  });
+
+  it('does not give the model an earlier answer that used no tool, and keeps it in the saved chat', async () => {
+    const deps = makeDeps([answer('ok')]);
+    const history = [
+      { role: 'user' as const, content: 'question without tool' },
+      { role: 'assistant' as const, content: 'answer without tool' },
+      { role: 'user' as const, content: 'question with tool' },
+      { role: 'tool' as const, content: 'tool result' },
+      { role: 'assistant' as const, content: 'answer with tool' },
+    ];
+    const result = await runAgent(deps, { ...input, history });
+    const sent = (deps.model.requests[0]?.messages ?? []).map((m) => m.content).join('\n');
+    expect(sent).not.toContain('without tool');
+    expect(sent).toContain('answer with tool');
+    expect(result.status).toBe('answered');
+    const saved = (await deps.memory.loadChat(input.origin)).map((m) => m.content).join('\n');
+    expect(saved).toContain('answer with tool');
+    expect(saved).toContain('answer without tool');
+    expect(saved).toContain('ok');
+  });
+
+  it('splits the saved chat by question: page text, repair and nudge turns stay with their question', async () => {
+    const deps = makeDeps([answer('ok')]);
+    const page = wrapUntrusted(PAGE_TEXT_TOOL, 'the page text');
+    const history = [
+      { role: 'user' as const, content: 'Q1 no tool' },
+      { role: 'assistant' as const, content: 'A1 no tool' },
+      { role: 'tool' as const, content: page },
+      { role: 'user' as const, content: 'Q2 with page text' },
+      { role: 'assistant' as const, content: 'A2 from the page' },
+      { role: 'user' as const, content: 'Q3 repaired' },
+      { role: 'assistant' as const, content: 'not json' },
+      { role: 'user' as const, content: REPAIR.replace('%s', 'bad') },
+      { role: 'assistant' as const, content: '{"tool":"search"}' },
+      { role: 'tool' as const, content: wrapUntrusted('search', 'r3') },
+      { role: 'assistant' as const, content: 'A3' },
+      { role: 'user' as const, content: 'Q4 nudged' },
+      { role: 'tool' as const, content: wrapUntrusted('search', 'r4') },
+      { role: 'user' as const, content: NUDGE },
+      { role: 'assistant' as const, content: 'A4' },
+      { role: 'user' as const, content: 'Q5 no tool' },
+      { role: 'assistant' as const, content: 'A5 no tool' },
+    ];
+    await runAgent(deps, { ...input, history });
+    const sent = (deps.model.requests[0]?.messages ?? []).map((m) => m.content);
+    const all = sent.join('\n');
+    for (const kept of [
+      'Q2 with page text',
+      'A2 from the page',
+      'Q3 repaired',
+      'A3',
+      'Q4 nudged',
+      'A4',
+    ])
+      expect(all, kept).toContain(kept);
+    for (const dropped of ['Q1 no tool', 'A1 no tool', 'Q5 no tool', 'A5 no tool'])
+      expect(all, dropped).not.toContain(dropped);
+    expect(deps.model.requests[0]?.messages[1]?.role).toBe('user');
   });
 
   it('turns a thrown tool error into a failed result the model can see', async () => {

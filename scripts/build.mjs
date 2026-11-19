@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 // The one build config. Two esbuild passes:
-// 1. Extension pages and the service worker as ES modules with shared chunks, so WebLLM
+// 1. Extension pages and the service worker as ES modules with shared chunks, so each library
 //    is bundled once (the service worker is declared "type": "module").
-//    The model Worker (model-worker.js) the offscreen document starts is one of them.
 // 2. Scripts that go into web pages as classic scripts: the two page-bridge scripts, the
 //    WebMCP polyfill for compat mode, and (development build only) the spike page.
-// The four model libraries (.wasm) and the CPU runtime engine (wllama.wasm) are copied in from
-// the pinned, hash-checked files (scripts/model-libs.mjs); WebLLM's remote library URL and
-// wllama's two remote compatibility addresses are replaced, so nothing fetches code.
+// The engine files (.wasm: llama.cpp and the query engine) are copied in from the installed
+// packages and hash-checked (scripts/model-libs.mjs); wllama's two remote compatibility
+// addresses are replaced, so nothing fetches code.
 // `--smoke` writes dist-smoke/, the development build: the scripted test model, access to
 // http://127.0.0.1 and http://127.0.0.2 and the ?tab= override for the Playwright smoke test, and the browser
 // check (spike) page. The release build, dist/, has none of these (scripts/check-dist.mjs).
@@ -16,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 import { copyExplorer } from './explorer-pins.mjs';
 import { checkQueryPins } from './query-pins.mjs';
 import { chromeMessages, localiseManifest } from './locale.mjs';
-import { bundleModelLibs, webLlmNoRemoteLibs, wllamaNoRemote } from './model-libs.mjs';
+import { bundleModelLibs, wllamaNoRemote } from './model-libs.mjs';
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 
 // `--eval` writes dist-eval/: the smoke-test build plus install-time access to the eval's
@@ -63,12 +62,11 @@ await build({
     sidepanel: 'src/entries/sidepanel.ts',
     options: 'src/entries/options.ts',
     explorer: 'src/entries/explorer.ts',
-    'model-worker': 'src/entries/model-worker.ts',
     'query-worker': 'src/entries/query-worker.ts',
   },
   format: 'esm',
   splitting: true,
-  plugins: [webLlmNoRemoteLibs, wllamaNoRemote],
+  plugins: [wllamaNoRemote],
   chunkNames: 'chunks/[name]-[hash]',
 });
 

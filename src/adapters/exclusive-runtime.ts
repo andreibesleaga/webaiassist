@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-// The offscreen document hosts two runtimes (WebLLM on the graphics card, llama.cpp on the
-// processor). Loading one lets the other go first, so a model chosen in the panel never
+// The offscreen document hosts two runtimes (llama.cpp on the graphics card and llama.cpp on
+// the processor). Loading one lets the other go first, so a model chosen in the panel never
 // sits in memory next to the one it replaced.
 import type {
   ChatRequest,

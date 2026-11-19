@@ -132,11 +132,11 @@ describe('side panel default model', () => {
     loadPage('sidepanel.html');
   });
 
-  it('starts the small bundled model, not Chrome’s built-in one, when WebGPU works', async () => {
+  it('starts Qwen3 1.7B, not Chrome’s built-in one, when WebGPU works', async () => {
     const deps = fakeDeps([]);
     deps.env = { promptApi: true, scripted: false, webgpu: true };
     await startPanel(deps);
-    expect(byId<HTMLSelectElement>('model').value).toBe('webllm:Qwen3-0.6B-q4f16_1-MLC');
+    expect(byId<HTMLSelectElement>('model').value).toBe('webllm:qwen3-1.7b-q4_k_m');
     click('start');
     await settle();
     expect(deps.created.map((c) => c.runtime)).toEqual(['webllm']);

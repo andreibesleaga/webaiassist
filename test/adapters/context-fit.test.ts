@@ -8,7 +8,6 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { CPU_CAPABILITIES, CPU_MODELS } from '../../src/adapters/cpu-models';
 import { WEBLLM_MODEL_IDS } from '../../src/adapters/models';
-import { WebLlmRuntime } from '../../src/adapters/webllm-runtime';
 import { runAgent } from '../../src/core/agent-loop';
 import { estimateTokens, REPLY_RESERVE_TOKENS, usableContext } from '../../src/core/history';
 import type { ModelCapabilities } from '../../src/core/ports/model-runtime';
@@ -92,13 +91,7 @@ function fullSiteFacts(): SiteFacts {
 
 /** The runtime of each listed model, as the loop sees it: same window for every model of a runtime. */
 const WINDOWS: readonly (readonly [string, ModelCapabilities])[] = [
-  ...WEBLLM_MODEL_IDS.map(
-    (id) =>
-      [
-        `${id} on the graphics card`,
-        new WebLlmRuntime(() => Promise.reject(new Error('unused'))).capabilities(),
-      ] as const,
-  ),
+  ...WEBLLM_MODEL_IDS.map((id) => [`${id} on the graphics card`, CPU_CAPABILITIES] as const),
   ...CPU_MODELS.map((m) => [`${m.id} on the processor`, CPU_CAPABILITIES] as const),
 ];
 

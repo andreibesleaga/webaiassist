@@ -47,12 +47,8 @@ describe('wllamaNoRemote', () => {
 });
 
 describe('pinned wasm files', () => {
-  it('lists the four model libraries, the wllama engine and the oxigraph engine under model-libs/', () => {
+  it('lists the wllama engine and the oxigraph engine under model-libs/, and nothing else', () => {
     expect(pinnedWasmPaths().sort()).toEqual([
-      'model-libs/Llama-3.2-3B-Instruct-q4f16_1_cs1k-webgpu.wasm',
-      'model-libs/Qwen3-0.6B-q4f16_1_cs1k-webgpu.wasm',
-      'model-libs/Qwen3.5-2B-q4f16_1_cs1k-webgpu.wasm',
-      'model-libs/gemma-4-E2B-it-q4f16_1_cs512-webgpu.wasm',
       'model-libs/oxigraph.wasm',
       'model-libs/wllama.wasm',
     ]);

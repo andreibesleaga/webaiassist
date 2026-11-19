@@ -12,6 +12,9 @@ export interface ModelCapabilities {
   readonly compactPrompt?: boolean;
   /** Tokens the runtime keeps free for the reply; the core's default applies when absent. */
   readonly replyTokens?: number;
+  /** A small model that chooses the page's own tools better without WebAIAssist's built-in graph
+   *  tool beside them: the built-in tool is offered only on a page with no tools of its own. */
+  readonly pageToolsFirst?: boolean;
 }
 
 export interface LoadProgress {

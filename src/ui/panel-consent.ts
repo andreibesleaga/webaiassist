@@ -5,7 +5,7 @@
 // of question once per host: where the model runs, what is sent there, that it may cost money.
 // An endpoint on this computer asks nothing.
 import { isLocalEndpoint } from '../adapters/endpoint-runtime';
-import { isStored, type StoredRuntime } from '../adapters/model-store';
+import { isStored } from '../adapters/model-store';
 import { byId } from './dom';
 import { downloadBytes } from './download-size';
 import { endpointHost } from './endpoint-host';
@@ -20,8 +20,8 @@ interface DownloadNeed {
   readonly name: string;
   readonly megabytes: number;
   readonly host: string;
-  /** "checked": the file's SHA-256 is verified; "pinned": a fixed version; "chrome": Chrome's own. */
-  readonly kind: 'checked' | 'pinned' | 'chrome' | 'remote';
+  /** "checked": the file's SHA-256 is verified; "chrome": Chrome's own. */
+  readonly kind: 'checked' | 'chrome' | 'remote';
 }
 
 async function storedList(ctx: PanelController) {
@@ -34,15 +34,13 @@ async function storedList(ctx: PanelController) {
 
 async function needOfStored(
   ctx: PanelController,
-  runtime: StoredRuntime,
   choice: PickerChoice,
 ): Promise<DownloadNeed | undefined> {
-  if (isStored(await storedList(ctx), runtime, choice.modelId)) return undefined;
+  if (isStored(await storedList(ctx), choice.modelId)) return undefined;
   const source = downloadBytes(choice, ctx.state.env);
   if (!source) return undefined;
   const megabytes = Math.round(source.bytes / MB);
-  const kind = runtime === 'webllm' ? 'pinned' : 'checked';
-  return { name: shortName(choice.label), megabytes, host: source.host, kind };
+  return { name: shortName(choice.label), megabytes, host: source.host, kind: 'checked' };
 }
 
 /** What a first download of this choice costs, or undefined when nothing has to download. */
@@ -51,7 +49,7 @@ export async function downloadNeed(
   choice: PickerChoice,
 ): Promise<DownloadNeed | undefined> {
   if (choice.runtime === 'webllm' || choice.runtime === 'cpu') {
-    return needOfStored(ctx, choice.runtime, choice);
+    return needOfStored(ctx, choice);
   }
   if (choice.runtime === 'endpoint') return remoteNeed(ctx);
   if (choice.runtime !== 'prompt-api') return undefined;
@@ -142,7 +140,7 @@ function consentTexts(need: DownloadNeed): {
   }
   return {
     title: t('consentTitle', values),
-    body: t(need.kind === 'checked' ? 'consentBody' : 'consentBodyPinned', values),
+    body: t('consentBody', values),
     ok: t('consentOk', values),
     status: t('consentStatus', values),
   };

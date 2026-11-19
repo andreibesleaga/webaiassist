@@ -11,15 +11,18 @@ import {
 } from '../../src/ui/model-picker';
 
 const env = { promptApi: false, scripted: false };
-const QWEN = 'Qwen3-0.6B-q4f16_1-MLC';
-const LLAMA = 'Llama-3.2-3B-Instruct-q4f16_1-MLC';
-const QWEN35 = 'Qwen3.5-2B-q4f16_1-MLC';
-const GEMMA = 'gemma-4-E2B-it-q4f16_1-MLC';
+const QWEN = 'qwen3-0.6b-q4_k_m';
+const QWEN17 = 'qwen3-1.7b-q4_k_m';
+const LLAMA = 'llama-3.2-3b-instruct-q4_k_m';
+const QWEN35 = 'qwen3.5-2b-q4_k_m';
+const GEMMA = 'gemma-4-e2b-it-q4_k_m';
+const DEFAULT = `webllm:${QWEN17}`;
 
 describe('model picker', () => {
-  it('lists the four browser models, and more only when they can be used', () => {
+  it('lists the five graphics-card models, and more only when they can be used', () => {
     expect(pickerChoices(DEFAULT_SETTINGS, env).map((c) => c.value)).toEqual([
       `webllm:${QWEN}`,
+      `webllm:${QWEN17}`,
       `webllm:${QWEN35}`,
       `webllm:${LLAMA}`,
       `webllm:${GEMMA}`,
@@ -40,6 +43,7 @@ describe('model picker', () => {
     );
     expect(all.map((c) => c.value)).toEqual([
       `webllm:${QWEN}`,
+      `webllm:${QWEN17}`,
       `webllm:${QWEN35}`,
       `webllm:${LLAMA}`,
       `webllm:${GEMMA}`,
@@ -82,15 +86,30 @@ describe('model picker', () => {
     });
 
     it('says "in this browser, on your graphics card" for every graphics-card model', () => {
-      for (const id of [QWEN, LLAMA, QWEN35, GEMMA]) {
+      for (const id of [QWEN, QWEN17, QWEN35, LLAMA, GEMMA]) {
         expect(label(`webllm:${id}`)).toContain('in this browser, on your graphics card');
       }
     });
 
-    it('marks Llama 3.2 3B and Gemma 4 E2B as slow in the list, and no other model', () => {
-      const slow = [LLAMA, GEMMA].map((id) => label(`webllm:${id}`));
-      for (const text of slow) expect(text).toContain('slow: may stall');
-      for (const id of [QWEN, QWEN35]) expect(label(`webllm:${id}`)).not.toContain('slow');
+    it('marks Gemma 4 E2B as slow in the list, and no other model', () => {
+      expect(label(`webllm:${GEMMA}`)).toContain('slow: may stall');
+      for (const id of [QWEN, QWEN17, QWEN35, LLAMA]) {
+        expect(label(`webllm:${id}`)).not.toContain('slow');
+      }
+    });
+
+    it('states a download size and a licence in every graphics-card label', () => {
+      for (const id of [QWEN, QWEN17, QWEN35, LLAMA, GEMMA]) {
+        expect(label(`webllm:${id}`)).toMatch(/\d(\.\d)? (MB|GB) download/);
+      }
+      expect(label(`webllm:${QWEN}`)).toContain('397 MB download');
+      expect(label(`webllm:${QWEN}`)).toContain('Apache-2.0');
+      expect(label(`webllm:${LLAMA}`)).toContain('2.0 GB download');
+      expect(label(`webllm:${LLAMA}`)).toContain('Llama 3.2 Community License');
+      expect(label(`webllm:${GEMMA}`)).toContain('3.1 GB download');
+      expect(label(`webllm:${GEMMA}`)).toContain('Apache-2.0');
+      expect(label(`webllm:${QWEN17}`)).toContain('1.1 GB download');
+      expect(label(`webllm:${QWEN35}`)).toContain('1.3 GB download');
     });
 
     it('says "in this browser, on your processor and memory" for every processor model', () => {
@@ -118,12 +137,12 @@ describe('model picker', () => {
     });
   });
 
-  it('selects the small bundled model when WebGPU works, or the browser model chosen', () => {
-    expect(selectedValue(DEFAULT_SETTINGS, env)).toBe(`webllm:${QWEN}`);
-    expect(selectedValue(DEFAULT_SETTINGS, { ...env, webgpu: true })).toBe(`webllm:${QWEN}`);
+  it('selects Qwen3 1.7B when WebGPU works, or the browser model chosen', () => {
+    expect(selectedValue(DEFAULT_SETTINGS, env)).toBe(DEFAULT);
+    expect(selectedValue(DEFAULT_SETTINGS, { ...env, webgpu: true })).toBe(DEFAULT);
     const chosen = { ...DEFAULT_SETTINGS, runtime: 'webllm' as const, webllmModel: LLAMA };
     expect(selectedValue(chosen, env)).toBe(`webllm:${LLAMA}`);
-    expect(selectedValue({ ...chosen, webllmModel: '' }, env)).toBe(`webllm:${QWEN}`);
+    expect(selectedValue({ ...chosen, webllmModel: '' }, env)).toBe(DEFAULT);
   });
 
   it('keeps the model the user chose, whatever the default would be', () => {
@@ -136,7 +155,7 @@ describe('model picker', () => {
   });
 
   it('keeps the graphics card as the default when the browser can run the processor models too', () => {
-    expect(selectedValue(DEFAULT_SETTINGS, { ...env, cpu: true })).toBe(`webllm:${QWEN}`);
+    expect(selectedValue(DEFAULT_SETTINGS, { ...env, cpu: true })).toBe(DEFAULT);
   });
 
   it('selects the processor model (Qwen3 1.7B) by default only when WebGPU does not work', () => {
@@ -151,8 +170,8 @@ describe('model picker', () => {
       ...DEFAULT_SETTINGS,
       endpoint: { ...DEFAULT_SETTINGS.endpoint, model: 'qwen3:0.6b' },
     };
-    expect(selectedValue(DEFAULT_SETTINGS, all)).toBe(`webllm:${QWEN}`);
-    expect(selectedValue(withEndpoint, all)).toBe(`webllm:${QWEN}`);
+    expect(selectedValue(DEFAULT_SETTINGS, all)).toBe(DEFAULT);
+    expect(selectedValue(withEndpoint, all)).toBe(DEFAULT);
   });
 
   it('without WebGPU, falls back to Chrome’s built-in model, then the endpoint, then its set-up', () => {
@@ -174,10 +193,8 @@ describe('model picker', () => {
   });
 
   it('falls back to the browser model when the chosen runtime cannot be used', () => {
-    expect(selectedValue({ ...DEFAULT_SETTINGS, runtime: 'prompt-api' }, env)).toBe(
-      `webllm:${QWEN}`,
-    );
-    expect(selectedValue({ ...DEFAULT_SETTINGS, runtime: 'endpoint' }, env)).toBe(`webllm:${QWEN}`);
+    expect(selectedValue({ ...DEFAULT_SETTINGS, runtime: 'prompt-api' }, env)).toBe(DEFAULT);
+    expect(selectedValue({ ...DEFAULT_SETTINGS, runtime: 'endpoint' }, env)).toBe(DEFAULT);
     expect(
       selectedValue({ ...DEFAULT_SETTINGS, runtime: 'prompt-api' }, { ...env, promptApi: true }),
     ).toBe('prompt-api');
@@ -198,6 +215,7 @@ describe('model picker', () => {
     const cpu = pickerChoices(DEFAULT_SETTINGS, { ...env, cpu: true });
     expect(cpu.map((c) => c.value)).toEqual([
       `webllm:${QWEN}`,
+      `webllm:${QWEN17}`,
       `webllm:${QWEN35}`,
       `webllm:${LLAMA}`,
       `webllm:${GEMMA}`,
@@ -206,9 +224,8 @@ describe('model picker', () => {
       'cpu:qwen3.5-2b-q4_k_m',
       SETUP_VALUE,
     ]);
-    expect(cpu[4]).toMatchObject({ runtime: 'cpu', modelId: 'qwen3-0.6b-q4_k_m' });
-    expect(cpu[4]?.label).toMatch(/397 MB/);
-    expect(pickerChoices(DEFAULT_SETTINGS, { ...env, cpu: false })).toHaveLength(5);
+    expect(cpu[5]).toMatchObject({ runtime: 'cpu', modelId: 'qwen3-0.6b-q4_k_m' });
+    expect(cpu[5]?.label).toMatch(/397 MB/);
   });
 
   it('adds the test models of the smoke build and keeps a chosen one', () => {
@@ -231,7 +248,7 @@ describe('model picker', () => {
     expect(selectedValue({ ...chosen, cpuModel: 'unknown' }, { ...env, cpu: true })).toBe(
       'cpu:qwen3-1.7b-q4_k_m',
     );
-    expect(selectedValue(chosen, env)).toBe(`webllm:${QWEN}`);
+    expect(selectedValue(chosen, env)).toBe(DEFAULT);
     expect(settingsFor(DEFAULT_SETTINGS, 'cpu:qwen3-1.7b-q4_k_m')).toMatchObject({
       runtime: 'cpu',
       cpuModel: 'qwen3-1.7b-q4_k_m',
@@ -239,34 +256,39 @@ describe('model picker', () => {
   });
 });
 
-describe('Gemma 4 E2B needs the shader-f16 feature of the graphics card', () => {
+describe('Gemma 4 E2B no longer needs the shader-f16 feature of the graphics card', () => {
   const values = (e: object): string[] =>
     pickerChoices(DEFAULT_SETTINGS, { ...env, ...e }).map((c) => c.value);
 
-  it('is listed when the adapter reports shader-f16, or when that is not known yet', () => {
+  it('is listed whether the adapter reports shader-f16, lacks it, or that is not known yet', () => {
     expect(values({ shaderF16: true })).toContain(`webllm:${GEMMA}`);
+    expect(values({ shaderF16: false })).toContain(`webllm:${GEMMA}`);
     expect(values({})).toContain(`webllm:${GEMMA}`);
   });
 
-  it('is not listed when the adapter lacks shader-f16; the other three stay', () => {
+  it('leaves all five graphics-card models in the list when the adapter lacks shader-f16', () => {
     expect(values({ shaderF16: false })).toEqual([
       `webllm:${QWEN}`,
+      `webllm:${QWEN17}`,
       `webllm:${QWEN35}`,
       `webllm:${LLAMA}`,
+      `webllm:${GEMMA}`,
       SETUP_VALUE,
     ]);
   });
 
-  it('is not kept selected when it was chosen on a computer that lacks the feature', () => {
+  it('keeps a saved Gemma choice selected, with or without shader-f16', () => {
     const chosen = { ...DEFAULT_SETTINGS, runtime: 'webllm' as const, webllmModel: GEMMA };
-    expect(selectedValue(chosen, { ...env, shaderF16: true })).toBe(`webllm:${GEMMA}`);
-    expect(selectedValue(chosen, { ...env, shaderF16: false })).toBe(`webllm:${QWEN}`);
+    for (const shaderF16 of [true, false, undefined]) {
+      expect(selectedValue(chosen, { ...env, shaderF16 })).toBe(`webllm:${GEMMA}`);
+    }
   });
 
-  it('never makes Gemma 4 E2B, Llama 3.2 3B or Qwen3.5 2B the default', () => {
+  it('always makes Qwen3 1.7B the default, never Qwen3 0.6B, Qwen3.5 2B, Llama 3.2 3B or Gemma 4 E2B', () => {
     for (const shaderF16 of [true, false, undefined]) {
       const picked = selectedValue(DEFAULT_SETTINGS, { ...env, webgpu: true, shaderF16 });
-      expect(picked).toBe(`webllm:${QWEN}`);
+      expect(picked).toBe(DEFAULT);
+      for (const other of [QWEN, QWEN35, LLAMA, GEMMA]) expect(picked).not.toBe(`webllm:${other}`);
     }
   });
 });

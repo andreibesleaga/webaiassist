@@ -60,12 +60,12 @@ Scenarios whose wording changed when they stopped being pending:
 | Tag | Scenarios |
 | --- | --- |
 | @smoke | 134 |
-| @unit | 198 |
+| @unit | 200 |
 | @gpu | 2 |
 | @cpu | 4 |
 | @nano | 1 |
 | @manual | 9 |
-| all | 346 |
+| all | 348 |
 | run by `npm run test:bdd` now | 134 |
 
 ### Every scenario
@@ -110,7 +110,7 @@ Scenarios whose wording changed when they stopped being pending:
 | F02.27 | Choosing a model | Switching model while one is ready releases the old one and starts the new one | @unit | `test/ui/panel-switch.test.ts` | unit test |
 | F02.28 | Choosing a model | The real processor model answers on the stub node and starts again from the stored copy | @cpu | `features/02-choosing-a-model.feature` | CPU run |
 | F02.29 | Choosing a model | Qwen3.5 2B, Llama 3.2 3B and Gemma 4 E2B are in the model list, on the graphics card | @unit | `test/ui/model-picker.test.ts`, `test/adapters/models.test.ts` | unit test |
-| F02.30 | Choosing a model | Llama 3.2 3B and Gemma 4 E2B are marked slow and are never a default | @unit | `test/adapters/models.test.ts`, `test/ui/model-picker.test.ts` | unit test |
+| F02.30 | Choosing a model | Gemma 4 E2B is marked slow, and neither it nor Llama 3.2 3B is ever a default | @unit | `test/adapters/models.test.ts`, `test/ui/model-picker.test.ts` | unit test |
 | F02.31 | Choosing a model | Gemma 4 E2B is hidden when the graphics card lacks shader-f16 | @unit | `test/ui/model-picker.test.ts`, `test/ui/options-page.test.ts` | unit test |
 | F02.32 | Choosing a model | The newer graphics-card models ask before their first download | @unit | `test/ui/panel-consent.test.ts` | unit test |
 | F02.33 | Choosing a model | A question on the AgenticSystemCore node fits the 4096-token window of every listed model | @unit | `test/adapters/context-fit.test.ts` | unit test |
@@ -132,7 +132,7 @@ Scenarios whose wording changed when they stopped being pending:
 | F03.10 | Download, consent, progress, cancel, cache and removal | Out of memory on the CPU model names the next step | @smoke | `features/03-download-consent-and-storage.feature` | npm run test:bdd |
 | F03.11 | Download, consent, progress, cancel, cache and removal | Model libraries are inside the package and match their recorded checksums | @unit | `test/security-review/dist-review.test.ts` | unit test |
 | F03.12 | Download, consent, progress, cancel, cache and removal | The model library inside the package loads and matches its pin | @smoke | `features/03-download-consent-and-storage.feature` | npm run test:bdd |
-| F03.13 | Download, consent, progress, cancel, cache and removal | The WebGPU model downloads only from its fixed address | @unit | `test/security-review/dist-review.test.ts`, `test/adapters/webllm-app-config.test.ts` | unit test |
+| F03.13 | Download, consent, progress, cancel, cache and removal | The WebGPU model downloads only from its fixed address | @unit | `test/security-review/dist-review.test.ts`, `test/adapters/cpu-models.test.ts` | unit test |
 | F03.14 | Download, consent, progress, cancel, cache and removal | Cancel ends the download of a processor model at once and keeps no partial file | @unit | `test/adapters/wllama-runtime.test.ts` | unit test |
 | F03.15 | Download, consent, progress, cancel, cache and removal | The processor runtime loads only the models in its list, each from a fixed address with a recorded SHA-256 | @unit | `test/adapters/wllama-runtime.test.ts`, `test/adapters/cpu-models.test.ts` | unit test |
 | F03.16 | Download, consent, progress, cancel, cache and removal | A stored copy that was checked once starts without a download and without a new hash | @unit | `test/adapters/wllama-runtime.test.ts` | unit test |
@@ -237,8 +237,8 @@ Scenarios whose wording changed when they stopped being pending:
 | F13.9 | Errors and offline use | An unexpected error offers to copy its details, without page content | @smoke | `features/13-errors-and-offline.feature` | npm run test:bdd |
 | F13.10 | Errors and offline use | A model that fails to load shows why, and Start can be pressed again | @unit | `test/ui/panel-controller.test.ts` | unit test |
 | F13.11 | Errors and offline use | A graphics device lost while answering stops the model line saying "Ready" and shows no library text | @unit | `test/ui/panel-problems.test.ts`, `test/adapters/model-errors.test.ts`, `test/adapters/model-host.test.ts` | unit test |
-| F13.12 | Errors and offline use | A chat on an engine that is no longer loaded says the model stopped, and Start loads it again | @unit | `test/adapters/webllm-runtime.test.ts`, `test/ui/panel-problems.test.ts` | unit test |
-| F13.13 | Errors and offline use | A bigger model prefills in shorter chunks, so one chunk stays under the graphics driver's time limit | @unit | `test/adapters/prefill-chunk.test.ts` | unit test |
+| F13.12 | Errors and offline use | A chat on an engine that is no longer loaded says the model stopped, and Start loads it again | @unit | `test/adapters/wllama-runtime-stop.test.ts`, `test/ui/panel-problems.test.ts` | unit test |
+| F13.13 | Errors and offline use | A reply that does not end after Stop releases the engine | @unit | `test/adapters/wllama-runtime-stop.test.ts` | unit test |
 | F14.1 | Memory, export and forget | Memory keeps the chat and the tool counts of each site, across restarts | @unit | `test/adapters/indexeddb-memory.test.ts` | unit test |
 | F14.2 | Memory, export and forget | With Memory off nothing is kept | @unit | `test/adapters/no-memory.test.ts` | unit test |
 | F14.3 | Memory, export and forget | Clear memory in Options says so | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
@@ -248,10 +248,11 @@ Scenarios whose wording changed when they stopped being pending:
 | F14.7 | Memory, export and forget | Export cannot be steered: links, images and HTML in answers are escaped | @unit | `test/core/export.test.ts` | unit test |
 | F14.8 | Memory, export and forget | The exported file says it was written by a local AI model | @unit | `test/core/export.test.ts` | unit test |
 | F14.9 | Memory, export and forget | Saved tool results are fenced as untrusted when they come back into a prompt | @unit | `test/core/agent-loop-saved.test.ts` | unit test |
-| F14.10 | Memory, export and forget | Going back to a site shows its saved chat again, with Memory on | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
-| F14.11 | Memory, export and forget | With Memory off, the empty chat says that chats are not kept | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
-| F14.12 | Memory, export and forget | Another site during an answer stops it, and a note says why | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
-| F14.13 | Memory, export and forget | Another page of the same site does not stop the answer | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
+| F14.10 | Memory, export and forget | An earlier answer that used no tool is not given to the model again | @unit | `test/core/agent-loop.test.ts` | unit test |
+| F14.11 | Memory, export and forget | Going back to a site shows its saved chat again, with Memory on | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
+| F14.12 | Memory, export and forget | With Memory off, the empty chat says that chats are not kept | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
+| F14.13 | Memory, export and forget | Another site during an answer stops it, and a note says why | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
+| F14.14 | Memory, export and forget | Another page of the same site does not stop the answer | @smoke | `features/14-memory-export-and-forget.feature` | npm run test:bdd |
 | F15.1 | Options | Saving the options says "Saved." | @smoke | `features/15-options.feature` | npm run test:bdd |
 | F15.2 | Options | Reset restores the defaults | @smoke | `features/15-options.feature` | npm run test:bdd |
 | F15.3 | Options | A saved choice comes back when Options is opened again | @smoke | `features/15-options.feature` | npm run test:bdd |
@@ -342,6 +343,7 @@ Scenarios whose wording changed when they stopped being pending:
 | F22.17 | Query and semantic tools | The built-in tool is listed apart and its results are fenced as untrusted data | @unit | `test/core/builtin-loop.test.ts` | unit test |
 | F22.18 | Query and semantic tools | After a failed query the model may fix it once, and after two failures it queries no more | @unit | `test/core/builtin-loop.test.ts` | unit test |
 | F22.19 | Query and semantic tools | The panel offers the built-in tool only on a node that publishes its graph and allows AI input | @unit | `test/ui/panel-graph-tool.test.ts` | unit test |
+| F22.20 | Query and semantic tools | A model in the browser gets the page's own tools first | @unit | `test/ui/panel-graph-tool.test.ts` | unit test |
 | F23.1 | The WebMCP conformance page and suite | A conformance case registers exactly its tools and its own check ends as expected | @smoke | `features/23-webmcp-conformance.feature`, `test/ui/conformance-files.test.ts` | npm run test:bdd |
 | F23.2 | The WebMCP conformance page and suite | The side panel lists, asks and shows results for the conformance cases of errors, large and slow tools | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |
 | F23.3 | The WebMCP conformance page and suite | A page that swaps a tool's description while the question to run it is open gets its call refused | @smoke | `features/23-webmcp-conformance.feature` | npm run test:bdd |

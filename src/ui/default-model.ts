@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Which model the panel selects when the user has not chosen one, and the one sentence that says
 // why. The order, from the measured runs of 15 and 16 Nov 2026 (docs/EVAL.md): Chrome's built-in
-// model when it is ready; the graphics card (Qwen3 0.6B) whenever WebGPU works here, even when its
+// model when it is ready; the graphics card (Qwen3 1.7B) whenever WebGPU works here, even when its
 // first answer was slow (that answer includes preparing the model; on the measured laptop the card
 // still answered about five times sooner than the processor model); the processor model (Qwen3
 // 1.7B); the endpoint; Chrome's built-in model still to download; the endpoint set-up. A model the user chose always wins (model-picker.ts), so it never gets here.
@@ -54,7 +54,9 @@ function lastResort(settings: Settings, env: PickerEnv): DefaultChoice {
 }
 
 export function chooseDefault(settings: Settings, env: PickerEnv): DefaultChoice {
-  const gpuWorks = env.webgpu !== false;
+  // The graphics-card models run on the same engine as the processor ones: a browser that
+  // cannot run it (env.cpu false) has neither.
+  const gpuWorks = env.webgpu !== false && env.cpu !== false;
   if (env.promptApi && env.builtIn === 'available') {
     return { value: 'prompt-api', why: 'whyBuiltIn' };
   }

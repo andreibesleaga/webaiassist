@@ -6,14 +6,13 @@ import pins from '../../scripts/model-libs.json';
 
 describe('checkRemoteCode', () => {
   it('passes bundles that name only data hosts', () => {
-    const texts = { 'a.js': 'fetch("https://huggingface.co/mlc-ai/x/resolve/abc/params.bin")' };
+    const texts = { 'a.js': 'fetch("https://huggingface.co/unsloth/x/resolve/abc/model.gguf")' };
     expect(checkRemoteCode(texts)).toEqual([]);
   });
 
-  it("refuses WebLLM's remote model-library host", () => {
+  it('refuses a bundle that names raw.githubusercontent.com', () => {
     const texts = {
-      'chunk.js':
-        'const p = "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/";',
+      'chunk.js': 'const p = "https://raw.githubusercontent.com/someone/some-libs/main/lib/";',
     };
     expect(checkRemoteCode(texts).join('\n')).toMatch(/chunk\.js .*raw\.githubusercontent\.com/);
   });
@@ -27,22 +26,21 @@ describe('checkRemoteCode', () => {
   });
 });
 
-const lib = pins.libs[0];
 const bytes = Buffer.from('not the real library');
 
 describe('checkModelLibFiles', () => {
   const realHash = createHash('sha256').update(bytes).digest('hex');
   const fakePins = {
-    libs: pins.libs.map((l) => ({ ...l, bytes: bytes.length, sha256: realHash })),
+    runtimes: pins.runtimes.map((r) => ({ ...r, bytes: bytes.length, sha256: realHash })),
   };
-  const allFiles = fakePins.libs.map((l) => `model-libs/${l.file}`);
+  const allFiles = fakePins.runtimes.map((r) => `model-libs/${r.file}`);
   const read = (): Buffer => bytes;
 
-  it('passes when every pinned library is present with its SHA-256 and nothing else is wasm', () => {
+  it('passes when every pinned engine file is present with its SHA-256 and nothing else is wasm', () => {
     expect(checkModelLibFiles(allFiles, read, fakePins)).toEqual([]);
   });
 
-  it('refuses a missing library, a changed one and an extra .wasm file', () => {
+  it('refuses a missing engine file, a changed one and an extra .wasm file', () => {
     const missing = checkModelLibFiles(allFiles.slice(1), read, fakePins);
     expect(missing.join('\n')).toMatch(/missing/);
     const changed = checkModelLibFiles(
@@ -52,23 +50,25 @@ describe('checkModelLibFiles', () => {
     );
     expect(changed.join('\n')).toMatch(/bytes|SHA-256/);
     const extra = checkModelLibFiles([...allFiles, 'chunks/other.wasm'], read, fakePins);
-    expect(extra.join('\n')).toMatch(/chunks\/other\.wasm is not a pinned model library/);
+    expect(extra.join('\n')).toMatch(/chunks\/other\.wasm is not a pinned engine file/);
   });
 
-  it('also holds the runtime engine to its pin: present, byte for byte, and the only extra .wasm', () => {
-    const withRuntime = {
-      ...fakePins,
-      runtimes: [{ file: 'wllama.wasm', bytes: bytes.length, sha256: realHash }],
-    };
-    const files = [...allFiles, 'model-libs/wllama.wasm'];
-    expect(checkModelLibFiles(files, read, withRuntime)).toEqual([]);
-    expect(checkModelLibFiles(allFiles, read, withRuntime).join('\n')).toMatch(
+  it('refuses an extra .wasm file even inside model-libs/', () => {
+    const extra = checkModelLibFiles([...allFiles, 'model-libs/extra.wasm'], read, fakePins);
+    expect(extra.join('\n')).toMatch(/model-libs\/extra\.wasm is not a pinned engine file/);
+  });
+
+  it('holds the wllama engine to its pin: present, and byte for byte', () => {
+    const wllama = 'model-libs/wllama.wasm';
+    expect(allFiles).toContain(wllama);
+    const withoutIt = allFiles.filter((f) => f !== wllama);
+    expect(checkModelLibFiles(withoutIt, read, fakePins).join('\n')).toMatch(
       /wllama\.wasm is missing/,
     );
     const changed = checkModelLibFiles(
-      files,
+      allFiles,
       (p) => (p.endsWith('wllama.wasm') ? Buffer.from('x') : bytes),
-      withRuntime,
+      fakePins,
     );
     expect(changed.join('\n')).toMatch(/wllama\.wasm has/);
   });
@@ -84,6 +84,7 @@ describe('checkModelLibFiles', () => {
   });
 
   it('uses the real pins by default', () => {
-    expect(checkModelLibFiles([], read).join('\n')).toContain(lib?.file ?? '-');
+    const problems = checkModelLibFiles([], read).join('\n');
+    for (const r of pins.runtimes) expect(problems).toContain(r.file);
   });
 });

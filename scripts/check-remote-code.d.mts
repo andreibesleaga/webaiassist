@@ -1,12 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 export interface LibPins {
-  readonly libs: readonly {
-    readonly file: string;
-    readonly bytes: number;
-    readonly sha256: string;
-  }[];
-  /** Engines (.wasm) copied from an installed package, pinned the same way. */
-  readonly runtimes?: readonly {
+  /** Engines (.wasm) copied from an installed package, pinned by size and SHA-256. */
+  readonly runtimes: readonly {
     readonly file: string;
     readonly bytes: number;
     readonly sha256: string;

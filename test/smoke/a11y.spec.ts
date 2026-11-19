@@ -117,9 +117,7 @@ test('confirmation dialog: axe-clean, Deny first, Tab stays inside, Escape denie
 test('Options page: no axe violations, all fields by Tab, saved with the keyboard', async () => {
   const options = await session.context.newPage();
   await options.goto(`chrome-extension://${session.extensionId}/options.html`);
-  await expect(options.locator('#webllm-model option')).toHaveCount(
-    await webllmOptionCount(options),
-  );
+  await expect(options.locator('#webllm-model option')).toHaveCount(webllmOptionCount());
   expect(await axe(options)).toEqual([]);
   await options.emulateMedia({ colorScheme: 'dark' });
   expect(await axe(options)).toEqual([]);

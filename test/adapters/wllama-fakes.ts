@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 // A fake llama.cpp engine and the set-up shared by the CPU runtime tests. No real engine is
 // ever loaded, nothing is downloaded.
-import { findCpuModel, type CpuModel } from '../../src/adapters/cpu-models';
+import { findCpuModel, LOCAL_FILES, type CpuModel } from '../../src/adapters/cpu-models';
 import {
   WllamaRuntime,
+  type Device,
   type WllamaChatRequest,
   type WllamaEngineLike,
 } from '../../src/adapters/wllama-runtime';
@@ -20,18 +21,29 @@ export interface Disk {
   readonly hashes: Map<string, string>;
   /** url -> the SHA-256 the runtime recorded after it checked the file. */
   readonly checked: Map<string, string>;
+  /** url -> the SHA-256 of each piece of the stored bytes (a file above 2 GiB). */
+  readonly parts: Map<string, readonly string[]>;
 }
 
-export const newDisk = (): Disk => ({ files: new Map(), hashes: new Map(), checked: new Map() });
+export const newDisk = (): Disk => ({
+  files: new Map(),
+  hashes: new Map(),
+  checked: new Map(),
+  parts: new Map(),
+});
 
 export class FakeEngine implements WllamaEngineLike {
   readonly downloads: string[] = [];
   readonly loads: string[] = [];
+  /** The device each load asked for. */
+  readonly devices: string[] = [];
   readonly requests: WllamaChatRequest[] = [];
   readonly hashed: string[] = [];
   exited = 0;
   /** What the next download stores: the real hash by default. */
-  serves: { bytes: number; sha256: string } | undefined;
+  serves: { bytes: number; sha256: string; parts?: readonly string[] } | undefined;
+  /** The piece sizes the runtime asked to hash with. */
+  readonly partSizes: number[] = [];
   failDownloadWith: Error | undefined;
   failLoadWith: Error | undefined;
   holdLoad: Promise<void> | undefined;
@@ -50,8 +62,12 @@ export class FakeEngine implements WllamaEngineLike {
     signal?: AbortSignal,
   ): Promise<void> {
     this.downloads.push(url);
-    const model = [findCpuModel(SMALL), findCpuModel(LARGE)].find((m) => m?.url === url);
-    const served = this.serves ?? { bytes: model?.bytes ?? 0, sha256: model?.sha256 ?? '' };
+    const model = LOCAL_FILES.find((m) => m.url === url);
+    const served = this.serves ?? {
+      bytes: model?.bytes ?? 0,
+      sha256: model?.sha256 ?? '',
+      parts: model?.parts,
+    };
     onProgress(served.bytes / 2, served.bytes);
     this.disk.files.set(url, served.bytes / 2);
     if (this.failDownloadWith) throw this.failDownloadWith;
@@ -63,6 +79,7 @@ export class FakeEngine implements WllamaEngineLike {
     onProgress(served.bytes, served.bytes);
     this.disk.files.set(url, served.bytes);
     this.disk.hashes.set(url, served.sha256);
+    this.disk.parts.set(url, served.parts ?? []);
   }
 
   sha256(url: string): Promise<string> {
@@ -70,9 +87,16 @@ export class FakeEngine implements WllamaEngineLike {
     return Promise.resolve(this.disk.hashes.get(url) ?? '');
   }
 
+  sha256Parts(url: string, partBytes: number): Promise<string[]> {
+    this.hashed.push(url);
+    this.partSizes.push(partBytes);
+    return Promise.resolve([...(this.disk.parts.get(url) ?? [])]);
+  }
+
   remove(url: string): Promise<void> {
     this.disk.files.delete(url);
     this.disk.hashes.delete(url);
+    this.disk.parts.delete(url);
     this.disk.checked.delete(url);
     return Promise.resolve();
   }
@@ -86,8 +110,9 @@ export class FakeEngine implements WllamaEngineLike {
     return Promise.resolve();
   }
 
-  async load(url: string): Promise<void> {
+  async load(url: string, _contextTokens?: number, device?: Device): Promise<void> {
     this.loads.push(url);
+    this.devices.push(device ?? '');
     await this.holdLoad;
     if (this.failLoadWith) throw this.failLoadWith;
   }
@@ -107,14 +132,22 @@ export class FakeEngine implements WllamaEngineLike {
   }
 }
 
-export function setup(disk = newDisk(), tune: (engine: FakeEngine) => void = () => {}) {
+export function setup(
+  disk = newDisk(),
+  tune: (engine: FakeEngine) => void = () => {},
+  device: Device = 'cpu',
+) {
   const engines: FakeEngine[] = [];
-  const runtime = new WllamaRuntime(() => {
-    const engine = new FakeEngine(disk);
-    tune(engine);
-    engines.push(engine);
-    return engine;
-  });
+  const runtime = new WllamaRuntime(
+    () => {
+      const engine = new FakeEngine(disk);
+      tune(engine);
+      engines.push(engine);
+      return engine;
+    },
+    [],
+    device,
+  );
   return { runtime, engines, disk };
 }
 

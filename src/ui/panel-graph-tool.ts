@@ -5,6 +5,7 @@
 // graph.nq with a digest. Nothing here reads the graph.
 import type { GraphQuery } from '../core/ports/graph-query';
 import type { PanelController } from './panel-controller';
+import { forModel } from '../core/tool-offer';
 import { aiBlocked } from './panel-page';
 
 export interface GraphToolPart {
@@ -16,13 +17,21 @@ export interface GraphToolPart {
 
 const NONE: GraphToolPart = { deps: {}, scope: {} };
 
+/** A model that picks the page's tools better alone (ModelCapabilities.pageToolsFirst) gets the
+ *  built-in tool only when the page offers no tool of its own for the model. */
+function pageToolsWin(ctx: PanelController): boolean {
+  const caps = ctx.state.runtime?.model.capabilities();
+  if (caps?.pageToolsFirst !== true) return false;
+  return forModel(ctx.state.page?.info?.tools ?? []).length > 0;
+}
+
 export async function graphToolFor(
   ctx: PanelController,
   plan: { readonly origin: string; readonly node: boolean },
   tabId: number,
 ): Promise<GraphToolPart> {
   const graph = ctx.deps.graphQuery;
-  if (!graph || !plan.node || aiBlocked(ctx)) return NONE;
+  if (!graph || !plan.node || aiBlocked(ctx) || pageToolsWin(ctx)) return NONE;
   const offered = await graph.available({ tabId, origin: plan.origin }).catch(() => false);
   return offered ? { deps: { builtin: graph }, scope: { graphQuery: true } } : NONE;
 }

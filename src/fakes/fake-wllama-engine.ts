@@ -105,6 +105,11 @@ class FakeWllamaEngine implements WllamaEngineLike {
     return Promise.resolve(read().disk[url]?.hash ?? '');
   }
 
+  /** The test models are small files with no piece hashes: never asked for. */
+  sha256Parts(): Promise<string[]> {
+    return Promise.resolve([]);
+  }
+
   remove(url: string): Promise<void> {
     delete read().disk[url];
     write();

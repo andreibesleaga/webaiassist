@@ -3,10 +3,10 @@
 // choice always wins and is kept (features/02-choosing-a-model.feature).
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS } from '../../src/adapters/settings';
-import { chooseDefault, whyFor } from '../../src/ui/default-model';
+import { chooseDefault, SETUP_VALUE, whyFor } from '../../src/ui/default-model';
 import type { PickerEnv } from '../../src/ui/model-picker';
 
-const QWEN = 'webllm:Qwen3-0.6B-q4f16_1-MLC';
+const QWEN = 'webllm:qwen3-1.7b-q4_k_m';
 const CPU = 'cpu:qwen3-1.7b-q4_k_m';
 const base: PickerEnv = { promptApi: false, scripted: false, webgpu: true, cpu: true };
 const withEndpoint = {
@@ -69,13 +69,20 @@ describe('the default model', () => {
     });
   });
 
-  it('stays on the graphics card when the processor model cannot run here', () => {
-    const noCpu = { ...base, cpu: false };
-    expect(chooseDefault(DEFAULT_SETTINGS, noCpu)).toMatchObject({
+  it('is not the graphics card in a browser that cannot run the local engine, which both local paths share', () => {
+    const noEngine = { ...base, cpu: false };
+    expect(chooseDefault(DEFAULT_SETTINGS, noEngine).value).not.toBe(QWEN);
+    expect(chooseDefault(DEFAULT_SETTINGS, noEngine)).toMatchObject({
+      value: SETUP_VALUE,
+      why: 'whySetup',
+    });
+  });
+
+  it('stays on the graphics card while it is not known whether the processor models can run', () => {
+    expect(chooseDefault(DEFAULT_SETTINGS, { ...base, cpu: undefined })).toMatchObject({
       value: QWEN,
       why: 'whyGpuOnly',
     });
-    expect(chooseDefault(DEFAULT_SETTINGS, { ...noCpu, cpu: undefined }).value).toBe(QWEN);
   });
 
   it('then the endpoint when one is set, then Chrome’s built-in model, then the set-up', () => {

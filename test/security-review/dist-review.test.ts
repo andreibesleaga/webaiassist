@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Independent security review, 12 Nov 2026: checks on the built package (dist/ and the
-// zip), the model-library pins and store-review points. Run after `npm run build` and
+// zip), the engine-file pins and store-review points. Run after `npm run build` and
 // `npm run zip` (`npm run test:dist` in the release gate, where a missing build fails); skipped
 // when dist/ is missing in a plain `vitest run`. A failing test is an open finding.
 import { createHash } from 'node:crypto';
@@ -8,12 +8,15 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { unzipSync } from 'fflate';
 import { describe, expect, it } from 'vitest';
-import { bundledAppConfig } from '../../src/adapters/webllm-app-config';
+import { GPU_MODELS, LOCAL_FILES } from '../../src/adapters/cpu-models';
 import pins from '../../scripts/model-libs.json';
 
 const ROOT = process.cwd();
 const DIST = join(ROOT, 'dist');
-const ZIP = join(ROOT, 'webaiassist-0.1.0.zip');
+const VERSION = (
+  JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { version: string }
+).version;
+const ZIP = join(ROOT, `webaiassist-${VERSION}.zip`);
 const built = existsSync(join(DIST, 'manifest.json')) && existsSync(ZIP);
 /** Set by `npm run test:dist`, which the release gate runs after build and zip: then a missing
  *  build is a failure, not a skip, so a clean CI checkout cannot pass these checks unseen. */
@@ -61,12 +64,15 @@ describe.runIf(built)('held: the package', () => {
     });
   });
 
-  it('the only WebAssembly files are the pinned model libraries and runtime engines', () => {
+  it('the only WebAssembly files are the two pinned engine files, byte for byte', () => {
     const wasm = files(DIST).filter((p) => p.endsWith('.wasm'));
-    const pinned = [...pins.libs, ...pins.runtimes];
+    const pinned = pins.runtimes;
+    expect(pinned.map((lib) => lib.file).sort()).toEqual(['oxigraph.wasm', 'wllama.wasm']);
     expect(wasm.sort()).toEqual(pinned.map((lib) => `model-libs/${lib.file}`).sort());
     for (const lib of pinned) {
-      expect(sha256(readFileSync(join(DIST, 'model-libs', lib.file)))).toBe(lib.sha256);
+      const bytes = readFileSync(join(DIST, 'model-libs', lib.file));
+      expect(bytes.length, lib.file).toBe(lib.bytes);
+      expect(sha256(bytes), lib.file).toBe(lib.sha256);
     }
   });
 
@@ -86,26 +92,22 @@ describe.runIf(built)('held: the package', () => {
     }
   });
 
-  it('weights come from one fixed Hugging Face revision per shipped model', () => {
-    const config = bundledAppConfig((p) => `chrome-extension://x/${p}`);
-    for (const record of config.model_list) {
-      expect(record.model).toMatch(
-        /^https:\/\/huggingface\.co\/mlc-ai\/[^/]+\/resolve\/[0-9a-f]{40}\/$/,
+  it('weights come from one fixed Hugging Face revision per shipped model file', () => {
+    for (const model of LOCAL_FILES) {
+      expect(model.url, model.id).toMatch(
+        /^https:\/\/huggingface\.co\/[\w.-]+\/[\w.-]+\/resolve\/[0-9a-f]{40}\/[\w.-]+\.gguf$/,
       );
-      expect(record.model_lib.startsWith('chrome-extension://x/model-libs/')).toBe(true);
-      expect(record.integrity.onFailure).toBe('error');
     }
   });
 });
 
-describe('finding: WebLLM can hash-check the model config and tokenizer, but is not asked to', () => {
-  it('every shipped model pins its mlc-chat-config.json and tokenizer.json', () => {
-    for (const record of bundledAppConfig((p) => p).model_list) {
-      const integrity: Record<string, unknown> = { ...record.integrity };
-      const config = typeof integrity.config === 'string' ? integrity.config : '';
-      expect(config, record.model_id).toMatch(/^sha256-/);
-      expect(integrity.tokenizer, record.model_id).toBeTypeOf('object');
+describe('every graphics-card and processor model pins its file', () => {
+  it('has a size and a SHA-256, and no weights in the package', () => {
+    for (const model of [...LOCAL_FILES, ...GPU_MODELS]) {
+      expect(model.sha256, model.id).toMatch(/^[0-9a-f]{64}$/);
+      expect(model.bytes, model.id).toBeGreaterThan(0);
     }
+    if (built) expect(files(DIST).filter((p) => p.endsWith('.gguf'))).toEqual([]);
   });
 });
 

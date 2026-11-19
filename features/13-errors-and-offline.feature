@@ -102,18 +102,19 @@ Feature: Errors and offline use
     And the chat shows plain words, not the library's sentence
     And the model host restarts to get a new device
 
-  # test: test/adapters/webllm-runtime.test.ts, test/ui/panel-problems.test.ts
+  # test: test/adapters/wllama-runtime-stop.test.ts, test/ui/panel-problems.test.ts
   @unit
   Scenario: A chat on an engine that is no longer loaded says the model stopped, and Start loads it again
     Given a graphics-card model is ready
-    When WebLLM answers that the model is not loaded
-    Then the message is "The model stopped. Press Start to load it again." and not WebLLM's own sentence
+    When the engine has crashed or the reply does not end after Stop
+    Then the message is "The model stopped. Press Start to load it again." and not the engine's own sentence
     And the model line no longer says "Ready"
     And pressing "Start" loads the model again instead of answering "Ready" at once
 
-  # test: test/adapters/prefill-chunk.test.ts
+  # test: test/adapters/wllama-runtime-stop.test.ts
   @unit
-  Scenario: A bigger model prefills in shorter chunks, so one chunk stays under the graphics driver's time limit
-    Given the graphics-card models Qwen3 0.6B, Llama 3.2 3B, Qwen3.5 2B and Gemma 4 E2B
-    Then each model has its own prefill chunk size, smaller for a model that costs more per token
-    And no chunk is smaller than 4 tokens
+  Scenario: A reply that does not end after Stop releases the engine
+    Given a graphics-card model is answering
+    When the person presses Stop and the reply has not ended after 5 seconds
+    Then the engine is released and no model is loaded
+    And the chat ends with "The model stopped. Press Start to load it again."

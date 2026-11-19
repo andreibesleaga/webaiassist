@@ -43,7 +43,7 @@ describe('the line about Chrome’s built-in model', () => {
     choose('prompt-api');
     await tick();
     expect(byId('model-status').textContent).toMatch(/not downloaded yet; Start downloads it/);
-    choose('webllm:Qwen3-0.6B-q4f16_1-MLC');
+    choose('webllm:qwen3-0.6b-q4_k_m');
     await tick();
     expect(byId('model-status').textContent).toBe('No model loaded. Press Start.');
   });

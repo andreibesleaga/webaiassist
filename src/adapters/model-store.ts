@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
-// The model files stored in this browser, across both local runtimes: which are there, how big,
-// and removal. The panel asks before a first download with it, and Options lists and removes with
-// it. Each runtime keeps its own cache (WebLLM in the Cache API, the processor runtime in the
-// extension's private file storage); a backend wraps one of them, and the store only joins them.
+// The model files stored in this browser: which are there, how big, and removal. The panel asks
+// before a first download with it, and Options lists and removes with it. Every file belongs to
+// the one local engine (llama.cpp), which keeps them in the extension's private file storage; a
+// model offered on the graphics card and on the processor is one file and is listed once.
 import { findCpuModel, type CpuModel } from './cpu-models';
-import { modelChoices, WEBLLM_MODEL_IDS } from './models';
 import type { WllamaEngineLike } from './wllama-runtime';
 
-export type StoredRuntime = 'webllm' | 'cpu';
+/** The engine a stored file belongs to. One today; the tag stays in the list and in removal. */
+export type StoredRuntime = 'cpu';
 
 export interface StoredModel {
   readonly runtime: StoredRuntime;
   readonly id: string;
-  /** Plain name, e.g. "Qwen3 0.6B on the processor". */
+  /** Plain name, e.g. "Qwen3 0.6B". */
   readonly name: string;
   readonly bytes: number;
 }
@@ -30,11 +30,12 @@ export interface StoreLike {
   removeAll(): Promise<{ count: number; bytes: number }>;
 }
 
-const nameOf = (label: string, suffix: string): string =>
-  `${label.split(' (')[0] ?? label}${suffix}`;
+/** The model's name without where it runs: the file serves both. */
+const nameOf = (label: string): string =>
+  (label.split(' (')[0] ?? label).replace(/ on the processor$/, '');
 
-/** Processor models: a stored file of exactly the recorded size counts; a partial one does not
- *  (the runtime deletes it before it downloads again). */
+/** The stored files: one of exactly the recorded size counts; a partial one does not (the
+ *  runtime deletes it before it downloads again). */
 export function cpuBackend(
   engine: Pick<WllamaEngineLike, 'storedBytes' | 'remove'>,
   models: readonly CpuModel[],
@@ -45,12 +46,7 @@ export function cpuBackend(
       const found: StoredModel[] = [];
       for (const model of models) {
         if ((await engine.storedBytes(model.url)) !== model.bytes) continue;
-        found.push({
-          runtime: 'cpu',
-          id: model.id,
-          name: nameOf(model.label, ''),
-          bytes: model.bytes,
-        });
+        found.push({ runtime: 'cpu', id: model.id, name: nameOf(model.label), bytes: model.bytes });
       }
       return found;
     },
@@ -61,36 +57,9 @@ export function cpuBackend(
   };
 }
 
-/** What the WebLLM adapter in src/entries/shared/webllm-store.ts provides. */
-export interface WebLlmFiles {
-  has(id: string): Promise<boolean>;
-  size(id: string): Promise<number>;
-  remove(id: string): Promise<void>;
-}
-
-const LABELS = new Map(modelChoices({ promptApi: false }).map((m) => [m.id, m.label]));
-
-export function webllmBackend(files: WebLlmFiles): ModelBackend {
-  return {
-    runtime: 'webllm',
-    async list() {
-      const found: StoredModel[] = [];
-      for (const id of WEBLLM_MODEL_IDS) {
-        if (!(await files.has(id))) continue;
-        const name = nameOf(LABELS.get(id) ?? id, ' on the graphics card');
-        found.push({ runtime: 'webllm', id, name, bytes: await files.size(id) });
-      }
-      return found;
-    },
-    remove: (id) => files.remove(id),
-  };
-}
-
-export const isStored = (
-  list: readonly StoredModel[],
-  runtime: StoredRuntime,
-  id: string,
-): boolean => list.some((m) => m.runtime === runtime && m.id === id);
+/** True when the file of model `id` is stored, whichever way the model is offered. */
+export const isStored = (list: readonly StoredModel[], id: string): boolean =>
+  list.some((m) => m.id === id);
 
 export class ModelStore implements StoreLike {
   constructor(private readonly backends: readonly ModelBackend[]) {}
@@ -111,30 +80,4 @@ export class ModelStore implements StoreLike {
     for (const model of all) await this.remove(model.runtime, model.id);
     return { count: all.length, bytes: all.reduce((sum, m) => sum + m.bytes, 0) };
   }
-}
-
-/** The part of a Cache (the Cache API) that sizes use. */
-export interface CacheLike {
-  keys(): Promise<readonly { readonly url: string }[]>;
-  match(request: { readonly url: string }): Promise<
-    | {
-        readonly headers: { get(name: string): string | null };
-        blob(): Promise<{ readonly size: number }>;
-      }
-    | undefined
-  >;
-}
-
-/** Bytes of the cached files whose address starts with `prefix`: the length header when there
- *  is one, else the stored size (a file-backed blob; nothing is read into memory). */
-export async function bytesUnder(cache: CacheLike, prefix: string): Promise<number> {
-  let total = 0;
-  for (const request of await cache.keys()) {
-    if (!request.url.startsWith(prefix)) continue;
-    const response = await cache.match(request);
-    if (!response) continue;
-    const length = Number(response.headers.get('content-length'));
-    total += Number.isFinite(length) && length > 0 ? length : (await response.blob()).size;
-  }
-  return total;
 }

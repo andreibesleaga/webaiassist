@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import { format } from 'prettier';
 import { parseEvalArgs, MODEL_IDS, type EvalArgs, type ModelKey } from './args.ts';
 import { cancelCheck, MANUAL, runChecks } from './checks.ts';
-import { ask, modelStatus, pageTools, selectModel, startModel } from './panel.ts';
+import { ask, clearMemory, modelStatus, pageTools, selectModel, startModel } from './panel.ts';
 import { loadPrompts, promptsFor, type PromptFile } from './prompts.ts';
 import {
   fillEvalMd,
@@ -60,8 +60,10 @@ async function ensureReady(panel: Page, key: ModelKey, args: EvalArgs): Promise<
   return { key, id, ...(await startModel(panel, args.startTimeoutMin)) };
 }
 
-/** A fresh chat: the panel page reloads and the model is started again if it must be. */
+/** A fresh chat: nothing remembered of any site, the panel page reloads and the model is started
+ *  again if it must be. */
 async function freshPanel(panel: Page, key: ModelKey, args: EvalArgs): Promise<void> {
+  if (!args.keepChat) await clearMemory(panel);
   await panel.reload();
   await panel.locator('#page-status').filter({ hasNotText: 'No page yet.' }).waitFor();
   await ensureReady(panel, key, args);
@@ -107,7 +109,8 @@ async function tryTarget(
     const panel = await ctx.session.openPanelFor(tabId);
     const why = await waitForTools(panel, target === 'stub' ? 10 : 20);
     if (why !== null) return why;
-    await ensureReady(panel, key, ctx.args);
+    // The first question too: the profile may hold this site's chat from an older run.
+    await freshPanel(panel, key, ctx.args);
     await askAll(ctx, panel, key, target);
     return null;
   } catch (error) {
@@ -125,8 +128,13 @@ async function runTarget(ctx: Ctx, key: ModelKey, target: 'stub' | 'live'): Prom
   if (skipped !== null) console.log(`  ${target}: skipped (${skipped})`);
 }
 
-async function adapterOf(panel: Page): Promise<boolean> {
-  return panel.evaluate(async () => !!(await navigator.gpu?.requestAdapter()));
+/** The graphics card the panel gets, as "vendor/architecture"; undefined when there is none. */
+async function adapterOf(panel: Page): Promise<string | undefined> {
+  return panel.evaluate(async () => {
+    const adapter = await navigator.gpu?.requestAdapter();
+    if (!adapter) return undefined;
+    return `${adapter.info.vendor || 'unknown'}/${adapter.info.architecture || 'unknown'}`;
+  });
 }
 
 async function chromeVersion(session: EvalSession, panel: Page): Promise<string> {
@@ -192,7 +200,7 @@ async function closingChecks(ctx: Ctx): Promise<{ late: CheckResult[]; chrome: s
   return { late, chrome: await chromeVersion(session, panel) };
 }
 
-async function finish(ctx: Ctx, adapter: boolean): Promise<void> {
+async function finish(ctx: Ctx, adapter: string | undefined): Promise<void> {
   const { args, session } = ctx;
   const closing = await closingChecks(ctx).catch((error: unknown) => {
     console.log(`  closing checks skipped: ${stoppedModel('', error).status}`);
@@ -203,7 +211,7 @@ async function finish(ctx: Ctx, adapter: boolean): Promise<void> {
     chrome: closing.chrome,
     os: `${process.platform} ${release()}`,
     scripted: args.scripted,
-    webgpu: { panelAdapter: adapter },
+    webgpu: { panelAdapter: adapter !== undefined, ...(adapter ? { adapter } : {}) },
     models: ctx.models,
     targets: ctx.targets,
     rows: ctx.rows,

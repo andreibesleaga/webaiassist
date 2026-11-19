@@ -166,9 +166,7 @@ test('the Options page with the model list is axe-clean in both themes at 320 px
   const options = await session.context.newPage();
   await options.goto(`chrome-extension://${session.extensionId}/options.html`);
   await options.setViewportSize({ width: 320, height: 700 });
-  await expect(options.locator('#webllm-model option')).toHaveCount(
-    await webllmOptionCount(options),
-  );
+  await expect(options.locator('#webllm-model option')).toHaveCount(webllmOptionCount());
   await cleanInBothThemes(options);
   const overflow = await options.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

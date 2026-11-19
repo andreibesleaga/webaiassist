@@ -36,10 +36,9 @@ describe('side panel controller', () => {
 
   it('says where the model runs when the host reports it', async () => {
     const deps = fakeDeps([answer('hi')]);
-    deps.model = Object.assign(new FakeModelRuntime([]), { where: () => 'offscreen-main' });
     await started(deps);
-    expect(byId('model-status').textContent).toMatch(
-      /^Ready: Qwen3 0\.6B\. Running in this browser, on your graphics card \(on the offscreen document’s main thread: WebGPU did not work in its Worker\)\.$/,
+    expect(byId('model-status').textContent).toBe(
+      'Ready: Qwen3 1.7B. Running in this browser, on your graphics card (in the offscreen document).',
     );
   });
 
@@ -48,17 +47,18 @@ describe('side panel controller', () => {
     await startPanel(deps);
     const options = [...byId<HTMLSelectElement>('model').options].map((o) => o.value);
     expect(options).toEqual([
-      'webllm:Qwen3-0.6B-q4f16_1-MLC',
-      'webllm:Qwen3.5-2B-q4f16_1-MLC',
-      'webllm:Llama-3.2-3B-Instruct-q4f16_1-MLC',
-      'webllm:gemma-4-E2B-it-q4f16_1-MLC',
+      'webllm:qwen3-0.6b-q4_k_m',
+      'webllm:qwen3-1.7b-q4_k_m',
+      'webllm:qwen3.5-2b-q4_k_m',
+      'webllm:llama-3.2-3b-instruct-q4_k_m',
+      'webllm:gemma-4-e2b-it-q4_k_m',
       'setup-endpoint',
     ]);
     click('start');
     await settle();
-    expect(deps.created.map((c) => c.modelId)).toEqual(['Qwen3-0.6B-q4f16_1-MLC']);
+    expect(deps.created.map((c) => c.modelId)).toEqual(['qwen3-1.7b-q4_k_m']);
     expect(byId('model-status').textContent).toBe(
-      'Ready: Qwen3 0.6B. Running in this browser, on your graphics card (in the offscreen document).',
+      'Ready: Qwen3 1.7B. Running in this browser, on your graphics card (in the offscreen document).',
     );
   });
 
@@ -102,10 +102,10 @@ describe('side panel controller', () => {
     const deps = fakeDeps([]);
     await startPanel(deps);
     const select = byId<HTMLSelectElement>('model');
-    select.value = 'webllm:Llama-3.2-3B-Instruct-q4f16_1-MLC';
+    select.value = 'webllm:llama-3.2-3b-instruct-q4_k_m';
     select.dispatchEvent(new Event('change'));
     await settle();
-    expect(deps.saved.at(-1)?.webllmModel).toBe('Llama-3.2-3B-Instruct-q4f16_1-MLC');
+    expect(deps.saved.at(-1)?.webllmModel).toBe('llama-3.2-3b-instruct-q4_k_m');
   });
 
   it('keeps the model chosen in the panel when the Options change', async () => {

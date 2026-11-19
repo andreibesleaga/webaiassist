@@ -10,6 +10,7 @@
 // host when the offscreen document has no WebGPU.
 import { httpOrigin } from '../adapters/allowed-sites';
 import { onActionClick, type ActionDeps } from '../adapters/action-click';
+import { removeLegacyCaches } from '../adapters/legacy-cache';
 import { probeWebGpu } from '../adapters/webgpu-probe';
 import type { GpuProbeRequest, GpuProbeResult } from '../protocol/messages';
 import { parseMessage } from '../protocol/validate';
@@ -59,7 +60,8 @@ async function ensureOffscreen(): Promise<void> {
     url: OFFSCREEN_URL,
     reasons: [chrome.offscreen.Reason.WORKERS],
     justification: 'Hosts the local model runtime, which runs in a WebGPU worker.',
-    // True since 0.1.0: the document starts a dedicated Worker for WebLLM (webllm-factory.ts).
+    // True since 0.1.0: the model's engine starts a dedicated Worker in the document
+    // (shared/wllama-engine.ts).
   });
 }
 
@@ -85,6 +87,12 @@ async function answerProbe(request: GpuProbeRequest): Promise<GpuProbeResult> {
     return failed(request, error instanceof Error ? error.message : String(error));
   }
 }
+
+// After an update from 0.1.0: the model files of the engine that version used are of no use to
+// this one and are removed (src/adapters/legacy-cache.ts). Nothing else runs at install.
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'update') void removeLegacyCaches(caches);
+});
 
 chrome.runtime.onMessage.addListener((raw: unknown, sender, sendResponse) => {
   if (!fromExtensionPage(sender)) return false;

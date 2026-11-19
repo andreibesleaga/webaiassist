@@ -1,6 +1,6 @@
 {
   "name": "webaiassist",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "A local AI model in your side panel that uses the WebMCP tools of the open page. Works with AgenticSystemCore nodes.",
   "license": "Apache-2.0",
@@ -48,7 +48,6 @@
   },
   "dependencies": {
     "@cfworker/json-schema": "4.1.1",
-    "@mlc-ai/web-llm": "0.2.86",
     "@w3c/webmcp-polyfill": "0.1.0",
     "@wllama/wllama": "3.8.1",
     "ajv": "8.20.0",
