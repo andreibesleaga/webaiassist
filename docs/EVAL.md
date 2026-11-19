@@ -151,6 +151,12 @@ model. It is not part of the gate; unit and browser tests use a fake server only
 Ollama needs `OLLAMA_ORIGINS=chrome-extension://*` for the extension; this script runs in Node and
 needs no setting.
 
+### Run of 19 Nov 2026 (version 0.1.1)
+
+Ollama on `localhost:11434`, `gemma3:4b`, the same command: the expected tool on 4 of 5 questions, a
+valid tool path and answer on 5 of 5, median answer 7.8 s, 11,267 prompt tokens and 262 completion
+tokens (`docs/eval/EVAL-ENDPOINT-localhost-2026-11-19.json`). The same result as on 14 Nov 2026.
+
 ### Run of 14 Nov 2026
 
 | Endpoint                                       | Tool right | Median answer (s) | Prompt tokens | Completion tokens | Price returned   |
@@ -404,6 +410,18 @@ runs it there (the same mechanism as `eval:nano:win`); the report comes back und
 The report is `docs/eval/EVAL-CONFORMANCE-<date>-<chrome version>.json`. The suite also runs in
 Playwright's Chromium: `npx playwright test test/smoke/conformance-browser.spec.ts
 test/smoke/conformance.spec.ts`. The Chromium and Chrome results are compared by hand.
+
+Real-Chrome run, 19 Nov 2026, version 0.1.1, Chrome 157.0.8103.79 on Windows
+(`docs/eval/EVAL-CONFORMANCE-2026-11-19-157.0.8103.79.json`): in the browser alone 16 of 16 cases as
+expected, none failed, none unsupported; with the extension 16 of 16 cases, every step as expected.
+The demo pages were not run again.
+
+Chrome's built-in model, the same day and browser, version 0.1.1, each question in a new chat
+(`npm run eval:nano`, `docs/eval/EVAL-NANO-2026-11-19-157.0.8103.79.json`, on battery power): start
+12.4 s, second start 3.1 s; a tool used on 5 of 5 questions on the test node and 5 of 5 on the live
+node; the whole expected sequence on 3 of 5 on each (it called `search` where `ask` was expected,
+which the questions accept: a valid tool path and answer on 5 of 5 on each); no errors; median answer
+15.5 s and 17.4 s.
 
 Real-Chrome run, 15 Nov 2026, Chrome 157.0.8103.52 on Windows
 (`docs/eval/EVAL-CONFORMANCE-2026-11-15-157.0.8103.52.json`):

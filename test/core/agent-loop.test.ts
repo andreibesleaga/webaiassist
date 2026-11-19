@@ -144,7 +144,12 @@ describe('runAgent: plan, call, observe, answer', () => {
       expect(all, kept).toContain(kept);
     for (const dropped of ['Q1 no tool', 'A1 no tool', 'Q5 no tool', 'A5 no tool'])
       expect(all, dropped).not.toContain(dropped);
+    // The first question kept is the one with page text: it starts on the person's turn and its
+    // page text follows it (saved before the question, given to the model after it).
     expect(deps.model.requests[0]?.messages[1]?.role).toBe('user');
+    expect(sent[1]).toContain('Q2 with page text');
+    expect(sent[2]).toContain('the page text');
+    expect(sent[3]).toContain('A2 from the page');
   });
 
   it('turns a thrown tool error into a failed result the model can see', async () => {

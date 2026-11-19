@@ -54,8 +54,10 @@ export interface ExchangeRules {
   readonly leadsQuestion: (message: ChatMessage) => boolean;
 }
 
-/** The saved chat cut into questions: each starts at a question the person asked, with the page
- *  text read for it, and holds everything until the next one. */
+/** The saved chat cut into questions: each starts at a question the person asked and holds
+ *  everything until the next one. Page text read for a question is saved before it; here it comes
+ *  right after it, so every question starts on the person's turn and none loses its page text
+ *  when the model's part of the chat is cut to start on a user turn. */
 function exchanges(history: readonly ChatMessage[], rules: ExchangeRules): ChatMessage[][] {
   const groups: ChatMessage[][] = [];
   let current: ChatMessage[] = [];
@@ -65,7 +67,8 @@ function exchanges(history: readonly ChatMessage[], rules: ExchangeRules): ChatM
       const lead =
         last !== undefined && rules.leadsQuestion(last) ? [current.pop() as ChatMessage] : [];
       if (current.length > 0) groups.push(current);
-      current = lead;
+      current = [message, ...lead];
+      continue;
     }
     current.push(message);
   }

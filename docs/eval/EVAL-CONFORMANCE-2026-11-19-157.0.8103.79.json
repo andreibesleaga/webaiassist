@@ -1,0 +1,511 @@
+{
+  "date": "2026-11-19",
+  "os": "win32 10.0.26300",
+  "chrome": "157.0.8103.79",
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+    "url": "http://127.0.0.1:50272/index.html",
+    "features": {
+      "modelContext": true,
+      "registerTool": true,
+      "getTools": true,
+      "executeTool": true,
+      "unregisterTool": false,
+      "declarativeForms": true
+    },
+    "results": [
+      {
+        "id": "c01",
+        "title": "Register, remove and register again",
+        "status": "pass",
+        "detail": "no unregisterTool (expected in Chrome 157)"
+      },
+      {
+        "id": "c02",
+        "title": "getTools and the fields of a tool",
+        "status": "pass",
+        "detail": "fields: annotations, description, inputSchema, name, origin, title, window; own tool with a foreign fromOrigins: still listed (the list adds origins)"
+      },
+      {
+        "id": "c03",
+        "title": "Result forms",
+        "status": "pass",
+        "detail": "object came back as string: {\"a\":1,\"list\":[1,2]}; an empty string came back as \"Operation succeeded\", null as \"null\"; c03_navigate is run by the extension stage only"
+      },
+      {
+        "id": "c04",
+        "title": "Tool-change events",
+        "status": "pass",
+        "detail": "toolchange 2x; toolactivated for: c04_keeper"
+      },
+      {
+        "id": "c05",
+        "title": "Annotations",
+        "status": "pass",
+        "detail": "a tool with no hints is listed with: null"
+      },
+      {
+        "id": "c06",
+        "title": "Input schemas",
+        "status": "pass",
+        "detail": "no-schema tool is listed with inputSchema null"
+      },
+      {
+        "id": "c07",
+        "title": "Tool errors",
+        "status": "pass",
+        "detail": "errors surface as: error:UnknownError: Tool was executed but the invocation failed. For example, the script function threw an error"
+      },
+      {
+        "id": "c08",
+        "title": "Cancellation",
+        "status": "pass",
+        "detail": "call ended as rejected: AbortError; toolcancel events: 1"
+      },
+      {
+        "id": "c09",
+        "title": "Slow tools",
+        "status": "pass",
+        "detail": "aborting a tool that ignores the signal: rejected"
+      },
+      {
+        "id": "c10",
+        "title": "Large results",
+        "status": "pass",
+        "detail": "nested object came back as 908 characters"
+      },
+      {
+        "id": "c11",
+        "title": "Declarative form tools",
+        "status": "pass",
+        "detail": "waits for Submit; :tool-form-active known"
+      },
+      {
+        "id": "c12",
+        "title": "Tools added later",
+        "status": "pass",
+        "detail": "both later tools were listed"
+      },
+      {
+        "id": "c13",
+        "title": "Tool removed while a call runs",
+        "status": "pass",
+        "detail": "the call finished and the tool left the list"
+      },
+      {
+        "id": "c14",
+        "title": "Frames",
+        "status": "pass",
+        "detail": "same-origin frame tool listed by default; cross-origin tool listed with fromOrigins"
+      },
+      {
+        "id": "c15",
+        "title": "Hostile definitions",
+        "status": "pass",
+        "detail": "215 tools listed; the browser kept every description as written; not accepted: \"c15_lookalike_\\u0440aypal\", \"c15_\\uff46ullwidth\", \"c15_zero\\u200bwidth\", \"c15 with space\", \"c15_with\\nnewline\""
+      },
+      {
+        "id": "c16",
+        "title": "Name of a built-in tool",
+        "status": "pass",
+        "detail": "4 of 5 look-alike names registered"
+      }
+    ]
+  },
+  "extension": {
+    "c01": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 3 tools"
+      },
+      {
+        "step": "click #c01-remove",
+        "ok": true,
+        "detail": "panel lists 2 tools"
+      },
+      {
+        "step": "click #c01-add",
+        "ok": true,
+        "detail": "panel lists 3 tools"
+      },
+      {
+        "step": "call c01_titled",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c02": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 1 tools"
+      },
+      {
+        "step": "call c02_inspect",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c03": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 7 tools"
+      },
+      {
+        "step": "call c03_string",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c03_json_string",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c03_object",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c03_empty",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c03_null",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c03_number",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c04": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 1 tools"
+      },
+      {
+        "step": "click #c04-add",
+        "ok": true,
+        "detail": "panel lists 2 tools"
+      },
+      {
+        "step": "click #c04-remove",
+        "ok": true,
+        "detail": "panel lists 1 tools"
+      },
+      {
+        "step": "call c04_keeper",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c05": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 7 tools"
+      },
+      {
+        "step": "call c05_read_only",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c05_untrusted",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c05_none",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c05_consequential",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c05_read_only_and_consequential",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c05_all",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c05_debugging",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c06": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 12 tools"
+      },
+      {
+        "step": "call c06_string",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_number",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_integer",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_boolean",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_array",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_object",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_enum",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_one_of",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_nested",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_optional",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_strict",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_no_schema",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c06_number",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c07": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 4 tools"
+      },
+      {
+        "step": "call c07_throw_error",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c07_reject",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c07_throw_string",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c07_instant",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c08": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 1 tools"
+      },
+      {
+        "step": "call c08_cancellable",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c09": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 3 tools"
+      },
+      {
+        "step": "call c09_two_seconds",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c09_thirty_ignores",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c10": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 4 tools"
+      },
+      {
+        "step": "call c10_1kb",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c10_100kb",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c10_1mb",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c10_deep",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c11": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 4 tools"
+      },
+      {
+        "step": "call c11_auto",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c11_select",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c11_wait",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c12": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 2 tools"
+      },
+      {
+        "step": "click #c12-add",
+        "ok": true,
+        "detail": "panel lists 3 tools"
+      }
+    ],
+    "c13": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 2 tools"
+      },
+      {
+        "step": "call c13_removes_itself",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "list after the calls",
+        "ok": true,
+        "detail": "panel lists 1 tools"
+      }
+    ],
+    "c14": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 1 tools"
+      },
+      {
+        "step": "call c14_top",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c15": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 159 tools"
+      },
+      {
+        "step": "call c15_clean",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c15_delete_account",
+        "ok": true,
+        "detail": "as expected"
+      },
+      {
+        "step": "call c15_swap",
+        "ok": true,
+        "detail": "as expected"
+      }
+    ],
+    "c16": [
+      {
+        "step": "list",
+        "ok": true,
+        "detail": "panel lists 4 tools"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "stage": "browser",
+      "ok": true,
+      "line": "browser: 16 cases, fail [], unsupported []"
+    },
+    {
+      "stage": "extension",
+      "ok": true,
+      "line": "extension: 16 cases, all steps as expected"
+    }
+  ]
+}

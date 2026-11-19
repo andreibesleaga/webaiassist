@@ -68,6 +68,8 @@ call, Chrome's built-in model, the processor models and chat endpoints work as b
   out), the panel says to press Start again, and the next Start loads the model again.
 - **The files of the old engine are removed once after the update**, so they do not keep taking disk space
   (they could be several gigabytes).
+- **Page text read for an earlier question stays with that question** when the saved chat is given to
+  the model: it now follows the question instead of being cut off when that question comes first.
 - **A graphics-card model that fails to load says why in graphics terms**: too little graphics memory, or
   a graphics device that gave up (the model host then starts again with a fresh device).
 - **The name of the keyboard shortcut is in the language file**, with the other texts Chrome shows.
