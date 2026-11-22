@@ -47,7 +47,7 @@
     "verify:release": "npm run verify && npm run build && npm run zip && npm run check:zip && npm run test:dist && npm run test:smoke && npm run test:bdd"
   },
   "dependencies": {
-    "@cfworker/json-schema": "4.1.1",
+    "@cfworker/json-schema": "4.1.6",
     "@w3c/webmcp-polyfill": "0.1.0",
     "@wllama/wllama": "3.8.1",
     "ajv": "8.20.0",
